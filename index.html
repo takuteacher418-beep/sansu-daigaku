@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 2.0</title>
+<title>算数大学｜Version 2.1</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -420,9 +420,12 @@
     <div class="login-grid">
       <div class="login-choice">
         <h3>🎒 児童として入る</h3>
-        <label>クラス</label><select id="loginClassSelect"></select>
-        <label>名前</label><select id="loginStudentSelect"></select>
+        <label>ログインID</label>
+        <input id="studentLoginIdInput" autocomplete="username" placeholder="例：aoi01">
+        <label>パスワード</label>
+        <input id="studentPasswordInput" type="password" autocomplete="current-password" placeholder="パスワード">
         <button class="primary" id="studentLoginBtn">学習を始める</button>
+        <div class="small" style="margin-top:8px">先生が登録したIDとパスワードを入力します。</div>
       </div>
       <div class="login-choice">
         <h3>🧑‍🏫 先生として入る</h3>
@@ -557,7 +560,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 2.0は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 2.1は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -566,6 +569,8 @@
         <div>
           <label>児童を追加するクラス</label><select id="manageClassSelect"></select>
           <label>児童名</label><input id="newStudentName" placeholder="例：あおい">
+          <label>ログインID</label><input id="newStudentLoginId" placeholder="例：aoi01">
+          <label>初期パスワード</label><input id="newStudentPassword" placeholder="例：1234">
           <button id="addStudentBtn" class="secondary">児童を追加</button>
         </div>
       </div>
@@ -644,7 +649,7 @@
 </main>
 
 <footer>
-  Version 2.0：クラス管理・児童別履歴・教師ダッシュボード・段階式ヒントを搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 2.1：個別IDログイン・クラス管理・児童別履歴・教師ダッシュボードを搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
@@ -702,12 +707,22 @@ let rubrics = JSON.parse(localStorage.getItem("sansuDaigakuRubrics") || "null") 
 let problems = JSON.parse(localStorage.getItem("sansuDaigakuProblems") || "null") || structuredClone(defaultProblems);
 let currentProblemId = problems[0]?.id || null;
 let hintShown = false;
-const DEFAULT_CLASSES=[{id:"c1",name:"5年1組",students:[{id:"s1",name:"あおい"},{id:"s2",name:"けんた"},{id:"s3",name:"さくら"}]}];
+const DEFAULT_CLASSES=[{id:"c1",name:"5年1組",students:[{id:"s1",name:"あおい",loginId:"aoi01",password:"1234"},{id:"s2",name:"けんた",loginId:"kenta01",password:"1234"},{id:"s3",name:"さくら",loginId:"sakura01",password:"1234"}]}];
 let classes=JSON.parse(localStorage.getItem("sansuDaigakuClasses")||"null")||DEFAULT_CLASSES;
 let session=JSON.parse(sessionStorage.getItem("sansuDaigakuSession")||"null");
 let progress={totalXp:0,completedProblems:[],problemStats:{}};
 let activeUnit="すべて";
 let currentHintIndex=0;
+
+function migrateStudentAccounts(){
+  let changed=false;
+  classes.forEach((c,ci)=>c.students.forEach((s,si)=>{
+    if(!s.loginId){s.loginId=`student${ci+1}${si+1}`;changed=true;}
+    if(!s.password){s.password="1234";changed=true;}
+  }));
+  if(changed) saveClasses();
+}
+
 function saveClasses(){localStorage.setItem("sansuDaigakuClasses",JSON.stringify(classes))}
 function studentProgressKey(id){return "sansuDaigakuProgress_"+id}
 function loadStudentProgress(id){return JSON.parse(localStorage.getItem(studentProgressKey(id))||"null")||{totalXp:0,completedProblems:[],problemStats:{}}}
@@ -796,14 +811,16 @@ function renderRubrics(){
 
 
 function refreshSelectors(){
-  const ids=["loginClassSelect","manageClassSelect","dashboardClassSelect"];
-  ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;const old=el.value;el.innerHTML=classes.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");if(classes.some(c=>c.id===old))el.value=old});
-  refreshStudentSelect();renderManagedStudents();renderDashboard();
-}
-function refreshStudentSelect(){
-  const cid=document.getElementById("loginClassSelect").value;
-  const c=classes.find(x=>x.id===cid);
-  document.getElementById("loginStudentSelect").innerHTML=(c?.students||[]).map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+  const ids=["manageClassSelect","dashboardClassSelect"];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const old=el.value;
+    el.innerHTML=classes.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+    if(classes.some(c=>c.id===old))el.value=old;
+  });
+  renderManagedStudents();
+  renderDashboard();
 }
 function startSession(s){
   session=s;sessionStorage.setItem("sansuDaigakuSession",JSON.stringify(s));
@@ -814,10 +831,46 @@ function startSession(s){
 }
 function logout(){sessionStorage.removeItem("sansuDaigakuSession");session=null;document.getElementById("sessionBar").style.display="none";document.getElementById("loginScreen").classList.remove("hidden");refreshSelectors()}
 function renderManagedStudents(){
-  const h=document.getElementById("managedStudentList");if(!h)return;
-  const cid=document.getElementById("manageClassSelect")?.value||classes[0]?.id;const c=classes.find(x=>x.id===cid);
-  h.innerHTML=`<strong>${escapeHtml(c?.name||"")}</strong>`+(c?.students||[]).map(s=>`<div class="student-row"><span><strong>${escapeHtml(s.name)}</strong></span><button class="ghost" onclick="removeStudent('${c.id}','${s.id}')">削除</button></div>`).join("");
+  const h=document.getElementById("managedStudentList");
+  if(!h)return;
+  const cid=document.getElementById("manageClassSelect")?.value||classes[0]?.id;
+  const c=classes.find(x=>x.id===cid);
+  h.innerHTML=`<strong>${escapeHtml(c?.name||"")}</strong>`+(c?.students||[]).map(s=>`
+    <div class="student-row" style="align-items:flex-start">
+      <div style="flex:1">
+        <div><strong>${escapeHtml(s.name)}</strong></div>
+        <div class="small">ID：${escapeHtml(s.loginId||"未設定")} ／ パスワード：${escapeHtml(s.password||"未設定")}</div>
+      </div>
+      <button class="ghost" onclick="editStudentAccount('${c.id}','${s.id}')">編集</button>
+      <button class="ghost" onclick="removeStudent('${c.id}','${s.id}')">削除</button>
+    </div>`).join("");
 }
+
+function editStudentAccount(cid,sid){
+  const c=classes.find(x=>x.id===cid);
+  const s=c?.students.find(x=>x.id===sid);
+  if(!s)return;
+  const name=prompt("児童名",s.name);
+  if(name===null)return;
+  const loginId=prompt("ログインID",s.loginId||"");
+  if(loginId===null)return;
+  if(classes.some(cl=>cl.students.some(st=>st.id!==sid && st.loginId===loginId.trim()))){
+    alert("そのログインIDはすでに使われています。");
+    return;
+  }
+  const password=prompt("パスワード",s.password||"");
+  if(password===null)return;
+  if(!name.trim()||!loginId.trim()||!password){
+    alert("児童名・ログインID・パスワードをすべて入力してください。");
+    return;
+  }
+  s.name=name.trim();
+  s.loginId=loginId.trim();
+  s.password=password;
+  saveClasses();
+  refreshSelectors();
+}
+
 function removeStudent(cid,sid){if(!confirm("この児童を削除しますか？"))return;const c=classes.find(x=>x.id===cid);c.students=c.students.filter(s=>s.id!==sid);saveClasses();refreshSelectors()}
 function renderDashboard(){
   const cid=document.getElementById("dashboardClassSelect")?.value||classes[0]?.id;const c=classes.find(x=>x.id===cid);if(!c)return;
@@ -918,17 +971,78 @@ function getCurrentProblem(){
 }
 
 function switchTab(tab){
-  if(tab==="teacher" && session?.role!=="teacher"){alert("教師としてログインしてください。");return;}
+  if(tab==="teacher" && session?.role!=="teacher"){
+    alert("教師としてログインしてください。");
+    return;
+  }
   
-document.getElementById("loginClassSelect").addEventListener("change",refreshStudentSelect);
-document.getElementById("studentLoginBtn").addEventListener("click",()=>{const classId=document.getElementById("loginClassSelect").value;const studentId=document.getElementById("loginStudentSelect").value;if(!studentId)return alert("児童を選んでください。");startSession({role:"student",classId,studentId})});
-document.getElementById("teacherLoginBtn").addEventListener("click",()=>{if(document.getElementById("teacherPassInput").value!=="4180")return alert("パスコードが違います。");startSession({role:"teacher"})});
+document.getElementById("studentLoginBtn").addEventListener("click",()=>{
+  const loginId=document.getElementById("studentLoginIdInput").value.trim();
+  const password=document.getElementById("studentPasswordInput").value;
+  if(!loginId||!password){
+    alert("ログインIDとパスワードを入力してください。");
+    return;
+  }
+  let foundClass=null;
+  let foundStudent=null;
+  for(const c of classes){
+    const s=c.students.find(st=>st.loginId===loginId);
+    if(s){foundClass=c;foundStudent=s;break;}
+  }
+  if(!foundStudent || foundStudent.password!==password){
+    alert("ログインIDまたはパスワードが違います。");
+    return;
+  }
+  document.getElementById("studentPasswordInput").value="";
+  startSession({role:"student",classId:foundClass.id,studentId:foundStudent.id});
+});
+document.getElementById("studentPasswordInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter") document.getElementById("studentLoginBtn").click();
+});
+document.getElementById("teacherLoginBtn").addEventListener("click",()=>{
+  if(document.getElementById("teacherPassInput").value!=="4180"){
+    alert("パスコードが違います。");
+    return;
+  }
+  document.getElementById("teacherPassInput").value="";
+  startSession({role:"teacher"});
+});
+document.getElementById("teacherPassInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter") document.getElementById("teacherLoginBtn").click();
+});
 document.getElementById("logoutBtn").addEventListener("click",logout);
-document.getElementById("addClassBtn").addEventListener("click",()=>{const name=document.getElementById("newClassName").value.trim();if(!name)return;classes.push({id:"c"+Date.now(),name,students:[]});document.getElementById("newClassName").value="";saveClasses();refreshSelectors()});
-document.getElementById("addStudentBtn").addEventListener("click",()=>{const cid=document.getElementById("manageClassSelect").value;const name=document.getElementById("newStudentName").value.trim();if(!name)return;classes.find(c=>c.id===cid)?.students.push({id:"s"+Date.now(),name});document.getElementById("newStudentName").value="";saveClasses();refreshSelectors()});
+document.getElementById("addClassBtn").addEventListener("click",()=>{
+  const name=document.getElementById("newClassName").value.trim();
+  if(!name)return alert("クラス名を入力してください。");
+  classes.push({id:"c"+Date.now(),name,students:[]});
+  document.getElementById("newClassName").value="";
+  saveClasses();
+  refreshSelectors();
+});
+document.getElementById("addStudentBtn").addEventListener("click",()=>{
+  const cid=document.getElementById("manageClassSelect").value;
+  const name=document.getElementById("newStudentName").value.trim();
+  const loginId=document.getElementById("newStudentLoginId").value.trim();
+  const password=document.getElementById("newStudentPassword").value;
+  if(!name||!loginId||!password){
+    alert("児童名・ログインID・パスワードをすべて入力してください。");
+    return;
+  }
+  if(classes.some(c=>c.students.some(s=>s.loginId===loginId))){
+    alert("そのログインIDはすでに使われています。");
+    return;
+  }
+  classes.find(c=>c.id===cid)?.students.push({id:"s"+Date.now(),name,loginId,password});
+  ["newStudentName","newStudentLoginId","newStudentPassword"].forEach(id=>document.getElementById(id).value="");
+  saveClasses();
+  refreshSelectors();
+});
 document.getElementById("manageClassSelect").addEventListener("change",renderManagedStudents);
 document.getElementById("dashboardClassSelect").addEventListener("change",renderDashboard);
-document.getElementById("nextHintBtn").addEventListener("click",()=>{currentHintIndex++;renderHintSteps()});
+document.getElementById("nextHintBtn").addEventListener("click",()=>{
+  currentHintIndex++;
+  renderHintSteps();
+});
 
 document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   document.getElementById("studentSection").classList.toggle("hidden", tab!=="student");
@@ -1088,6 +1202,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
     });
   }
   renderRubrics();
+  migrateStudentAccounts();
   refreshSelectors();
   if(session){startSession(session);}else{
     document.getElementById("loginScreen").classList.remove("hidden");
