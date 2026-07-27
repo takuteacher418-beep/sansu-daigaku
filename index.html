@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 1.1</title>
+<title>算数大学｜Version 1.2</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -314,6 +314,71 @@
   }
   .level-up-banner.show{transform:translate(-50%,0)}
 
+  .unit-filter{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+  .unit-chip{
+    border:1px solid var(--border);
+    background:#fff;
+    color:#334155;
+    padding:8px 12px;
+    border-radius:999px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .unit-chip.active{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+  .difficulty{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    font-weight:900;
+    padding:5px 9px;
+    border-radius:999px;
+    background:#fff7ed;
+    color:#b45309;
+    border:1px solid #fed7aa;
+    margin-top:8px;
+  }
+  .problem-stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    margin-top:12px;
+  }
+  .stat-box{
+    background:#f8fafc;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:9px 10px;
+    text-align:center;
+  }
+  .stat-box strong{
+    display:block;
+    font-size:18px;
+    color:#334155;
+  }
+  .title-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#fef3c7;
+    color:#92400e;
+    border:1px solid #fde68a;
+    font-size:13px;
+    font-weight:900;
+  }
+
+
   @media(max-width:760px){
     .grid{grid-template-columns:1fr}
     .rubric-item{grid-template-columns:1fr}
@@ -359,7 +424,7 @@
           </div>
           <div class="level-panel">
             <div class="level-row">
-              <div class="level-badge">⭐ Lv.<span id="studentLevel">1</span></div>
+              <div><div class="level-badge">⭐ Lv.<span id="studentLevel">1</span></div><div class="title-badge" id="studentTitleBadge">算数大学 新入生</div></div>
               <div class="xp-text">EXP：<span id="studentXp">0</span> / <span id="xpNext">100</span></div>
             </div>
             <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
@@ -383,6 +448,7 @@
           <span class="pill" id="problemCountPill">0問</span>
         </div>
       </div>
+      <div id="unitFilter" class="unit-filter"></div>
       <div id="problemCards" class="problem-cards"></div>
     </div>
   </div>
@@ -458,6 +524,13 @@
       <label>問題タイトル</label>
       <input id="title" value="平均とは何か" />
 
+      <label>難易度</label>
+      <select id="difficulty">
+        <option value="1">★☆☆ 基礎</option>
+        <option value="2" selected>★★☆ 標準</option>
+        <option value="3">★★★ 発展</option>
+      </select>
+
       <label>問題文</label>
       <textarea id="question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
 
@@ -501,7 +574,7 @@
 </main>
 
 <footer>
-  Version 1.1：たっくん教授・問題一覧・経験値制度を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 1.2：たっくん教授・単元別表示・難易度・称号・学習記録を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
@@ -514,7 +587,7 @@ const defaultRubrics = [
 
 const defaultProblems = [
   {
-    id:"p1", grade:"5年生", unit:"平均", title:"平均とは何か",
+    id:"p1", grade:"5年生", unit:"平均", title:"平均とは何か", difficulty:1,
     question:"「平均」とは、どのような数ですか。自分の言葉で説明しましょう。",
     modelAnswer:"平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。",
     hint:"全部の数をどうして、そのあと何で割るか考えよう。",
@@ -524,7 +597,7 @@ const defaultProblems = [
     rubrics:structuredClone(defaultRubrics)
   },
   {
-    id:"p2", grade:"5年生", unit:"小数のわり算", title:"小数点を移す理由",
+    id:"p2", grade:"5年生", unit:"小数のわり算", title:"小数点を移す理由", difficulty:2,
     question:"小数でわる計算では、なぜわる数を整数にして考えてよいのでしょうか。説明しましょう。",
     modelAnswer:"わられる数とわる数を同じ数だけ10倍や100倍しても、商は変わらないからです。",
     hint:"わられる数とわる数を、同じ数だけ大きくするとどうなるか考えよう。",
@@ -539,7 +612,7 @@ const defaultProblems = [
     ]
   },
   {
-    id:"p3", grade:"5年生", unit:"合同な図形", title:"合同とは何か",
+    id:"p3", grade:"5年生", unit:"合同な図形", title:"合同とは何か", difficulty:1,
     question:"2つの図形が「合同である」とは、どのようなことですか。説明しましょう。",
     modelAnswer:"2つの図形を重ねたとき、形も大きさもぴったり重なることです。",
     hint:"形と大きさの両方に注目しよう。",
@@ -561,11 +634,24 @@ let currentProblemId = problems[0]?.id || null;
 let hintShown = false;
 let progress = JSON.parse(localStorage.getItem("sansuDaigakuProgress") || "null") || {
   totalXp: 0,
-  completedProblems: []
+  completedProblems: [],
+  problemStats: {}
 };
+if(!progress.problemStats) progress.problemStats = {};
+let activeUnit = "すべて";
 
 function levelFromXp(totalXp){
   return Math.floor(totalXp / 100) + 1;
+}
+
+function titleFromLevel(level){
+  if(level >= 7) return "算数大学 教授";
+  if(level >= 6) return "算数大学 准教授";
+  if(level >= 5) return "算数大学 助手";
+  if(level >= 4) return "算数ことば名人";
+  if(level >= 3) return "説明チャレンジャー";
+  if(level >= 2) return "ことば研究員";
+  return "算数大学 新入生";
 }
 
 function updateExperienceUI(){
@@ -579,6 +665,7 @@ function updateExperienceUI(){
   document.getElementById("completedCount").textContent = completed;
   document.getElementById("totalXpDisplay").textContent = progress.totalXp;
   document.getElementById("nextRewardLevel").textContent = level + 1;
+  document.getElementById("studentTitleBadge").textContent = titleFromLevel(level);
 }
 
 function awardExperience(problemId, amount){
@@ -589,6 +676,7 @@ function awardExperience(problemId, amount){
   localStorage.setItem("sansuDaigakuProgress", JSON.stringify(progress));
   const newLevel = levelFromXp(progress.totalXp);
   updateExperienceUI();
+  renderUnitFilter();
   renderProblemList();
   if(newLevel > oldLevel){
     const banner = document.getElementById("levelUpBanner");
@@ -632,21 +720,48 @@ function renderRubrics(){
   });
 }
 
+function renderUnitFilter(){
+  const units = ["すべて", ...new Set(problems.map(p=>p.unit))];
+  const holder = document.getElementById("unitFilter");
+  holder.innerHTML = "";
+  units.forEach(unit=>{
+    const btn = document.createElement("button");
+    btn.className = "unit-chip" + (unit===activeUnit ? " active" : "");
+    btn.textContent = unit;
+    btn.addEventListener("click",()=>{
+      activeUnit = unit;
+      renderUnitFilter();
+      renderProblemList();
+    });
+    holder.appendChild(btn);
+  });
+}
+
 function renderProblemList(){
   const cards = document.getElementById("problemCards");
   cards.innerHTML = "";
-  document.getElementById("problemCountPill").textContent = `${problems.length}問`;
+  const visibleProblems = activeUnit === "すべて" ? problems : problems.filter(p=>p.unit===activeUnit);
+  document.getElementById("problemCountPill").textContent = `${visibleProblems.length}問`;
 
-  problems.forEach((p,index)=>{
+  visibleProblems.forEach((p,index)=>{
     const card = document.createElement("div");
     card.className = "problem-card";
     const completed = progress.completedProblems.includes(p.id);
+    const stat = progress.problemStats[p.id] || {attempts:0,bestScore:0,maxScore:p.maxScore||0};
+    const difficulty = Number(p.difficulty || 2);
+    const stars = "★".repeat(difficulty) + "☆".repeat(3-difficulty);
+    const diffLabel = difficulty===1 ? "基礎" : difficulty===2 ? "標準" : "発展";
     if(completed) card.classList.add("completed");
     card.innerHTML = `
-      <div class="small">問題 ${index+1}<span class="xp-reward">＋50 EXP</span></div>
+      <div class="small">問題 ${index+1}<span class="xp-reward">＋${difficulty*25} EXP</span></div>
       <div><span class="pill">${escapeHtml(p.unit)}</span></div>
+      <div class="difficulty">${stars} ${diffLabel}</div>
       <h3>${escapeHtml(p.title)}</h3>
       <div class="small">${escapeHtml(p.question)}</div>
+      <div class="problem-stats">
+        <div class="stat-box"><strong>${stat.attempts}</strong>挑戦回数</div>
+        <div class="stat-box"><strong>${stat.bestScore} / ${stat.maxScore || p.maxScore || 0}</strong>最高得点</div>
+      </div>
       ${completed ? '<div class="complete-mark">✅ クリア済み</div>' : ''}
       <div class="start">${completed ? 'もう一度挑戦する' : 'この問題に挑戦する'} →</div>
     `;
@@ -660,6 +775,7 @@ function showProblemList(){
   document.getElementById("problemDetailView").classList.add("hidden");
   document.getElementById("characterSpeech").textContent = "挑戦する問題を選ぼう。正しく説明できると50EXP獲得だよ！";
   updateExperienceUI();
+  renderUnitFilter();
   renderProblemList();
 }
 
@@ -700,6 +816,7 @@ function currentTeacherProblem(){
     grade:document.getElementById("grade").value,
     unit:document.getElementById("unit").value.trim() || "未設定",
     title:document.getElementById("title").value.trim() || "新しい問題",
+    difficulty:Number(document.getElementById("difficulty").value)||2,
     question:document.getElementById("question").value.trim(),
     modelAnswer:document.getElementById("modelAnswer").value.trim(),
     hint:document.getElementById("hint").value.trim(),
@@ -778,6 +895,13 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   score = Math.min(score,max);
   const ratio = max ? score/max : 0;
 
+  const previousStat = progress.problemStats[p.id] || {attempts:0,bestScore:0,maxScore:max};
+  previousStat.attempts += 1;
+  previousStat.bestScore = Math.max(previousStat.bestScore || 0, score);
+  previousStat.maxScore = max;
+  progress.problemStats[p.id] = previousStat;
+  localStorage.setItem("sansuDaigakuProgress", JSON.stringify(progress));
+
   let level = "ヒントを見て考えよう";
   let cls = "status-warn";
   let feedback = "書けているところはあります。足りない考えを一つずつ加えてみよう。";
@@ -785,9 +909,9 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   if(ratio >= .85){
     level = "ばっちり説明できた！";
     cls = "status-ok";
-    const gained = awardExperience(p.id, 50);
+    const gained = awardExperience(p.id, (Number(p.difficulty||2))*25);
     feedback = p.successComment || "大切な言葉を使って、わかりやすく説明できたね！";
-    if(gained) feedback += " 初回クリアで50EXPを獲得したよ！";
+    if(gained) feedback += ` 初回クリアで${(Number(p.difficulty||2))*25}EXPを獲得したよ！`;
   } else if(ratio >= .55){
     level = "あと一歩！";
     feedback = "大切な考えがいくつか書けています。もう一つ言葉を足すと、さらに伝わりやすくなります。";
@@ -832,13 +956,14 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 (function load(){
   const config = JSON.parse(localStorage.getItem("sansuDaigakuConfig") || "null");
   if(config){
-    ["grade","unit","title","question","modelAnswer","hint","maxScore","characterName","successComment"].forEach(k=>{
+    ["grade","unit","title","difficulty","question","modelAnswer","hint","maxScore","characterName","successComment"].forEach(k=>{
       const el = document.getElementById(k);
       if(el && config[k] !== undefined) el.value = config[k];
     });
   }
   renderRubrics();
   updateExperienceUI();
+  renderUnitFilter();
   renderProblemList();
   showProblemList();
 })();
