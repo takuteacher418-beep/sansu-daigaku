@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 6.1</title>
+<title>算数大学｜Version 6.2</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 6.1: 成長・経験値システム */
+/* Version 6.2: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -533,7 +533,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>6.1</strong>★★★</div>
+    <div class="version-badge">Version<strong>6.2</strong>★★★</div>
   </header>
 
   <nav class="topbar">
@@ -597,7 +597,33 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
             <label>問題タイトル</label><input id="problemTitle" placeholder="例：平均とは何か">
             <label>問題文</label><textarea id="problemText" placeholder="児童に説明してほしい内容を書きます。"></textarea>
             <label>ヒント</label><input id="problemHint" value="問題文の大切な言葉に注目しよう。">
-            <label>模範解答</label><textarea id="problemAnswer"></textarea>
+            <label>模範解答</label>
+            <textarea id="problemAnswer" placeholder="例：全部の量を同じ大きさにならして表した数"></textarea>
+
+            <div class="judgement-settings">
+              <strong>柔軟な正誤判定</strong>
+              <div class="judgement-help" style="margin-top:9px">
+                必須キーワードは、すべてではなく設定した割合以上が含まれれば正解候補になります。
+                言い換えグループでは、「合計｜全部｜総量」のように「｜」で類語をつなぎます。
+                グループは1行に1つ入力してください。
+              </div>
+
+              <label>正解として評価する必須キーワード</label>
+              <textarea id="problemKeywords" placeholder="例：全部の量&#10;個数&#10;等しくする"></textarea>
+
+              <label>言い換え・類語グループ</label>
+              <textarea id="problemSynonyms" placeholder="例：全部｜合計｜総量&#10;等しくする｜ならす｜均等にする"></textarea>
+
+              <label>合格に必要なキーワード一致率</label>
+              <select id="problemPassRate">
+                <option value="0.5">50％以上</option>
+                <option value="0.6" selected>60％以上</option>
+                <option value="0.7">70％以上</option>
+                <option value="0.8">80％以上</option>
+                <option value="1">すべて一致</option>
+              </select>
+            </div>
+
             <label>難易度</label>
             <select id="problemDifficulty">
               <option value="1">★☆☆ 基礎（25EXP）</option>
@@ -712,15 +738,34 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       </section>
     </div>
 
-    <div class="student-problem">
-      <label>単元</label><select id="studentUnitSelect"></select>
-      <label>問題</label><select id="studentProblemSelect"></select>
-      <div id="studentProblemBody" style="margin-top:18px"></div>
-      <label>あなたの答え</label><textarea id="studentResponse" placeholder="考えたことを自分の言葉で書こう。"></textarea>
-      <button id="submitAnswerBtn" class="primary" style="width:100%;margin-top:14px">回答を提出する</button>
-      <div id="studentScoreBox" class="score-box hidden"></div>
-      <div id="researchLevelCard" class="research-level-card hidden"></div>
-    </div>
+    <section class="challenge-stage">
+      <div class="challenge-banner">
+        <div class="challenge-label">⚔️ 今日の研究ミッション</div>
+        <div id="studentRewardPreview" class="challenge-reward">クリア報酬 +50EXP</div>
+      </div>
+      <div class="challenge-content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+          <div><label>単元</label><select id="studentUnitSelect"></select></div>
+          <div><label>問題</label><select id="studentProblemSelect"></select></div>
+        </div>
+
+        <div id="studentProblemBody" class="problem-scroll"></div>
+
+        <div class="answer-zone">
+          <div class="answer-zone-title">✍️ あなたの考えを研究ノートに書こう</div>
+          <textarea id="studentResponse" placeholder="答えだけでなく、「なぜそう考えたか」も書くと研究レベルが上がりやすくなります。"></textarea>
+          <div class="answer-support">
+            <span>自分の言葉で説明して大丈夫です。</span>
+            <span id="answerCharacterCount">0文字</span>
+          </div>
+          <div class="answer-meter"><div id="answerMeterFill" class="answer-meter-fill"></div></div>
+          <button id="submitAnswerBtn" class="submit-challenge">🚀 研究結果を提出する</button>
+        </div>
+
+        <div id="studentScoreBox" class="score-box hidden"></div>
+        <div id="researchLevelCard" class="research-level-card hidden"></div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -829,6 +874,99 @@ function setPanel(name){
   document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.panel===name));
   document.querySelectorAll(".panel").forEach(panel=>panel.classList.toggle("active",panel.id==="panel-"+name));
   window.scrollTo({top:document.querySelector(".topbar").offsetTop,behavior:"smooth"});
+}
+
+
+const BUILTIN_SYNONYM_GROUPS = [
+  ["全部","合計","総量","全体"],
+  ["等しくする","ならす","均等にする","同じにする","そろえる"],
+  ["分ける","分配する","割り振る"],
+  ["増える","大きくなる","多くなる"],
+  ["減る","小さくなる","少なくなる"],
+  ["求める","計算する","出す"],
+  ["かける","乗じる","掛ける","乗算する"],
+  ["わる","除する","割る","除算する"],
+  ["たす","加える","足す","加算する"],
+  ["ひく","引く","差を求める","減算する"],
+  ["もとにする量","基準量","基準となる量"],
+  ["比べる量","比較量","比べられる量"],
+  ["単位量あたり","1あたり","一つ分あたり"]
+];
+function normalizeAnswerText(value){
+  return String(value||"")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[。、，,.・!！?？「」『』（）()[\]{}:：;；\s]/g,"")
+    .replace(/です|ます|でした|ました|である|ということ/g,"");
+}
+function parseKeywordLines(value){
+  return String(value||"").split(/\n|,/).map(v=>v.trim()).filter(Boolean);
+}
+function parseSynonymGroups(value){
+  return String(value||"").split(/\n/).map(line=>
+    line.split(/[｜|]/).map(v=>v.trim()).filter(Boolean)
+  ).filter(group=>group.length);
+}
+function expandTermWithSynonyms(term,customGroups){
+  const normalized=normalizeAnswerText(term);
+  const groups=[...customGroups,...BUILTIN_SYNONYM_GROUPS];
+  const matched=groups.find(group=>group.some(word=>normalizeAnswerText(word)===normalized));
+  return matched||[term];
+}
+function answerContainsAny(answer,terms){
+  const normalizedAnswer=normalizeAnswerText(answer);
+  return terms.some(term=>{
+    const normalizedTerm=normalizeAnswerText(term);
+    return normalizedTerm && normalizedAnswer.includes(normalizedTerm);
+  });
+}
+function evaluateFlexibleAnswer(problem,response){
+  const customGroups=parseSynonymGroups(problem.synonymGroups||"");
+  let keywords=parseKeywordLines(problem.keywords||"");
+
+  if(!keywords.length){
+    keywords=parseKeywordLines(
+      String(problem.modelAnswer||"")
+        .replace(/[。、]/g,"\n")
+    ).filter(term=>normalizeAnswerText(term).length>=2);
+  }
+
+  const checks=keywords.map(keyword=>{
+    const acceptable=expandTermWithSynonyms(keyword,customGroups);
+    return {
+      keyword,
+      acceptable,
+      hit:answerContainsAny(response,acceptable)
+    };
+  });
+
+  const keywordRatio=checks.length
+    ? checks.filter(check=>check.hit).length/checks.length
+    : 0;
+
+  const modelNormalized=normalizeAnswerText(problem.modelAnswer||"");
+  const responseNormalized=normalizeAnswerText(response);
+  let modelSimilarity=0;
+
+  if(modelNormalized && responseNormalized){
+    const modelChunks=String(problem.modelAnswer||"")
+      .split(/[、。\s]+/)
+      .map(v=>normalizeAnswerText(v))
+      .filter(v=>v.length>=2);
+    if(modelChunks.length){
+      const hits=modelChunks.filter(chunk=>responseNormalized.includes(chunk)).length;
+      modelSimilarity=hits/modelChunks.length;
+    }
+  }
+
+  const lengthBonus=Math.min(0.12,responseNormalized.length/250);
+  const passRate=Number(problem.passRate||0.6);
+  const blendedScore=Math.min(1,(keywordRatio*0.82)+(modelSimilarity*0.18)+lengthBonus);
+  const passed=checks.length
+    ? keywordRatio>=passRate || blendedScore>=Math.max(0.62,passRate)
+    : responseNormalized.length>=18;
+
+  return {checks,keywordRatio,modelSimilarity,blendedScore,passRate,passed};
 }
 
 function ensureStudentProgress(student){
@@ -1082,6 +1220,9 @@ function resetProblemForm(){
   document.getElementById("problemText").value="";
   document.getElementById("problemHint").value="問題文の大切な言葉に注目しよう。";
   document.getElementById("problemAnswer").value="";
+  document.getElementById("problemKeywords").value="";
+  document.getElementById("problemSynonyms").value="";
+  document.getElementById("problemPassRate").value="0.6";
   document.getElementById("problemDifficulty").value="2";
   document.getElementById("problemMaxScore").value="10";
   document.getElementById("saveProblemBtn").textContent="この問題を保存する";
@@ -1096,6 +1237,9 @@ function saveProblem(){
     unitId,title,text,
     hint:document.getElementById("problemHint").value.trim(),
     modelAnswer:document.getElementById("problemAnswer").value.trim(),
+    keywords:document.getElementById("problemKeywords").value.trim(),
+    synonymGroups:document.getElementById("problemSynonyms").value.trim(),
+    passRate:Number(document.getElementById("problemPassRate").value)||0.6,
     difficulty:Number(document.getElementById("problemDifficulty").value)||2,
     maxScore:Number(document.getElementById("problemMaxScore").value)||10
   };
@@ -1119,6 +1263,9 @@ function editProblem(id){
   document.getElementById("problemText").value=p.text;
   document.getElementById("problemHint").value=p.hint||"";
   document.getElementById("problemAnswer").value=p.modelAnswer||"";
+  document.getElementById("problemKeywords").value=p.keywords||"";
+  document.getElementById("problemSynonyms").value=p.synonymGroups||"";
+  document.getElementById("problemPassRate").value=String(p.passRate||0.6);
   document.getElementById("problemDifficulty").value=String(p.difficulty||2);
   document.getElementById("problemMaxScore").value=p.maxScore||10;
   document.getElementById("saveProblemBtn").textContent="問題の変更を保存する";
@@ -1183,27 +1330,45 @@ function renderStudentProblems(){
 function renderStudentProblemBody(){
   const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);
   const body=document.getElementById("studentProblemBody");
-  body.innerHTML=problem?`<h2>${escapeHtml(problem.title)}</h2><p style="line-height:1.8">${escapeHtml(problem.text)}</p><div class="muted">ヒント：${escapeHtml(problem.hint||"なし")}</div>`:'<div class="empty">問題を選んでください。</div>';
+  const reward=document.getElementById("studentRewardPreview");
+
+  if(problem){
+    const difficulty=Number(problem.difficulty||2);
+    const stars="★".repeat(difficulty)+"☆".repeat(3-difficulty);
+    const rewardXp=difficulty*25;
+    body.innerHTML=`<div class="muted" style="margin-bottom:8px">研究難易度 ${stars}</div>
+      <h2>${escapeHtml(problem.title)}</h2>
+      <p>${escapeHtml(problem.text)}</p>
+      <div class="hint-orb">💡 たっくん教授のヒント：${escapeHtml(problem.hint||"自分の考えを順序よく書こう。")}</div>`;
+    reward.textContent=`初回クリア報酬 +${rewardXp}EXP`;
+  }else{
+    body.innerHTML='<div class="empty">問題を選んでください。</div>';
+    reward.textContent="問題を選んで研究開始";
+  }
+
   document.getElementById("studentResponse").value="";
+  document.getElementById("answerCharacterCount").textContent="0文字";
+  document.getElementById("answerMeterFill").style.width="0%";
   document.getElementById("studentScoreBox").classList.add("hidden");
   document.getElementById("researchLevelCard").classList.add("hidden");
 }
+
 function submitStudentAnswer(){
   const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);
   const response=document.getElementById("studentResponse").value.trim();
   const student=data.students.find(s=>s.id===activeStudentId);
+
   if(!problem){showToast("問題を選んでください。");return}
   if(!student){showToast("児童情報を確認できません。");return}
-  if(!response){showToast("答えを書いてください。");return}
+  if(!response){showToast("研究ノートに考えを書いてください。");return}
 
   const progress=ensureStudentProgress(student);
-  const modelWords=(problem.modelAnswer||"").split(/[、。\s]+/).filter(word=>word.length>=2);
-  const hits=modelWords.filter(word=>response.includes(word)).length;
+  const evaluation=evaluateFlexibleAnswer(problem,response);
   const maxScore=Number(problem.maxScore)||10;
-  const score=modelWords.length
-    ? Math.max(1,Math.round(maxScore*(hits/modelWords.length)))
-    : Math.min(maxScore,Math.max(1,Math.round(response.length/12)));
-  const ratio=maxScore?score/maxScore:0;
+
+  let scoreRatio=evaluation.blendedScore;
+  if(evaluation.passed)scoreRatio=Math.max(scoreRatio,0.70);
+  const score=Math.max(1,Math.min(maxScore,Math.round(maxScore*scoreRatio)));
 
   const stat=progress.problemStats[problem.id]||{attempts:0,bestScore:0,maxScore};
   stat.attempts+=1;
@@ -1212,14 +1377,14 @@ function submitStudentAnswer(){
   progress.problemStats[problem.id]=stat;
 
   let researchLevel=1;
-  if(ratio>=.95)researchLevel=5;
-  else if(ratio>=.70)researchLevel=4;
-  else if(ratio>=.40)researchLevel=3;
-  else if(ratio>0||response.length>=10)researchLevel=2;
+  if(scoreRatio>=.92)researchLevel=5;
+  else if(scoreRatio>=.76)researchLevel=4;
+  else if(scoreRatio>=.56)researchLevel=3;
+  else if(scoreRatio>=.30||response.length>=10)researchLevel=2;
 
   let gained=false;
   const xpReward=(Number(problem.difficulty||2))*25;
-  if(ratio>=.70){
+  if(evaluation.passed){
     gained=awardExperience(student,problem,xpReward);
   }
 
@@ -1232,20 +1397,31 @@ function submitStudentAnswer(){
     maxScore,
     researchLevel,
     xpGained:gained?xpReward:0,
+    keywordRatio:evaluation.keywordRatio,
+    passed:evaluation.passed,
     date:new Date().toLocaleString("ja-JP")
   });
   saveData();
 
+  const hitChips=evaluation.checks.map(check=>
+    `<span class="match-chip ${check.hit?"hit":"miss"}">${check.hit?"✓":"△"} ${escapeHtml(check.keyword)}</span>`
+  ).join("");
+
   const box=document.getElementById("studentScoreBox");
-  const message=ratio>=.70
-    ?"大切な言葉を使って、よく説明できました。"
-    :ratio>=.40
-      ?"あと一歩です。大切な考えをもう一つ加えてみよう。"
-      :"模範解答と比べて、大切な言葉を確認しよう。";
+  let message;
+  if(evaluation.passed){
+    message="言い方が模範解答と違っていても、大切な考えが伝わっています。";
+  }else if(evaluation.keywordRatio>=evaluation.passRate*0.65){
+    message="かなり近い説明です。足りない考えを一つ加えるとクリアに近づきます。";
+  }else{
+    message="自分の言葉で書けています。ヒントを見て、大切な考えをもう少し加えてみよう。";
+  }
+
   box.innerHTML=`<strong>${score}点 / ${maxScore}点</strong>
     <div style="margin-top:7px">${message}</div>
-    ${gained?`<div class="xp-reward" style="margin-top:8px">初回クリア！ +${xpReward}EXPを獲得しました。</div>`:
-      ratio>=.70?'<div class="muted" style="margin-top:8px">クリア済みの問題なので、EXPは初回のみ獲得できます。</div>':""}`;
+    ${evaluation.checks.length?`<div class="match-feedback"><div class="muted">説明に含まれていた大切な考え</div>${hitChips}</div>`:""}
+    ${gained?`<div class="xp-reward" style="margin-top:9px">ミッションクリア！ +${xpReward}EXPを獲得しました。</div>`:
+      evaluation.passed?'<div class="muted" style="margin-top:9px">この問題のEXPはすでに獲得済みです。</div>':""}`;
   box.classList.remove("hidden");
   showResearchLevel(researchLevel,score,maxScore);
   renderGrowthDashboard();
@@ -1318,6 +1494,12 @@ function bindEvents(){
       }catch{showToast("読み込みに失敗しました。JSON形式を確認してください。")}
     };
     reader.readAsText(file);
+  });
+
+  document.getElementById("studentResponse").addEventListener("input",event=>{
+    const length=event.target.value.length;
+    document.getElementById("answerCharacterCount").textContent=`${length}文字`;
+    document.getElementById("answerMeterFill").style.width=`${Math.min(100,length)}%`;
   });
 
   document.getElementById("studentUnitSelect").addEventListener("change",renderStudentProblems);
