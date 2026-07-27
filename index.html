@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 3.4</title>
+<title>算数大学｜Version 4.0</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -370,7 +370,7 @@
   }
 
 
-  /* Version 3.4: 学習開始を中央に置いたコンパクトホーム */
+  /* Version 4.0: 学習開始を中央に置いたコンパクトホーム */
   #problemListView.home-layout,
   #problemListView{
     display:grid;
@@ -503,7 +503,7 @@
   }
 
 
-  /* Version 3.4: 参考デザインを反映したゲーム型ダッシュボード */
+  /* Version 4.0: 参考デザインを反映したゲーム型ダッシュボード */
   body{
     background:
       radial-gradient(circle at 50% 0,rgba(255,248,220,.95),transparent 34%),
@@ -724,6 +724,59 @@
     max-height:142px!important;
     object-fit:contain!important;
     object-position:center!important;
+  }
+
+
+  /* Version 4.0: 問題作成テンプレートと研究レベル評価 */
+  .template-panel{
+    margin:0 0 16px;
+    padding:14px;
+    border:2px solid #c4b5fd;
+    border-radius:16px;
+    background:linear-gradient(145deg,#faf5ff,#eef2ff);
+  }
+  .template-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:8px;
+    margin-top:10px;
+  }
+  .template-btn{
+    background:#fff;
+    color:#5b21b6;
+    border:1px solid #c4b5fd;
+    border-radius:12px;
+    padding:10px;
+    font-weight:900;
+  }
+  .template-btn:hover{background:#ede9fe}
+  .research-level-card{
+    margin:12px 0;
+    padding:15px;
+    border:2px solid #a78bfa;
+    border-radius:16px;
+    background:linear-gradient(145deg,#faf5ff,#fff);
+  }
+  .research-stars{
+    font-size:28px;
+    letter-spacing:3px;
+    color:#f59e0b;
+    font-weight:900;
+  }
+  .research-title{
+    margin-top:4px;
+    font-size:22px;
+    color:#5b21b6;
+    font-weight:900;
+  }
+  .friendly-note{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:#eef2ff;
+    color:#3730a3;
+    font-weight:800;
+    line-height:1.6;
   }
 
   .login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef2ff,#ecfeff,#fff7ed)}
@@ -1004,7 +1057,7 @@
     </div>
 
     <div class="card">
-      <h2>採点結果</h2>
+      <h2>採点結果</h2><div id="researchLevelCard" class="research-level-card hidden"></div>
       <div id="emptyResult" class="small">回答を送ると、ここに結果が表示されます。</div>
       <div id="resultBox" class="result hidden">
         <div class="score"><span id="scoreValue">0</span>点</div>
@@ -1026,7 +1079,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 3.4は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 4.0は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -1053,6 +1106,12 @@
   <div class="grid">
     <div class="card">
       <h2>問題の基本設定</h2>
+<div class="template-panel">
+  <strong>🧩 単元テンプレートから作成</strong>
+  <div class="small">単元を選ぶと、問題タイトル・模範解答・ヒント・評価観点・同義語を自動入力します。</div>
+  <div id="templateButtons" class="template-grid"></div>
+</div>
+
 
       <label>学年</label>
       <select id="grade">
@@ -1115,10 +1174,163 @@
 </main>
 
 <footer>
-  Version 3.4：問題選択を中央に配置したコンパクト画面・算数大学キャンパス・無料版AI教授を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 4.0：問題選択を中央に配置したコンパクト画面・算数大学キャンパス・無料版AI教授を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
+function migrateFriendlyRubrics(){
+  let changed=false;
+  problems.forEach(p=>{
+    const key=Object.keys(UNIT_TEMPLATES).find(k=>String(p.unit||"").includes(k)||k.includes(String(p.unit||"")));
+    if(!key)return;
+    const t=UNIT_TEMPLATES[key];
+    if(!Array.isArray(p.rubrics)||!p.rubrics.length){
+      p.rubrics=t.rubrics.map(r=>({...r}));
+      changed=true;
+    }
+  });
+  if(changed)localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+}
+
+
+const UNIT_TEMPLATES={
+  "平均":{
+    unit:"平均",
+    title:"平均の考え方を説明しよう",
+    question:"「平均」とは、どのような数ですか。自分の言葉で説明しましょう。",
+    modelAnswer:"全部の数を合わせ、その合計を個数で分けて、同じ大きさにならした数です。",
+    hint:"全部の数をどうして、そのあと何で分けるか考えよう。",
+    rubrics:[
+      {name:"全部の量を合わせる考え",keywords:"合計,全部足す,足した,合わせた,全部集めた,まとめた",points:1},
+      {name:"個数で分ける考え",keywords:"個数で割る,人数で分ける,同じように分ける,ならす,割った,分けた",points:1},
+      {name:"平均の意味",keywords:"平均,同じ大きさ,ならした数,1つ分",points:1}
+    ]
+  },
+  "割合":{
+    unit:"割合",
+    title:"割合の考え方を説明しよう",
+    question:"割合を求めるとき、どのような量に注目すればよいですか。",
+    modelAnswer:"もとにする量を1と見て、比べる量がその何倍かを表します。",
+    hint:"何を1と見るか、比べる量はどれかを考えよう。",
+    rubrics:[
+      {name:"もとにする量",keywords:"もとにする量,全体,基準,1とみる量",points:1},
+      {name:"比べる量",keywords:"比べる量,部分,比べたい量",points:1},
+      {name:"割合の関係",keywords:"割合,何倍,全体のうち,どれくらい",points:1}
+    ]
+  },
+  "速さ":{
+    unit:"速さ",
+    title:"速さを説明しよう",
+    question:"速さは、どのように比べるとよいですか。",
+    modelAnswer:"道のりを時間で分けて、1時間あたりや1分あたりに進む道のりで比べます。",
+    hint:"道のりと時間を、同じ時間あたりにそろえて考えよう。",
+    rubrics:[
+      {name:"道のり",keywords:"道のり,距離,進んだ長さ",points:1},
+      {name:"時間",keywords:"時間,何時間,何分",points:1},
+      {name:"単位時間あたり",keywords:"1時間あたり,1分あたり,同じ時間,速さ",points:1}
+    ]
+  },
+  "体積":{
+    unit:"体積",
+    title:"体積の求め方を説明しよう",
+    question:"直方体の体積は、どのように考えて求めますか。",
+    modelAnswer:"1段に並ぶ1立方センチメートルの立方体の個数を求め、それが高さの分だけ何段あるか考えます。",
+    hint:"まず1段に何個あるか、その段が何段あるか考えよう。",
+    rubrics:[
+      {name:"1段の個数",keywords:"縦×横,底面,1段,並ぶ個数",points:1},
+      {name:"高さの段数",keywords:"高さ,何段,重なる,段数",points:1},
+      {name:"体積の意味",keywords:"体積,1立方センチメートル,立方体の個数",points:1}
+    ]
+  },
+  "単位量あたり":{
+    unit:"単位量あたりの大きさ",
+    title:"単位量あたりで比べよう",
+    question:"混み具合などを比べるとき、どのように考えるとよいですか。",
+    modelAnswer:"人数や面積のどちらかを1あたりにそろえて比べます。",
+    hint:"1人あたり、または1㎡あたりにそろえてみよう。",
+    rubrics:[
+      {name:"1あたりにそろえる",keywords:"1あたり,1人あたり,1㎡あたり,そろえる",points:1},
+      {name:"比べる量",keywords:"人数,面積,量,比べる",points:1},
+      {name:"比べた結果",keywords:"多い,少ない,混んでいる,広い",points:1}
+    ]
+  },
+  "面積":{
+    unit:"面積",
+    title:"面積の求め方を説明しよう",
+    question:"この図形の面積を、どのように考えて求めましたか。",
+    modelAnswer:"図形を分けたり移したりして、知っている図形に直し、底辺と高さを使って求めます。",
+    hint:"知っている図形に変えられないか考えよう。",
+    rubrics:[
+      {name:"図形の変形",keywords:"分ける,切る,移す,つなげる,変形",points:1},
+      {name:"底辺と高さ",keywords:"底辺,高さ,たて,横",points:1},
+      {name:"式の理由",keywords:"なぜ,だから,面積,求められる",points:1}
+    ]
+  }
+};
+
+function normalizeForMatch(text){
+  return String(text||"")
+    .toLowerCase()
+    .replace(/[　\s、。,.!！?？「」『』（）()・]/g,"")
+    .replace(/しました|します|です|ます|だった|でした|する|した/g,"");
+}
+function flexibleMatch(answer,keyword){
+  const a=normalizeForMatch(answer);
+  const k=normalizeForMatch(keyword);
+  if(!k)return false;
+  if(a.includes(k))return true;
+  const chars=[...new Set(k)].filter(ch=>/[\u3040-\u30ff\u3400-\u9fff0-9]/.test(ch));
+  if(chars.length<3)return false;
+  const hit=chars.filter(ch=>a.includes(ch)).length;
+  return hit/chars.length>=0.72;
+}
+function renderTemplateButtons(){
+  const holder=document.getElementById("templateButtons");
+  if(!holder)return;
+  holder.innerHTML=Object.keys(UNIT_TEMPLATES)
+    .map(k=>`<button type="button" class="template-btn" data-template="${escapeHtml(k)}">${escapeHtml(k)}</button>`)
+    .join("");
+  holder.querySelectorAll("[data-template]").forEach(btn=>{
+    btn.addEventListener("click",()=>applyTemplate(btn.dataset.template));
+  });
+}
+function applyTemplate(key){
+  const t=UNIT_TEMPLATES[key];
+  if(!t)return;
+  document.getElementById("unit").value=t.unit;
+  document.getElementById("title").value=t.title;
+  document.getElementById("question").value=t.question;
+  document.getElementById("modelAnswer").value=t.modelAnswer;
+  document.getElementById("hint").value=t.hint;
+  rubrics=t.rubrics.map(r=>({...r}));
+  document.getElementById("maxScore").value=3;
+  renderRubrics();
+  renderTemplateButtons();
+  document.getElementById("saveMessage").textContent=`「${key}」テンプレートを読み込みました。問題文は自由に書き換えられます。`;
+}
+function showResearchLevel(level,hitCount,total){
+  const card=document.getElementById("researchLevelCard");
+  if(!card)return;
+  const labels={
+    1:"研究スタート",
+    2:"考えを書けた",
+    3:"大切な考えが伝わる",
+    4:"友達にも伝わる説明",
+    5:"先生レベルの説明"
+  };
+  card.classList.remove("hidden");
+  card.innerHTML=`
+    <div class="research-stars">${"★".repeat(level)}${"☆".repeat(5-level)}</div>
+    <div class="research-title">研究レベル Lv.${level}</div>
+    <div><strong>${labels[level]}</strong></div>
+    <div class="friendly-note">
+      ${level>=4
+        ?"よく伝わる説明です。自分の言葉で理由までつなげられています。"
+        :`評価観点は${hitCount}/${total}個伝わっています。あと1つだけ大切な考えを加えてみよう。`}
+    </div>`;
+}
+
+
 function updateGameDashboard(){
   if(!session || session.role!=="student") return;
   const level=levelFromXp(progress.totalXp||0);
@@ -1958,21 +2170,29 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
     const keys = String(r.keywords||"").split(",").map(s=>s.trim()).filter(Boolean);
     let hit = false;
     if(keys.length === 0){
-      hit = answer.length >= 20 && /[。.!！?？]/.test(answer);
+      hit = answer.length >= 10;
     } else {
-      hit = keys.some(k=>answer.includes(k));
+      hit = keys.some(k=>flexibleMatch(answer,k));
     }
     if(hit){
       score += Number(r.points)||0;
-      good.push(`${r.name}が書けています。`);
+      good.push(`${r.name}の考えが伝わっています。`);
     } else {
-      improve.push(`${r.name}を、もう少しくわしく書いてみよう。`);
+      improve.push(`${r.name}に近い考えを、あと一つ加えてみよう。`);
     }
   });
 
   const max = Number(p.maxScore) || scoringRubrics.reduce((a,b)=>a+(Number(b.points)||0),0);
   score = Math.min(score,max);
   const ratio = max ? score/max : 0;
+  const hitCount=good.length;
+  const totalCriteria=Math.max(1,scoringRubrics.length);
+  let researchLevel=1;
+  if(ratio>=.95)researchLevel=5;
+  else if(ratio>=.70)researchLevel=4;
+  else if(ratio>=.40)researchLevel=3;
+  else if(ratio>0 || answer.length>=10)researchLevel=2;
+  showResearchLevel(researchLevel,hitCount,totalCriteria);
 
   const previousStat = progress.problemStats[p.id] || {attempts:0,bestScore:0,maxScore:max};
   previousStat.attempts += 1;
@@ -1986,16 +2206,16 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   let cls = "status-warn";
   let feedback = "書けているところはあります。足りない考えを一つずつ加えてみよう。";
 
-  if(ratio >= .85){
+  if(ratio >= .70){
     level = "ばっちり説明できた！";
     cls = "status-ok";
     const gained = awardExperience(p.id, (Number(p.difficulty||2))*25);
     feedback = p.successComment || "大切な言葉を使って、わかりやすく説明できたね！";
     if(gained) feedback += ` 初回クリアで${(Number(p.difficulty||2))*25}EXPを獲得したよ！`;
-  } else if(ratio >= .55){
+  } else if(ratio >= .40){
     level = "あと一歩！";
     feedback = "大切な考えがいくつか書けています。もう一つ言葉を足すと、さらに伝わりやすくなります。";
-  } else if(ratio < .25){
+  } else if(ratio < .15){
     level = "先生といっしょに確認しよう";
     feedback = "まずは、問題に出てくる大切な言葉を一つ使って説明してみよう。";
   }
@@ -2044,6 +2264,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   }
   renderRubrics();
   migrateStudentAccounts();
+  migrateFriendlyRubrics();
   bindLoginAndManagementEvents();
   refreshSelectors();
   if(session){startSession(session);}else{
