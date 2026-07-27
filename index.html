@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 4.2</title>
+<title>算数大学｜Version 4.3</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -370,7 +370,7 @@
   }
 
 
-  /* Version 4.2: 学習開始を中央に置いたコンパクトホーム */
+  /* Version 4.3: 学習開始を中央に置いたコンパクトホーム */
   #problemListView.home-layout,
   #problemListView{
     display:grid;
@@ -503,7 +503,7 @@
   }
 
 
-  /* Version 4.2: 参考デザインを反映したゲーム型ダッシュボード */
+  /* Version 4.3: 参考デザインを反映したゲーム型ダッシュボード */
   body{
     background:
       radial-gradient(circle at 50% 0,rgba(255,248,220,.95),transparent 34%),
@@ -727,7 +727,7 @@
   }
 
 
-  /* Version 4.2: 問題作成テンプレートと研究レベル評価 */
+  /* Version 4.3: 問題作成テンプレートと研究レベル評価 */
   .template-panel{
     margin:0 0 16px;
     padding:14px;
@@ -780,7 +780,7 @@
   }
 
 
-  /* Version 4.2: 見やすい問題作成ウィザード */
+  /* Version 4.3: 見やすい問題作成ウィザード */
   .problem-maker{
     display:grid;
     gap:16px;
@@ -950,6 +950,153 @@
   @media(max-width:850px){
     .maker-two-column{grid-template-columns:1fr}
     .preview-card{position:static}
+  }
+
+
+  /* Version 4.3: かんたん問題作成 */
+  .simple-maker-shell{
+    display:grid;
+    grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);
+    gap:18px;
+    align-items:start;
+  }
+  .simple-maker-main{
+    display:grid;
+    gap:14px;
+  }
+  .simple-start-card{
+    padding:18px;
+    border:2px solid #818cf8;
+    border-radius:18px;
+    background:linear-gradient(145deg,#eef2ff,#ffffff);
+  }
+  .simple-start-card h2{margin-bottom:6px;color:#312e81}
+  .simple-mode-note{
+    padding:10px 12px;
+    border-radius:12px;
+    background:#fff;
+    border:1px solid #c7d2fe;
+    line-height:1.6;
+    font-size:13px;
+    color:#4338ca;
+    font-weight:700;
+  }
+  .big-field label{
+    font-size:16px;
+    margin-top:16px;
+  }
+  .big-field input,
+  .big-field textarea{
+    font-size:16px;
+    padding:13px 14px;
+  }
+  .big-field textarea{min-height:150px}
+  .one-click-template-title{
+    font-size:14px;
+    font-weight:900;
+    color:#475569;
+    margin-bottom:8px;
+  }
+  .simple-template-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .simple-template-btn{
+    padding:12px 8px;
+    border-radius:13px;
+    background:#fff;
+    color:#4338ca;
+    border:1px solid #a5b4fc;
+    font-weight:900;
+  }
+  .simple-template-btn.selected{
+    background:#4f46e5;
+    color:#fff;
+    border-color:#4f46e5;
+  }
+  .auto-setting-box{
+    padding:13px;
+    border-radius:14px;
+    background:#f0fdf4;
+    border:1px solid #86efac;
+    color:#166534;
+    line-height:1.6;
+    font-size:13px;
+  }
+  .simple-save-button{
+    width:100%;
+    min-height:58px;
+    font-size:18px;
+    border-radius:16px;
+    box-shadow:0 8px 18px rgba(79,70,229,.22);
+  }
+  .maker-side-card{
+    position:sticky;
+    top:12px;
+    display:grid;
+    gap:12px;
+  }
+  .simple-preview{
+    padding:16px;
+    border:2px solid #f0c96a;
+    border-radius:18px;
+    background:linear-gradient(145deg,#fffdf5,#fff8e5);
+  }
+  .simple-preview-title{
+    font-size:19px;
+    font-weight:900;
+    color:#78350f;
+    margin:8px 0;
+  }
+  .simple-preview-question{
+    min-height:100px;
+    padding:13px;
+    border:1px dashed #d97706;
+    border-radius:12px;
+    background:#fff;
+    white-space:pre-wrap;
+    line-height:1.7;
+  }
+  .saved-problem-help{
+    padding:14px;
+    border-radius:16px;
+    background:#f8fafc;
+    border:1px solid #cbd5e1;
+  }
+  .advanced-creator{
+    border:1px solid #cbd5e1;
+    border-radius:16px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .advanced-creator summary{
+    padding:14px 16px;
+    cursor:pointer;
+    font-weight:900;
+    color:#334155;
+    background:#f8fafc;
+  }
+  .advanced-creator-body{
+    padding:16px;
+    border-top:1px solid #e2e8f0;
+  }
+  .duplicate-warning{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:#fff7ed;
+    border:1px solid #fdba74;
+    color:#9a3412;
+    font-weight:800;
+    line-height:1.5;
+  }
+  @media(max-width:900px){
+    .simple-maker-shell{grid-template-columns:1fr}
+    .maker-side-card{position:static}
+  }
+  @media(max-width:600px){
+    .simple-template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
 
   .login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef2ff,#ecfeff,#fff7ed)}
@@ -1252,7 +1399,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 4.2は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 4.3は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -1276,97 +1423,64 @@
     </div>
   </div>
 
-  <div class="card wide problem-maker">
-    <div class="maker-header">
-      <div>
-        <h2 style="margin-bottom:6px">問題を作る</h2>
-        <div class="small">上から順番に入力すれば、問題を作成できます。</div>
-      </div>
-      <button type="button" class="ghost" id="clearProblemFormBtn">＋ 新しい問題を作る</button>
-    </div>
-
-    <div class="maker-guide">
-      💡 初めて作るときは、まず単元テンプレートを選んでください。問題文と評価観点が自動で入るので、必要なところだけ直せば完成します。
-    </div>
-
-    <div class="maker-step">
-      <div class="maker-step-header">
-        <div class="step-number">1</div>
-        <div>
-          <div class="step-heading">単元を選ぶ</div>
-          <div class="step-caption">選ぶだけで、問題文・ヒント・評価観点の例が入ります。</div>
-        </div>
-      </div>
-      <div class="maker-step-body">
-        <div class="template-panel" style="margin:0">
-          <div id="templateButtons" class="template-grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="maker-step">
-      <div class="maker-step-header">
-        <div class="step-number">2</div>
-        <div>
-          <div class="step-heading">児童に出す問題を書く</div>
-          <div class="step-caption">赤い「必須」が付いている欄だけでも問題を作れます。</div>
-        </div>
-      </div>
-      <div class="maker-step-body maker-two-column">
-        <div>
-          <label>単元名 <span class="required-mark">必須</span></label>
-          <input id="unit" value="平均" placeholder="例：平均" />
-          <div class="field-help">問題一覧で分類するための名前です。</div>
-
-          <label>問題タイトル <span class="required-mark">必須</span></label>
-          <input id="title" value="平均とは何か" placeholder="例：平均の考え方を説明しよう" />
-          <div class="field-help">児童が問題を選ぶ画面に表示されます。</div>
-
-          <label>問題文 <span class="required-mark">必須</span></label>
-          <textarea id="question" placeholder="児童に答えてほしい内容を書きます。">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
-          <div class="field-help">短く、何を説明するのかが分かる文章にします。</div>
-
-          <label>児童向けヒント <span class="optional-mark">任意</span></label>
-          <input id="hint" value="全部の数をどうして、そのあと何で割るか考えよう。" placeholder="例：まず、全部の数をどうするか考えよう" />
-        </div>
-
-        <aside class="preview-card">
-          <h3>👀 児童画面のプレビュー</h3>
-          <div id="previewTitle" style="font-weight:900;font-size:18px">平均とは何か</div>
-          <div class="preview-meta">
-            <span id="previewUnit" class="preview-chip">平均</span>
-            <span id="previewDifficulty" class="preview-chip">★★☆ 標準</span>
+  <div class="card wide">
+    <div class="simple-maker-shell">
+      <div class="simple-maker-main">
+        <div class="simple-start-card">
+          <h2>かんたん問題作成</h2>
+          <div class="simple-mode-note">
+            基本は、<strong>①単元を選ぶ → ②問題文を書く → ③保存する</strong>だけです。<br>
+            評価観点やヒントは自動で入ります。
           </div>
-          <div id="previewQuestion" class="preview-question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</div>
-          <div class="small" style="margin-top:10px">ヒント</div>
-          <div id="previewHint" style="margin-top:4px;line-height:1.6">全部の数をどうして、そのあと何で割るか考えよう。</div>
-        </aside>
-      </div>
-    </div>
 
-    <div class="maker-step">
-      <div class="maker-step-header">
-        <div class="step-number">3</div>
-        <div>
-          <div class="step-heading">評価する考えを確認する</div>
-          <div class="step-caption">児童が別の言い方をしても評価できるようにします。</div>
-        </div>
-      </div>
-      <div class="maker-step-body">
-        <div class="rubric-explanation">
-          「キーワード」には、同じ意味で使える言葉を「,」で区切って登録します。<br>
-          例：<strong>合計, 全部足す, 合わせる, 全部集める</strong>
-        </div>
-        <div id="rubricList"></div>
-        <button class="secondary" id="addRubricBtn">＋ 評価する考えを追加</button>
+          <div style="margin-top:16px">
+            <div class="one-click-template-title">① 単元を選ぶ</div>
+            <div id="templateButtons" class="simple-template-grid"></div>
+          </div>
 
-        <details class="advanced-settings" style="margin-top:16px">
-          <summary>詳細設定を開く</summary>
-          <div class="advanced-body">
+          <div class="big-field">
+            <label>② 問題タイトル</label>
+            <input id="title" value="平均とは何か" placeholder="例：平均の考え方を説明しよう">
+
+            <label>③ 問題文</label>
+            <textarea id="question" placeholder="児童に説明してほしいことを書きます。">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
+          </div>
+
+          <input id="unit" value="平均" type="hidden">
+
+          <div class="auto-setting-box" style="margin-top:14px">
+            ✅ ヒント・模範解答・評価観点・同義語は、選んだ単元に合わせて自動設定されます。
+          </div>
+
+          <button class="primary simple-save-button" id="addProblemBtn" style="margin-top:16px">
+            この問題を保存する
+          </button>
+
+          <div id="saveMessage" class="small" style="margin-top:10px"></div>
+          <div id="duplicateMessage" class="duplicate-warning hidden"></div>
+        </div>
+
+        <details class="advanced-creator">
+          <summary>細かく設定する（必要な先生だけ）</summary>
+          <div class="advanced-creator-body">
+            <label>単元名</label>
+            <input id="unitVisible" value="平均" placeholder="例：平均">
+
+            <label>児童向けヒント</label>
+            <input id="hint" value="全部の数をどうして、そのあと何で割るか考えよう。">
+
+            <label>模範解答</label>
+            <textarea id="modelAnswer">平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。</textarea>
+
+            <label>評価する考え</label>
+            <div class="rubric-explanation">
+              同じ意味の言葉は「,」で区切ります。例：合計,全部足す,合わせる
+            </div>
+            <div id="rubricList"></div>
+            <button class="secondary" id="addRubricBtn">＋ 評価する考えを追加</button>
+
             <label>学年</label>
-            <select id="grade">
-              <option>5年生</option>
-            </select>
+            <select id="grade"><option>5年生</option></select>
 
             <label>難易度</label>
             <select id="difficulty">
@@ -1375,47 +1489,60 @@
               <option value="3">★★★ 発展</option>
             </select>
 
-            <label>模範解答</label>
-            <textarea id="modelAnswer">平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。</textarea>
-            <div class="field-help">採点の参考として教師が確認する文章です。</div>
-
             <label>満点</label>
-            <input id="maxScore" type="number" value="8" min="1" />
+            <input id="maxScore" type="number" value="8" min="1">
 
             <label>キャラクター名</label>
-            <input id="characterName" value="たっくん教授" />
+            <input id="characterName" value="たっくん教授">
 
             <label>よくできたときのコメント</label>
-            <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！" />
+            <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！">
           </div>
         </details>
-      </div>
-    </div>
 
-    <div class="save-action-box">
-      <div style="font-weight:900;font-size:18px;color:#166534">4　問題を保存する</div>
-      <div class="small" style="margin:5px 0 12px">入力内容を確認し、問題一覧へ追加します。</div>
-      <button class="primary" id="addProblemBtn" style="width:100%">この問題を問題一覧に追加する</button>
-      <div class="save-sub-actions">
-        <button class="secondary" id="publishBtn">児童画面で確認する</button>
-        <button class="ghost" id="saveBtn">この端末に保存する</button>
-        <button class="danger" id="resetBtn">すべて初期設定に戻す</button>
+        <div class="save-sub-actions">
+          <button class="secondary" id="publishBtn">保存せずに児童画面で確認</button>
+          <button class="ghost" id="clearProblemFormBtn">入力を空にする</button>
+          <button class="ghost" id="saveBtn">この端末に保存</button>
+          <button class="danger" id="resetBtn">すべて初期設定に戻す</button>
+        </div>
       </div>
-      <div id="saveMessage" class="small" style="margin-top:10px"></div>
+
+      <aside class="maker-side-card">
+        <div class="simple-preview">
+          <div class="small">児童にはこのように見えます</div>
+          <div id="previewTitle" class="simple-preview-title">平均とは何か</div>
+          <div class="preview-meta">
+            <span id="previewUnit" class="preview-chip">平均</span>
+            <span id="previewDifficulty" class="preview-chip">★★☆ 標準</span>
+          </div>
+          <div id="previewQuestion" class="simple-preview-question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</div>
+          <div class="small" style="margin-top:10px">自動ヒント</div>
+          <div id="previewHint" style="margin-top:4px;line-height:1.6">全部の数をどうして、そのあと何で割るか考えよう。</div>
+        </div>
+
+        <div class="saved-problem-help">
+          <strong>重複登録を防止します</strong>
+          <div class="small" style="margin-top:5px;line-height:1.6">
+            同じ単元・タイトル・問題文の問題は、もう一度保存しても増えません。
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
   </div>
 </section>
 </main>
 
-<footer>
-  Version 4.2：教師用の問題作成画面を4段階の分かりやすい手順に整理。単元テンプレート、児童画面プレビュー、やさしい評価機能を搭載しています。
-</footer>
+<footer>Version 4.3：問題作成を「単元を選ぶ・問題文を書く・保存する」の3操作に簡略化。重複登録防止機能を追加。</footer>
 
 <script>
 function updateProblemPreview(){
+  const unitVisible=document.getElementById("unitVisible");
+  const unitHidden=document.getElementById("unit");
+  if(unitVisible&&unitHidden)unitHidden.value=unitVisible.value;
   const title=document.getElementById("title");
-  const unit=document.getElementById("unit");
+  const unit=document.getElementById("unitVisible")||document.getElementById("unit");
   const question=document.getElementById("question");
   const hint=document.getElementById("hint");
   const difficulty=document.getElementById("difficulty");
@@ -1433,7 +1560,7 @@ function updateProblemPreview(){
   }
 }
 function bindProblemMakerUI(){
-  ["title","unit","question","hint","difficulty"].forEach(id=>{
+  ["title","unitVisible","question","hint","difficulty"].forEach(id=>{
     const el=document.getElementById(id);
     if(el){
       el.addEventListener("input",updateProblemPreview);
@@ -1444,6 +1571,7 @@ function bindProblemMakerUI(){
   if(clearBtn){
     clearBtn.addEventListener("click",()=>{
       document.getElementById("unit").value="";
+      document.getElementById("unitVisible").value="";
       document.getElementById("title").value="";
       document.getElementById("question").value="";
       document.getElementById("hint").value="";
@@ -1459,7 +1587,7 @@ function bindProblemMakerUI(){
       updateProblemPreview();
       const msg=document.getElementById("saveMessage");
       if(msg)msg.textContent="新しい問題を入力できます。";
-      document.getElementById("unit")?.focus();
+      document.getElementById("title")?.focus();
     });
   }
   updateProblemPreview();
@@ -1576,17 +1704,23 @@ function flexibleMatch(answer,keyword){
 function renderTemplateButtons(){
   const holder=document.getElementById("templateButtons");
   if(!holder)return;
+  const currentUnit=document.getElementById("unit")?.value||"";
   holder.innerHTML=Object.keys(UNIT_TEMPLATES)
-    .map(k=>`<button type="button" class="template-btn" data-template="${escapeHtml(k)}">${escapeHtml(k)}</button>`)
+    .map(k=>`<button type="button" class="simple-template-btn ${currentUnit.includes(k)?"selected":""}" data-template="${escapeHtml(k)}">${escapeHtml(k)}</button>`)
     .join("");
   holder.querySelectorAll("[data-template]").forEach(btn=>{
-    btn.addEventListener("click",()=>applyTemplate(btn.dataset.template));
+    btn.addEventListener("click",()=>{
+      applyTemplate(btn.dataset.template);
+      renderTemplateButtons();
+    });
   });
 }
 function applyTemplate(key){
   const t=UNIT_TEMPLATES[key];
   if(!t)return;
   document.getElementById("unit").value=t.unit;
+  const unitVisible=document.getElementById("unitVisible");
+  if(unitVisible)unitVisible.value=t.unit;
   document.getElementById("title").value=t.title;
   document.getElementById("question").value=t.question;
   document.getElementById("modelAnswer").value=t.modelAnswer;
@@ -2274,6 +2408,13 @@ function renderProblemList(){
 }
 
 function showProblemList(){
+  const previewId=sessionStorage.getItem("sansuPreviewProblemId");
+  if(previewId){
+    problems=problems.filter(p=>p.id!==previewId);
+    sessionStorage.removeItem("sansuPreviewProblemId");
+    currentProblemId=problems[0]?.id||null;
+  }
+
   document.getElementById("problemListView").classList.remove("hidden");
   document.getElementById("problemDetailView").classList.add("hidden");
   document.getElementById("characterSpeech").textContent = "挑戦する問題を選ぼう。正しく説明できると50EXP獲得だよ！";
@@ -2451,11 +2592,40 @@ function bindLoginAndManagementEvents(){
   }
 }
 
+
+function problemSignature(problem){
+  return [
+    String(problem.unit||"").trim().toLowerCase(),
+    String(problem.title||"").trim().toLowerCase(),
+    String(problem.question||"").trim().replace(/\s+/g,"").toLowerCase()
+  ].join("||");
+}
+function removeDuplicateProblems(){
+  const seen=new Set();
+  const unique=[];
+  let removed=0;
+  problems.forEach(p=>{
+    const sig=problemSignature(p);
+    if(seen.has(sig)){
+      removed++;
+      return;
+    }
+    seen.add(sig);
+    unique.push(p);
+  });
+  if(removed){
+    problems=unique;
+    localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  }
+  return removed;
+}
+let problemSaveLocked=false;
+
 function currentTeacherProblem(){
   return {
     id:"p"+Date.now(),
     grade:document.getElementById("grade").value,
-    unit:document.getElementById("unit").value.trim() || "未設定",
+    unit:(document.getElementById("unitVisible")?.value||document.getElementById("unit").value).trim() || "未設定",
     title:document.getElementById("title").value.trim() || "新しい問題",
     difficulty:Number(document.getElementById("difficulty").value)||2,
     question:document.getElementById("question").value.trim(),
@@ -2477,21 +2647,61 @@ document.getElementById("addRubricBtn").addEventListener("click",()=>{
 });
 
 document.getElementById("addProblemBtn").addEventListener("click",()=>{
-  const p = currentTeacherProblem();
-  problems.push(p);
-  currentProblemId = p.id;
-  localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
-  document.getElementById("saveMessage").textContent = `「${p.title}」を問題一覧に追加しました。`;
-  renderProblemList();
+  if(problemSaveLocked)return;
+  problemSaveLocked=true;
+  const button=document.getElementById("addProblemBtn");
+  if(button)button.disabled=true;
+
+  try{
+    const p=currentTeacherProblem();
+    const duplicate=problems.find(existing=>problemSignature(existing)===problemSignature(p));
+    const duplicateMessage=document.getElementById("duplicateMessage");
+
+    if(!p.title.trim()||!p.question.trim()){
+      document.getElementById("saveMessage").textContent="問題タイトルと問題文を入力してください。";
+      return;
+    }
+
+    if(duplicate){
+      currentProblemId=duplicate.id;
+      if(duplicateMessage){
+        duplicateMessage.classList.remove("hidden");
+        duplicateMessage.textContent=`同じ内容の「${duplicate.title}」はすでに登録されています。新しい問題は追加しませんでした。`;
+      }
+      document.getElementById("saveMessage").textContent="重複を防止しました。";
+      return;
+    }
+
+    problems.push(p);
+    currentProblemId=p.id;
+    localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+    if(duplicateMessage)duplicateMessage.classList.add("hidden");
+    document.getElementById("saveMessage").textContent=`「${p.title}」を1件追加しました。`;
+    renderUnitFilter();
+    renderProblemList();
+    refreshSelectors();
+  }finally{
+    setTimeout(()=>{
+      problemSaveLocked=false;
+      if(button)button.disabled=false;
+    },400);
+  }
 });
 
 document.getElementById("publishBtn").addEventListener("click",()=>{
-  const p = currentTeacherProblem();
-  problems.push(p);
-  currentProblemId = p.id;
-  localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  const p=currentTeacherProblem();
+  const existing=problems.find(item=>problemSignature(item)===problemSignature(p));
+  if(existing){
+    currentProblemId=existing.id;
+  }else{
+    const previewId="preview-"+Date.now();
+    p.id=previewId;
+    problems.push(p);
+    currentProblemId=previewId;
+    sessionStorage.setItem("sansuPreviewProblemId",previewId);
+  }
   switchTab("student");
-  openProblem(p.id);
+  openProblem(currentProblemId);
 });
 
 document.getElementById("hintBtn").addEventListener("click",()=>{
@@ -2606,6 +2816,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 
 (function load(){
   ensureProblemData();
+  removeDuplicateProblems();
   const config = JSON.parse(localStorage.getItem("sansuDaigakuConfig") || "null");
   if(config){
     ["grade","unit","title","difficulty","question","modelAnswer","hint","maxScore","characterName","successComment"].forEach(k=>{
