@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 6.0</title>
+<title>算数大学｜Version 6.1</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -295,6 +295,191 @@ textarea{min-height:110px;resize:vertical}
 }
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
+
+/* Version 6.1: 成長・経験値システム */
+.growth-dashboard{
+  display:grid;
+  grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
+  gap:16px;
+  margin-bottom:18px;
+}
+.growth-profile{
+  padding:18px;
+  border:1px solid #8c6a24;
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 85% 0%,rgba(255,219,113,.18),transparent 34%),
+    linear-gradient(180deg,#102b5c,#07162f);
+  box-shadow:var(--shadow);
+}
+.growth-profile-top{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.growth-avatar{
+  width:74px;height:74px;
+  display:grid;place-items:center;
+  border:2px solid var(--gold);
+  border-radius:50%;
+  font-size:38px;
+  background:linear-gradient(180deg,#173d7d,#091c3e);
+  box-shadow:0 0 22px rgba(244,201,107,.2);
+}
+.growth-name{font-size:24px;font-weight:900}
+.growth-title{
+  display:inline-block;
+  margin-top:5px;
+  padding:5px 10px;
+  border:1px solid #e8bf5a;
+  border-radius:999px;
+  color:#ffe9a7;
+  background:rgba(122,78,8,.32);
+  font-weight:900;
+}
+.level-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  margin-top:18px;
+}
+.level-value{
+  color:var(--gold-2);
+  font-family:Georgia,serif;
+  font-size:36px;
+  font-weight:900;
+}
+.xp-track{
+  height:16px;
+  margin-top:8px;
+  overflow:hidden;
+  border:1px solid #4169a5;
+  border-radius:999px;
+  background:#030d21;
+}
+.xp-fill{
+  height:100%;
+  width:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#0d73e8,#58b8ff,#f7d476);
+  box-shadow:0 0 18px rgba(88,184,255,.4);
+  transition:width .45s ease;
+}
+.growth-numbers{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:14px;
+}
+.growth-number{
+  padding:10px 8px;
+  text-align:center;
+  border:1px solid #2f5187;
+  border-radius:11px;
+  background:#071a38;
+}
+.growth-number strong{
+  display:block;
+  color:var(--gold-2);
+  font-size:23px;
+}
+.campus-card{
+  padding:18px;
+  border:1px solid #315b9a;
+  border-radius:16px;
+  background:linear-gradient(180deg,#0b2857,#06152f);
+  box-shadow:var(--shadow);
+}
+.campus-title-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:14px;
+}
+.campus-title-row h3{margin:0}
+.campus-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(90px,1fr));
+  gap:8px;
+}
+.campus-building{
+  min-height:112px;
+  padding:10px 6px;
+  text-align:center;
+  border:1px solid #40669f;
+  border-radius:12px;
+  background:linear-gradient(180deg,#102d60,#071831);
+}
+.campus-building.locked{
+  opacity:.52;
+  filter:grayscale(.75);
+}
+.building-icon{font-size:33px}
+.building-name{margin-top:4px;font-weight:900}
+.building-condition{margin-top:4px;color:#9fb0cf;font-size:11px}
+.campus-next{
+  margin-top:12px;
+  padding:11px 12px;
+  border:1px solid #72591f;
+  border-radius:11px;
+  color:#ffe8a4;
+  background:rgba(112,75,12,.18);
+}
+.research-level-card{
+  margin-top:14px;
+  padding:16px;
+  text-align:center;
+  border:1px solid #e2b84e;
+  border-radius:14px;
+  background:linear-gradient(180deg,#173867,#0a2147);
+}
+.research-stars{
+  color:#ffd75e;
+  font-size:28px;
+  letter-spacing:.1em;
+}
+.research-level-title{
+  margin-top:5px;
+  color:#fff3c0;
+  font-weight:900;
+  font-size:20px;
+}
+.level-up-banner{
+  position:fixed;
+  left:50%;
+  top:24px;
+  z-index:3000;
+  padding:16px 28px;
+  border:2px solid #ffe591;
+  border-radius:999px;
+  color:#1c263d;
+  font-size:22px;
+  font-weight:900;
+  background:linear-gradient(180deg,#fff4ba,#e1ac38);
+  box-shadow:0 14px 35px rgba(0,0,0,.35);
+  opacity:0;
+  transform:translate(-50%,-40px) scale(.9);
+  pointer-events:none;
+  transition:.3s ease;
+}
+.level-up-banner.show{
+  opacity:1;
+  transform:translate(-50%,0) scale(1);
+}
+.xp-reward{
+  color:#ffe18a;
+  font-weight:900;
+}
+@media(max-width:1050px){
+  .growth-dashboard{grid-template-columns:1fr}
+  .campus-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+  .growth-numbers{grid-template-columns:1fr}
+  .campus-grid{grid-template-columns:repeat(2,1fr)}
+}
+
 @media(max-width:1050px){
   .dashboard-grid,.two-col{grid-template-columns:1fr}
   .form-card{position:static}
@@ -348,7 +533,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>6.0</strong>★★★</div>
+    <div class="version-badge">Version<strong>6.1</strong>★★★</div>
   </header>
 
   <nav class="topbar">
@@ -413,6 +598,12 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
             <label>問題文</label><textarea id="problemText" placeholder="児童に説明してほしい内容を書きます。"></textarea>
             <label>ヒント</label><input id="problemHint" value="問題文の大切な言葉に注目しよう。">
             <label>模範解答</label><textarea id="problemAnswer"></textarea>
+            <label>難易度</label>
+            <select id="problemDifficulty">
+              <option value="1">★☆☆ 基礎（25EXP）</option>
+              <option value="2" selected>★★☆ 標準（50EXP）</option>
+              <option value="3">★★★ 発展（75EXP）</option>
+            </select>
             <label>満点</label><input id="problemMaxScore" type="number" min="1" value="10">
             <button id="saveProblemBtn" class="primary" style="width:100%;margin-top:16px">この問題を保存する</button>
             <button id="resetProblemBtn" class="ghost" style="width:100%;margin-top:8px">入力をリセット</button>
@@ -489,6 +680,38 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <h2 id="studentWelcome"></h2>
       <button id="studentLogoutBtn" class="ghost">ログアウト</button>
     </div>
+
+    <div class="growth-dashboard">
+      <section class="growth-profile">
+        <div class="growth-profile-top">
+          <div class="growth-avatar">🎓</div>
+          <div>
+            <div id="growthStudentName" class="growth-name">学生</div>
+            <div id="growthTitle" class="growth-title">算数大学 新入生</div>
+          </div>
+        </div>
+        <div class="level-line">
+          <div id="growthLevel" class="level-value">Lv.1</div>
+          <div id="growthXpText" class="muted">0 / 100 EXP</div>
+        </div>
+        <div class="xp-track"><div id="growthXpFill" class="xp-fill"></div></div>
+        <div class="growth-numbers">
+          <div class="growth-number"><strong id="growthTotalXp">0</strong><span>総EXP</span></div>
+          <div class="growth-number"><strong id="growthCompleted">0</strong><span>クリア</span></div>
+          <div class="growth-number"><strong id="growthResearchPoints">0</strong><span>研究ポイント</span></div>
+        </div>
+      </section>
+
+      <section class="campus-card">
+        <div class="campus-title-row">
+          <h3>🏫 算数大学キャンパス</h3>
+          <span class="muted">学ぶほど大学が成長します</span>
+        </div>
+        <div id="campusGrid" class="campus-grid"></div>
+        <div id="campusNext" class="campus-next"></div>
+      </section>
+    </div>
+
     <div class="student-problem">
       <label>単元</label><select id="studentUnitSelect"></select>
       <label>問題</label><select id="studentProblemSelect"></select>
@@ -496,6 +719,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <label>あなたの答え</label><textarea id="studentResponse" placeholder="考えたことを自分の言葉で書こう。"></textarea>
       <button id="submitAnswerBtn" class="primary" style="width:100%;margin-top:14px">回答を提出する</button>
       <div id="studentScoreBox" class="score-box hidden"></div>
+      <div id="researchLevelCard" class="research-level-card hidden"></div>
     </div>
   </div>
 </div>
@@ -524,12 +748,23 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   </div>
 </div>
 
+<div id="levelUpBanner" class="level-up-banner">🎉 レベルアップ！</div>
 <div id="toast" class="toast"></div>
 
 <script>
 "use strict";
 
 const STORAGE_KEY = "sansuDaigakuV6";
+
+const CAMPUS_BUILDINGS = [
+  {name:"本館",icon:"🏫",need:0,message:"算数大学の学びの中心"},
+  {name:"中庭",icon:"🌳",need:50,message:"考えを落ち着ける場所"},
+  {name:"図書館",icon:"📚",need:120,message:"算数の言葉を集める場所"},
+  {name:"研究棟",icon:"🔬",need:250,message:"難しい問題を研究する場所"},
+  {name:"講堂",icon:"🏛️",need:450,message:"自分の説明を発表する場所"},
+  {name:"天文台",icon:"🔭",need:700,message:"新しい考えを発見する場所"}
+];
+
 const defaultData = {
   settings:{schoolName:"",passcode:"4180"},
   units:[
@@ -564,7 +799,15 @@ function loadData(){
         settings:{...defaultData.settings,...(saved.settings||{})},
         units:Array.isArray(saved.units)?saved.units:clone(defaultData.units),
         problems:Array.isArray(saved.problems)?saved.problems:[],
-        students:Array.isArray(saved.students)?saved.students:[],
+        students:Array.isArray(saved.students)?saved.students.map(student=>({
+          ...student,
+          progress:{
+            totalXp:0,
+            completedProblems:[],
+            problemStats:{},
+            ...(student.progress||{})
+          }
+        })):[],
         results:Array.isArray(saved.results)?saved.results:[]
       };
     }
@@ -587,6 +830,102 @@ function setPanel(name){
   document.querySelectorAll(".panel").forEach(panel=>panel.classList.toggle("active",panel.id==="panel-"+name));
   window.scrollTo({top:document.querySelector(".topbar").offsetTop,behavior:"smooth"});
 }
+
+function ensureStudentProgress(student){
+  if(!student)return null;
+  student.progress=student.progress||{};
+  student.progress.totalXp=Number(student.progress.totalXp||0);
+  student.progress.completedProblems=Array.isArray(student.progress.completedProblems)?student.progress.completedProblems:[];
+  student.progress.problemStats=student.progress.problemStats&&typeof student.progress.problemStats==="object"?student.progress.problemStats:{};
+  return student.progress;
+}
+function levelFromXp(totalXp){
+  return Math.floor(Number(totalXp||0)/100)+1;
+}
+function titleFromLevel(level){
+  if(level>=8)return "算数大学 学長";
+  if(level>=7)return "算数大学 教授";
+  if(level>=6)return "算数大学 准教授";
+  if(level>=5)return "算数大学 助手";
+  if(level>=4)return "算数ことば名人";
+  if(level>=3)return "説明チャレンジャー";
+  if(level>=2)return "ことば研究員";
+  return "算数大学 新入生";
+}
+function researchPointsFor(student){
+  const progress=ensureStudentProgress(student);
+  if(!progress)return 0;
+  const attempts=Object.values(progress.problemStats).reduce((sum,stat)=>sum+Number(stat.attempts||0),0);
+  return progress.totalXp+(attempts*5);
+}
+function renderGrowthDashboard(){
+  const student=data.students.find(s=>s.id===activeStudentId);
+  if(!student)return;
+  const progress=ensureStudentProgress(student);
+  const level=levelFromXp(progress.totalXp);
+  const currentXp=progress.totalXp%100;
+  const nextXp=level*100;
+  document.getElementById("growthStudentName").textContent=student.name;
+  document.getElementById("growthTitle").textContent=titleFromLevel(level);
+  document.getElementById("growthLevel").textContent=`Lv.${level}`;
+  document.getElementById("growthXpText").textContent=`${progress.totalXp} / ${nextXp} EXP`;
+  document.getElementById("growthXpFill").style.width=`${currentXp}%`;
+  document.getElementById("growthTotalXp").textContent=progress.totalXp;
+  document.getElementById("growthCompleted").textContent=progress.completedProblems.length;
+  document.getElementById("growthResearchPoints").textContent=researchPointsFor(student);
+  renderCampus(student);
+}
+function renderCampus(student){
+  const rp=researchPointsFor(student);
+  const holder=document.getElementById("campusGrid");
+  if(!holder)return;
+  holder.innerHTML=CAMPUS_BUILDINGS.map(building=>{
+    const unlocked=rp>=building.need;
+    return `<div class="campus-building ${unlocked?"":"locked"}" title="${escapeHtml(building.message)}">
+      <div class="building-icon">${unlocked?building.icon:"🔒"}</div>
+      <div class="building-name">${escapeHtml(building.name)}</div>
+      <div class="building-condition">${unlocked?"完成！":`${building.need}RPで解放`}</div>
+    </div>`;
+  }).join("");
+  const next=CAMPUS_BUILDINGS.find(building=>rp<building.need);
+  const nextBox=document.getElementById("campusNext");
+  if(next){
+    nextBox.innerHTML=`次は「<strong>${escapeHtml(next.name)}</strong>」を建設。あと <strong>${next.need-rp} RP</strong>`;
+  }else{
+    nextBox.innerHTML="<strong>🎓 算数大学キャンパス完成！</strong> これからも研究を続けよう。";
+  }
+}
+function showResearchLevel(level,score,max){
+  const card=document.getElementById("researchLevelCard");
+  const labels={
+    1:"研究スタート",
+    2:"考えを書けた",
+    3:"大切な考えが伝わる",
+    4:"友達にも伝わる説明",
+    5:"先生レベルの説明"
+  };
+  card.innerHTML=`<div class="research-stars">${"★".repeat(level)}${"☆".repeat(5-level)}</div>
+    <div class="research-level-title">研究レベル Lv.${level}</div>
+    <div><strong>${labels[level]}</strong></div>
+    <div class="muted" style="margin-top:6px">今回の得点：${score} / ${max}</div>`;
+  card.classList.remove("hidden");
+}
+function awardExperience(student,problem,amount){
+  const progress=ensureStudentProgress(student);
+  if(progress.completedProblems.includes(problem.id))return false;
+  const oldLevel=levelFromXp(progress.totalXp);
+  progress.completedProblems.push(problem.id);
+  progress.totalXp+=amount;
+  const newLevel=levelFromXp(progress.totalXp);
+  if(newLevel>oldLevel){
+    const banner=document.getElementById("levelUpBanner");
+    banner.textContent=`🎉 レベルアップ！ Lv.${newLevel}「${titleFromLevel(newLevel)}」`;
+    banner.classList.add("show");
+    setTimeout(()=>banner.classList.remove("show"),2800);
+  }
+  return true;
+}
+
 function renderStats(){
   document.getElementById("statUnits").textContent=data.units.length;
   document.getElementById("statProblems").textContent=data.problems.length;
@@ -631,7 +970,7 @@ function renderProblems(){
     return `<div class="problem-card">
       <div>
         <strong>${escapeHtml(problem.title)}</strong>
-        <div class="muted">${escapeHtml(unit?.name||"未所属")}｜満点 ${escapeHtml(problem.maxScore)}点</div>
+        <div class="muted">${escapeHtml(unit?.name||"未所属")}｜満点 ${escapeHtml(problem.maxScore)}点｜<span class="xp-reward">初回クリア +${(Number(problem.difficulty||2))*25}EXP</span></div>
       </div>
       <div class="actions">
         <button class="secondary" data-edit-problem="${problem.id}">編集</button>
@@ -666,7 +1005,7 @@ function renderResults(){
     return `<div class="result-card">
       <div>
         <strong>${escapeHtml(student?.name||"削除された児童")}｜${escapeHtml(problem?.title||"削除された問題")}</strong>
-        <div class="muted">${escapeHtml(result.date)}｜${escapeHtml(result.score)}点</div>
+        <div class="muted">${escapeHtml(result.date)}｜${escapeHtml(result.score)} / ${escapeHtml(result.maxScore||"")}点｜研究Lv.${escapeHtml(result.researchLevel||1)}${result.xpGained?`｜+${escapeHtml(result.xpGained)}EXP`:""}</div>
       </div>
       <button class="danger" data-delete-result="${result.id}">削除</button>
     </div>`;
@@ -743,6 +1082,7 @@ function resetProblemForm(){
   document.getElementById("problemText").value="";
   document.getElementById("problemHint").value="問題文の大切な言葉に注目しよう。";
   document.getElementById("problemAnswer").value="";
+  document.getElementById("problemDifficulty").value="2";
   document.getElementById("problemMaxScore").value="10";
   document.getElementById("saveProblemBtn").textContent="この問題を保存する";
 }
@@ -756,6 +1096,7 @@ function saveProblem(){
     unitId,title,text,
     hint:document.getElementById("problemHint").value.trim(),
     modelAnswer:document.getElementById("problemAnswer").value.trim(),
+    difficulty:Number(document.getElementById("problemDifficulty").value)||2,
     maxScore:Number(document.getElementById("problemMaxScore").value)||10
   };
   if(editingProblemId){
@@ -778,6 +1119,7 @@ function editProblem(id){
   document.getElementById("problemText").value=p.text;
   document.getElementById("problemHint").value=p.hint||"";
   document.getElementById("problemAnswer").value=p.modelAnswer||"";
+  document.getElementById("problemDifficulty").value=String(p.difficulty||2);
   document.getElementById("problemMaxScore").value=p.maxScore||10;
   document.getElementById("saveProblemBtn").textContent="問題の変更を保存する";
 }
@@ -798,7 +1140,12 @@ function saveStudent(){
     const student=data.students.find(s=>s.id===editingStudentId);
     Object.assign(student,{name,grade});showToast("児童情報を変更しました。");
   }else{
-    data.students.push({id:uid("student"),name,grade});showToast("児童を登録しました。");
+    data.students.push({
+      id:uid("student"),
+      name,
+      grade,
+      progress:{totalXp:0,completedProblems:[],problemStats:{}}
+    });showToast("児童を登録しました。");
   }
   resetStudentForm();saveData();
 }
@@ -816,7 +1163,9 @@ function enterStudentApp(studentId){
   document.getElementById("teacherApp").classList.add("hidden");
   document.getElementById("studentApp").classList.remove("hidden");
   document.getElementById("studentWelcome").textContent=`${student.name}さんの学習ページ`;
+  ensureStudentProgress(student);
   renderStudentUnits();
+  renderGrowthDashboard();
 }
 function renderStudentUnits(){
   const unitSelect=document.getElementById("studentUnitSelect");
@@ -837,20 +1186,69 @@ function renderStudentProblemBody(){
   body.innerHTML=problem?`<h2>${escapeHtml(problem.title)}</h2><p style="line-height:1.8">${escapeHtml(problem.text)}</p><div class="muted">ヒント：${escapeHtml(problem.hint||"なし")}</div>`:'<div class="empty">問題を選んでください。</div>';
   document.getElementById("studentResponse").value="";
   document.getElementById("studentScoreBox").classList.add("hidden");
+  document.getElementById("researchLevelCard").classList.add("hidden");
 }
 function submitStudentAnswer(){
   const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);
   const response=document.getElementById("studentResponse").value.trim();
+  const student=data.students.find(s=>s.id===activeStudentId);
   if(!problem){showToast("問題を選んでください。");return}
+  if(!student){showToast("児童情報を確認できません。");return}
   if(!response){showToast("答えを書いてください。");return}
-  const modelWords=(problem.modelAnswer||"").split(/[、。\s]+/).filter(w=>w.length>=2);
-  const hits=modelWords.filter(w=>response.includes(w)).length;
-  const score=modelWords.length?Math.max(1,Math.round(problem.maxScore*(hits/modelWords.length))):Math.min(problem.maxScore,Math.max(1,Math.round(response.length/12)));
-  data.results.push({id:uid("result"),studentId:activeStudentId,problemId:problem.id,response,score,date:new Date().toLocaleString("ja-JP")});
+
+  const progress=ensureStudentProgress(student);
+  const modelWords=(problem.modelAnswer||"").split(/[、。\s]+/).filter(word=>word.length>=2);
+  const hits=modelWords.filter(word=>response.includes(word)).length;
+  const maxScore=Number(problem.maxScore)||10;
+  const score=modelWords.length
+    ? Math.max(1,Math.round(maxScore*(hits/modelWords.length)))
+    : Math.min(maxScore,Math.max(1,Math.round(response.length/12)));
+  const ratio=maxScore?score/maxScore:0;
+
+  const stat=progress.problemStats[problem.id]||{attempts:0,bestScore:0,maxScore};
+  stat.attempts+=1;
+  stat.bestScore=Math.max(Number(stat.bestScore||0),score);
+  stat.maxScore=maxScore;
+  progress.problemStats[problem.id]=stat;
+
+  let researchLevel=1;
+  if(ratio>=.95)researchLevel=5;
+  else if(ratio>=.70)researchLevel=4;
+  else if(ratio>=.40)researchLevel=3;
+  else if(ratio>0||response.length>=10)researchLevel=2;
+
+  let gained=false;
+  const xpReward=(Number(problem.difficulty||2))*25;
+  if(ratio>=.70){
+    gained=awardExperience(student,problem,xpReward);
+  }
+
+  data.results.push({
+    id:uid("result"),
+    studentId:activeStudentId,
+    problemId:problem.id,
+    response,
+    score,
+    maxScore,
+    researchLevel,
+    xpGained:gained?xpReward:0,
+    date:new Date().toLocaleString("ja-JP")
+  });
   saveData();
+
   const box=document.getElementById("studentScoreBox");
-  box.innerHTML=`<strong>${score}点 / ${problem.maxScore}点</strong><div style="margin-top:7px">${score>=problem.maxScore*.7?"大切な言葉を使って、よく説明できました。":"模範解答と比べて、もう一度大切な言葉を確認しよう。"}</div>`;
+  const message=ratio>=.70
+    ?"大切な言葉を使って、よく説明できました。"
+    :ratio>=.40
+      ?"あと一歩です。大切な考えをもう一つ加えてみよう。"
+      :"模範解答と比べて、大切な言葉を確認しよう。";
+  box.innerHTML=`<strong>${score}点 / ${maxScore}点</strong>
+    <div style="margin-top:7px">${message}</div>
+    ${gained?`<div class="xp-reward" style="margin-top:8px">初回クリア！ +${xpReward}EXPを獲得しました。</div>`:
+      ratio>=.70?'<div class="muted" style="margin-top:8px">クリア済みの問題なので、EXPは初回のみ獲得できます。</div>':""}`;
   box.classList.remove("hidden");
+  showResearchLevel(researchLevel,score,maxScore);
+  renderGrowthDashboard();
 }
 function bindEvents(){
   document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>setPanel(btn.dataset.panel)));
