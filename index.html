@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 2.1</title>
+<title>算数大学｜Version 2.2</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -560,7 +560,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 2.1は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 2.2は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -649,7 +649,7 @@
 </main>
 
 <footer>
-  Version 2.1：個別IDログイン・クラス管理・児童別履歴・教師ダッシュボードを搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 2.2：個別IDログイン・クラス管理・児童別履歴・教師ダッシュボードを搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
@@ -883,7 +883,15 @@ function buildHints(p){
   const ks=(p.rubrics||[]).flatMap(r=>String(r.keywords||"").split(",")).map(s=>s.trim()).filter(Boolean);
   return ["問題文の中で、説明すべき大切な言葉を見つけよう。",rs.length?`「${rs.slice(0,2).join("」「")}」の観点を入れてみよう。`:"何を、どのようにするか順番に書こう。",ks.length?`使えそうな言葉：${ks.slice(0,4).join("・")}`:"算数の言葉を一つ使ってみよう。",p.hint||"具体的な数や図を思い浮かべよう。"];
 }
-function renderHintSteps(){const p=getCurrentProblem();const hs=buildHints(p);document.getElementById("hintSteps").innerHTML=hs.map((h,i)=>`<div class="hint-step ${i<=currentHintIndex?"":"locked"}">${i<=currentHintIndex?escapeHtml(h):"🔒 まだ見られません"}</div>`).join("");document.getElementById("nextHintBtn").disabled=currentHintIndex>=hs.length-1}
+function renderHintSteps(){
+  const holder=document.getElementById("hintSteps");
+  const nextButton=document.getElementById("nextHintBtn");
+  if(!holder||!nextButton)return;
+  const p=getCurrentProblem();
+  const hs=buildHints(p);
+  holder.innerHTML=hs.map((h,i)=>`<div class="hint-step ${i<=currentHintIndex?"":"locked"}">${i<=currentHintIndex?escapeHtml(h):"🔒 まだ見られません"}</div>`).join("");
+  nextButton.disabled=currentHintIndex>=hs.length-1;
+}
 
 function renderUnitFilter(){
   const units = ["すべて", ...new Set(problems.map(p=>p.unit))];
@@ -975,79 +983,128 @@ function switchTab(tab){
     alert("教師としてログインしてください。");
     return;
   }
-  
-document.getElementById("studentLoginBtn").addEventListener("click",()=>{
-  const loginId=document.getElementById("studentLoginIdInput").value.trim();
-  const password=document.getElementById("studentPasswordInput").value;
-  if(!loginId||!password){
-    alert("ログインIDとパスワードを入力してください。");
-    return;
-  }
-  let foundClass=null;
-  let foundStudent=null;
-  for(const c of classes){
-    const s=c.students.find(st=>st.loginId===loginId);
-    if(s){foundClass=c;foundStudent=s;break;}
-  }
-  if(!foundStudent || foundStudent.password!==password){
-    alert("ログインIDまたはパスワードが違います。");
-    return;
-  }
-  document.getElementById("studentPasswordInput").value="";
-  startSession({role:"student",classId:foundClass.id,studentId:foundStudent.id});
-});
-document.getElementById("studentPasswordInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter") document.getElementById("studentLoginBtn").click();
-});
-document.getElementById("teacherLoginBtn").addEventListener("click",()=>{
-  if(document.getElementById("teacherPassInput").value!=="4180"){
-    alert("パスコードが違います。");
-    return;
-  }
-  document.getElementById("teacherPassInput").value="";
-  startSession({role:"teacher"});
-});
-document.getElementById("teacherPassInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter") document.getElementById("teacherLoginBtn").click();
-});
-document.getElementById("logoutBtn").addEventListener("click",logout);
-document.getElementById("addClassBtn").addEventListener("click",()=>{
-  const name=document.getElementById("newClassName").value.trim();
-  if(!name)return alert("クラス名を入力してください。");
-  classes.push({id:"c"+Date.now(),name,students:[]});
-  document.getElementById("newClassName").value="";
-  saveClasses();
-  refreshSelectors();
-});
-document.getElementById("addStudentBtn").addEventListener("click",()=>{
-  const cid=document.getElementById("manageClassSelect").value;
-  const name=document.getElementById("newStudentName").value.trim();
-  const loginId=document.getElementById("newStudentLoginId").value.trim();
-  const password=document.getElementById("newStudentPassword").value;
-  if(!name||!loginId||!password){
-    alert("児童名・ログインID・パスワードをすべて入力してください。");
-    return;
-  }
-  if(classes.some(c=>c.students.some(s=>s.loginId===loginId))){
-    alert("そのログインIDはすでに使われています。");
-    return;
-  }
-  classes.find(c=>c.id===cid)?.students.push({id:"s"+Date.now(),name,loginId,password});
-  ["newStudentName","newStudentLoginId","newStudentPassword"].forEach(id=>document.getElementById(id).value="");
-  saveClasses();
-  refreshSelectors();
-});
-document.getElementById("manageClassSelect").addEventListener("change",renderManagedStudents);
-document.getElementById("dashboardClassSelect").addEventListener("change",renderDashboard);
-document.getElementById("nextHintBtn").addEventListener("click",()=>{
-  currentHintIndex++;
-  renderHintSteps();
-});
-
-document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  document.querySelectorAll(".tab").forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab===tab);
+  });
   document.getElementById("studentSection").classList.toggle("hidden", tab!=="student");
   document.getElementById("teacherSection").classList.toggle("hidden", tab!=="teacher");
   if(tab==="student") showProblemList();
+}
+
+function bindLoginAndManagementEvents(){
+  const studentLoginBtn=document.getElementById("studentLoginBtn");
+  const studentPasswordInput=document.getElementById("studentPasswordInput");
+  const teacherLoginBtn=document.getElementById("teacherLoginBtn");
+  const teacherPassInput=document.getElementById("teacherPassInput");
+
+  studentLoginBtn.addEventListener("click",()=>{
+    const loginId=document.getElementById("studentLoginIdInput").value.trim();
+    const password=studentPasswordInput.value;
+    if(!loginId||!password){
+      alert("ログインIDとパスワードを入力してください。");
+      return;
+    }
+
+    let foundClass=null;
+    let foundStudent=null;
+    for(const c of classes){
+      const s=c.students.find(st=>st.loginId===loginId);
+      if(s){
+        foundClass=c;
+        foundStudent=s;
+        break;
+      }
+    }
+
+    if(!foundStudent || foundStudent.password!==password){
+      alert("ログインIDまたはパスワードが違います。");
+      return;
+    }
+
+    studentPasswordInput.value="";
+    startSession({
+      role:"student",
+      classId:foundClass.id,
+      studentId:foundStudent.id
+    });
+  });
+
+  studentPasswordInput.addEventListener("keydown",e=>{
+    if(e.key==="Enter") studentLoginBtn.click();
+  });
+
+  teacherLoginBtn.addEventListener("click",()=>{
+    if(teacherPassInput.value!=="4180"){
+      alert("パスコードが違います。");
+      return;
+    }
+    teacherPassInput.value="";
+    startSession({role:"teacher"});
+  });
+
+  teacherPassInput.addEventListener("keydown",e=>{
+    if(e.key==="Enter") teacherLoginBtn.click();
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click",logout);
+
+  document.getElementById("addClassBtn").addEventListener("click",()=>{
+    const name=document.getElementById("newClassName").value.trim();
+    if(!name){
+      alert("クラス名を入力してください。");
+      return;
+    }
+    classes.push({id:"c"+Date.now(),name,students:[]});
+    document.getElementById("newClassName").value="";
+    saveClasses();
+    refreshSelectors();
+  });
+
+  document.getElementById("addStudentBtn").addEventListener("click",()=>{
+    const cid=document.getElementById("manageClassSelect").value;
+    const name=document.getElementById("newStudentName").value.trim();
+    const loginId=document.getElementById("newStudentLoginId").value.trim();
+    const password=document.getElementById("newStudentPassword").value;
+
+    if(!name||!loginId||!password){
+      alert("児童名・ログインID・パスワードをすべて入力してください。");
+      return;
+    }
+    if(classes.some(c=>c.students.some(s=>s.loginId===loginId))){
+      alert("そのログインIDはすでに使われています。");
+      return;
+    }
+
+    const targetClass=classes.find(c=>c.id===cid);
+    if(!targetClass){
+      alert("クラスが見つかりません。");
+      return;
+    }
+
+    targetClass.students.push({
+      id:"s"+Date.now(),
+      name,
+      loginId,
+      password
+    });
+
+    ["newStudentName","newStudentLoginId","newStudentPassword"].forEach(id=>{
+      document.getElementById(id).value="";
+    });
+    saveClasses();
+    refreshSelectors();
+  });
+
+  document.getElementById("manageClassSelect").addEventListener("change",renderManagedStudents);
+  document.getElementById("dashboardClassSelect").addEventListener("change",renderDashboard);
+
+  const nextHintBtn=document.getElementById("nextHintBtn");
+  if(nextHintBtn){
+    nextHintBtn.addEventListener("click",()=>{
+      currentHintIndex++;
+      renderHintSteps();
+    });
+  }
 }
 
 function currentTeacherProblem(){
@@ -1203,6 +1260,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   }
   renderRubrics();
   migrateStudentAccounts();
+  bindLoginAndManagementEvents();
   refreshSelectors();
   if(session){startSession(session);}else{
     document.getElementById("loginScreen").classList.remove("hidden");
