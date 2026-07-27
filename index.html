@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 4.1</title>
+<title>算数大学｜Version 4.2</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -370,7 +370,7 @@
   }
 
 
-  /* Version 4.1: 学習開始を中央に置いたコンパクトホーム */
+  /* Version 4.2: 学習開始を中央に置いたコンパクトホーム */
   #problemListView.home-layout,
   #problemListView{
     display:grid;
@@ -503,7 +503,7 @@
   }
 
 
-  /* Version 4.1: 参考デザインを反映したゲーム型ダッシュボード */
+  /* Version 4.2: 参考デザインを反映したゲーム型ダッシュボード */
   body{
     background:
       radial-gradient(circle at 50% 0,rgba(255,248,220,.95),transparent 34%),
@@ -727,7 +727,7 @@
   }
 
 
-  /* Version 4.1: 問題作成テンプレートと研究レベル評価 */
+  /* Version 4.2: 問題作成テンプレートと研究レベル評価 */
   .template-panel{
     margin:0 0 16px;
     padding:14px;
@@ -777,6 +777,179 @@
     color:#3730a3;
     font-weight:800;
     line-height:1.6;
+  }
+
+
+  /* Version 4.2: 見やすい問題作成ウィザード */
+  .problem-maker{
+    display:grid;
+    gap:16px;
+  }
+  .maker-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .maker-guide{
+    padding:12px 14px;
+    border-radius:14px;
+    background:#eef2ff;
+    color:#3730a3;
+    line-height:1.6;
+    font-weight:700;
+  }
+  .maker-step{
+    border:1px solid #dbe3ef;
+    border-radius:18px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .maker-step-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 16px;
+    background:linear-gradient(90deg,#f8fafc,#eef2ff);
+    border-bottom:1px solid #dbe3ef;
+  }
+  .step-number{
+    display:grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+    border-radius:50%;
+    background:#4f46e5;
+    color:#fff;
+    font-size:18px;
+    font-weight:900;
+  }
+  .step-heading{
+    font-size:18px;
+    font-weight:900;
+    color:#312e81;
+  }
+  .step-caption{
+    font-size:12px;
+    color:#64748b;
+    margin-top:2px;
+  }
+  .maker-step-body{padding:16px}
+  .maker-two-column{
+    display:grid;
+    grid-template-columns:1.35fr .85fr;
+    gap:16px;
+  }
+  .field-help{
+    margin-top:5px;
+    font-size:12px;
+    color:#64748b;
+    line-height:1.5;
+  }
+  .required-mark{
+    display:inline-block;
+    margin-left:5px;
+    padding:2px 6px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#991b1b;
+    font-size:10px;
+    vertical-align:middle;
+  }
+  .optional-mark{
+    display:inline-block;
+    margin-left:5px;
+    padding:2px 6px;
+    border-radius:999px;
+    background:#f1f5f9;
+    color:#475569;
+    font-size:10px;
+    vertical-align:middle;
+  }
+  .preview-card{
+    position:sticky;
+    top:12px;
+    padding:16px;
+    border:2px solid #f0c96a;
+    border-radius:18px;
+    background:linear-gradient(145deg,#fffdf5,#fff8e5);
+  }
+  .preview-card h3{margin-top:0;color:#92400e}
+  .preview-question{
+    margin-top:10px;
+    padding:13px;
+    border-radius:13px;
+    background:#fff;
+    border:1px dashed #d97706;
+    line-height:1.7;
+    white-space:pre-wrap;
+  }
+  .preview-meta{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .preview-chip{
+    padding:5px 8px;
+    border-radius:999px;
+    background:#fff;
+    border:1px solid #fde68a;
+    color:#92400e;
+    font-size:12px;
+    font-weight:800;
+  }
+  .advanced-settings{
+    border:1px solid #cbd5e1;
+    border-radius:14px;
+    background:#f8fafc;
+    overflow:hidden;
+  }
+  .advanced-settings summary{
+    cursor:pointer;
+    padding:13px 15px;
+    font-weight:900;
+    color:#334155;
+    list-style:none;
+  }
+  .advanced-settings summary::-webkit-details-marker{display:none}
+  .advanced-settings summary::before{content:"▶";display:inline-block;margin-right:8px}
+  .advanced-settings[open] summary::before{content:"▼"}
+  .advanced-body{
+    padding:0 15px 15px;
+    border-top:1px solid #e2e8f0;
+  }
+  .save-action-box{
+    padding:16px;
+    border:2px solid #86efac;
+    border-radius:18px;
+    background:linear-gradient(145deg,#f0fdf4,#ffffff);
+  }
+  .save-action-box .primary{
+    min-height:50px;
+    font-size:17px;
+  }
+  .save-sub-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .rubric-explanation{
+    margin-bottom:12px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:#fffbeb;
+    color:#92400e;
+    border:1px solid #fde68a;
+    font-size:13px;
+    line-height:1.6;
+  }
+  @media(max-width:850px){
+    .maker-two-column{grid-template-columns:1fr}
+    .preview-card{position:static}
   }
 
   .login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef2ff,#ecfeff,#fff7ed)}
@@ -1079,7 +1252,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 4.1は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 4.2は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -1103,81 +1276,196 @@
     </div>
   </div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>問題の基本設定</h2>
-<div class="template-panel">
-  <strong>🧩 単元テンプレートから作成</strong>
-  <div class="small">単元を選ぶと、問題タイトル・模範解答・ヒント・評価観点・同義語を自動入力します。</div>
-  <div id="templateButtons" class="template-grid"></div>
-</div>
-
-
-      <label>学年</label>
-      <select id="grade">
-        <option>5年生</option>
-      </select>
-
-      <label>単元名</label>
-      <input id="unit" value="平均" />
-
-      <label>問題タイトル</label>
-      <input id="title" value="平均とは何か" />
-
-      <label>難易度</label>
-      <select id="difficulty">
-        <option value="1">★☆☆ 基礎</option>
-        <option value="2" selected>★★☆ 標準</option>
-        <option value="3">★★★ 発展</option>
-      </select>
-
-      <label>問題文</label>
-      <textarea id="question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
-
-      <label>模範解答</label>
-      <textarea id="modelAnswer">平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。</textarea>
-
-      <label>児童向けヒント</label>
-      <input id="hint" value="全部の数をどうして、そのあと何で割るか考えよう。" />
+  <div class="card wide problem-maker">
+    <div class="maker-header">
+      <div>
+        <h2 style="margin-bottom:6px">問題を作る</h2>
+        <div class="small">上から順番に入力すれば、問題を作成できます。</div>
+      </div>
+      <button type="button" class="ghost" id="clearProblemFormBtn">＋ 新しい問題を作る</button>
     </div>
 
-    <div class="card">
-      <h2>採点基準</h2>
-      <div class="small">キーワードは「,」で区切って入力します。意味の近い言葉も複数登録できます。</div>
-
-      <div id="rubricList"></div>
-
-      <button class="secondary" id="addRubricBtn">＋ 評価項目を追加</button>
-
-      <h3>返却設定</h3>
-      <label>満点</label>
-      <input id="maxScore" type="number" value="8" min="1" />
-
-      <label>キャラクター名</label>
-      <input id="characterName" value="たっくん教授" />
-
-      <label>正解時のコメント</label>
-      <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！" />
+    <div class="maker-guide">
+      💡 初めて作るときは、まず単元テンプレートを選んでください。問題文と評価観点が自動で入るので、必要なところだけ直せば完成します。
     </div>
 
-    <div class="card wide">
-      <div class="row">
-        <button class="primary" id="addProblemBtn">問題一覧に追加する</button>
-        <button class="secondary" id="publishBtn">現在の問題を開く</button>
+    <div class="maker-step">
+      <div class="maker-step-header">
+        <div class="step-number">1</div>
+        <div>
+          <div class="step-heading">単元を選ぶ</div>
+          <div class="step-caption">選ぶだけで、問題文・ヒント・評価観点の例が入ります。</div>
+        </div>
+      </div>
+      <div class="maker-step-body">
+        <div class="template-panel" style="margin:0">
+          <div id="templateButtons" class="template-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="maker-step">
+      <div class="maker-step-header">
+        <div class="step-number">2</div>
+        <div>
+          <div class="step-heading">児童に出す問題を書く</div>
+          <div class="step-caption">赤い「必須」が付いている欄だけでも問題を作れます。</div>
+        </div>
+      </div>
+      <div class="maker-step-body maker-two-column">
+        <div>
+          <label>単元名 <span class="required-mark">必須</span></label>
+          <input id="unit" value="平均" placeholder="例：平均" />
+          <div class="field-help">問題一覧で分類するための名前です。</div>
+
+          <label>問題タイトル <span class="required-mark">必須</span></label>
+          <input id="title" value="平均とは何か" placeholder="例：平均の考え方を説明しよう" />
+          <div class="field-help">児童が問題を選ぶ画面に表示されます。</div>
+
+          <label>問題文 <span class="required-mark">必須</span></label>
+          <textarea id="question" placeholder="児童に答えてほしい内容を書きます。">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
+          <div class="field-help">短く、何を説明するのかが分かる文章にします。</div>
+
+          <label>児童向けヒント <span class="optional-mark">任意</span></label>
+          <input id="hint" value="全部の数をどうして、そのあと何で割るか考えよう。" placeholder="例：まず、全部の数をどうするか考えよう" />
+        </div>
+
+        <aside class="preview-card">
+          <h3>👀 児童画面のプレビュー</h3>
+          <div id="previewTitle" style="font-weight:900;font-size:18px">平均とは何か</div>
+          <div class="preview-meta">
+            <span id="previewUnit" class="preview-chip">平均</span>
+            <span id="previewDifficulty" class="preview-chip">★★☆ 標準</span>
+          </div>
+          <div id="previewQuestion" class="preview-question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</div>
+          <div class="small" style="margin-top:10px">ヒント</div>
+          <div id="previewHint" style="margin-top:4px;line-height:1.6">全部の数をどうして、そのあと何で割るか考えよう。</div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="maker-step">
+      <div class="maker-step-header">
+        <div class="step-number">3</div>
+        <div>
+          <div class="step-heading">評価する考えを確認する</div>
+          <div class="step-caption">児童が別の言い方をしても評価できるようにします。</div>
+        </div>
+      </div>
+      <div class="maker-step-body">
+        <div class="rubric-explanation">
+          「キーワード」には、同じ意味で使える言葉を「,」で区切って登録します。<br>
+          例：<strong>合計, 全部足す, 合わせる, 全部集める</strong>
+        </div>
+        <div id="rubricList"></div>
+        <button class="secondary" id="addRubricBtn">＋ 評価する考えを追加</button>
+
+        <details class="advanced-settings" style="margin-top:16px">
+          <summary>詳細設定を開く</summary>
+          <div class="advanced-body">
+            <label>学年</label>
+            <select id="grade">
+              <option>5年生</option>
+            </select>
+
+            <label>難易度</label>
+            <select id="difficulty">
+              <option value="1">★☆☆ 基礎</option>
+              <option value="2" selected>★★☆ 標準</option>
+              <option value="3">★★★ 発展</option>
+            </select>
+
+            <label>模範解答</label>
+            <textarea id="modelAnswer">平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。</textarea>
+            <div class="field-help">採点の参考として教師が確認する文章です。</div>
+
+            <label>満点</label>
+            <input id="maxScore" type="number" value="8" min="1" />
+
+            <label>キャラクター名</label>
+            <input id="characterName" value="たっくん教授" />
+
+            <label>よくできたときのコメント</label>
+            <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！" />
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="save-action-box">
+      <div style="font-weight:900;font-size:18px;color:#166534">4　問題を保存する</div>
+      <div class="small" style="margin:5px 0 12px">入力内容を確認し、問題一覧へ追加します。</div>
+      <button class="primary" id="addProblemBtn" style="width:100%">この問題を問題一覧に追加する</button>
+      <div class="save-sub-actions">
+        <button class="secondary" id="publishBtn">児童画面で確認する</button>
         <button class="ghost" id="saveBtn">この端末に保存する</button>
-        <button class="danger" id="resetBtn">初期設定に戻す</button>
+        <button class="danger" id="resetBtn">すべて初期設定に戻す</button>
       </div>
       <div id="saveMessage" class="small" style="margin-top:10px"></div>
     </div>
+  </div>
   </div>
 </section>
 </main>
 
 <footer>
-  Version 4.1：問題選択を中央に配置したコンパクト画面・算数大学キャンパス・無料版AI教授を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 4.2：教師用の問題作成画面を4段階の分かりやすい手順に整理。単元テンプレート、児童画面プレビュー、やさしい評価機能を搭載しています。
 </footer>
 
 <script>
+function updateProblemPreview(){
+  const title=document.getElementById("title");
+  const unit=document.getElementById("unit");
+  const question=document.getElementById("question");
+  const hint=document.getElementById("hint");
+  const difficulty=document.getElementById("difficulty");
+  const previewTitle=document.getElementById("previewTitle");
+  const previewUnit=document.getElementById("previewUnit");
+  const previewQuestion=document.getElementById("previewQuestion");
+  const previewHint=document.getElementById("previewHint");
+  const previewDifficulty=document.getElementById("previewDifficulty");
+  if(previewTitle)previewTitle.textContent=title?.value.trim()||"問題タイトル";
+  if(previewUnit)previewUnit.textContent=unit?.value.trim()||"単元未設定";
+  if(previewQuestion)previewQuestion.textContent=question?.value.trim()||"ここに問題文が表示されます。";
+  if(previewHint)previewHint.textContent=hint?.value.trim()||"ヒントはまだありません。";
+  if(previewDifficulty&&difficulty){
+    previewDifficulty.textContent=difficulty.options[difficulty.selectedIndex]?.text||"★★☆ 標準";
+  }
+}
+function bindProblemMakerUI(){
+  ["title","unit","question","hint","difficulty"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.addEventListener("input",updateProblemPreview);
+      el.addEventListener("change",updateProblemPreview);
+    }
+  });
+  const clearBtn=document.getElementById("clearProblemFormBtn");
+  if(clearBtn){
+    clearBtn.addEventListener("click",()=>{
+      document.getElementById("unit").value="";
+      document.getElementById("title").value="";
+      document.getElementById("question").value="";
+      document.getElementById("hint").value="";
+      document.getElementById("modelAnswer").value="";
+      document.getElementById("difficulty").value="2";
+      document.getElementById("maxScore").value="3";
+      rubrics=[
+        {name:"大切な考え①",keywords:"",points:1},
+        {name:"大切な考え②",keywords:"",points:1},
+        {name:"大切な考え③",keywords:"",points:1}
+      ];
+      renderRubrics();
+      updateProblemPreview();
+      const msg=document.getElementById("saveMessage");
+      if(msg)msg.textContent="新しい問題を入力できます。";
+      document.getElementById("unit")?.focus();
+    });
+  }
+  updateProblemPreview();
+}
+
+
 function migrateFriendlyRubrics(){
   ensureProblemData();
   let changed=false;
@@ -1307,7 +1595,9 @@ function applyTemplate(key){
   document.getElementById("maxScore").value=3;
   renderRubrics();
   renderTemplateButtons();
+  bindProblemMakerUI();
   document.getElementById("saveMessage").textContent=`「${key}」テンプレートを読み込みました。問題文は自由に書き換えられます。`;
+  updateProblemPreview();
 }
 function showResearchLevel(level,hitCount,total){
   const card=document.getElementById("researchLevelCard");
