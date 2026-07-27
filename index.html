@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>算数大学｜プロトタイプ</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --primary:#4f46e5;
+    --primary-soft:#eef2ff;
+    --accent:#f59e0b;
+    --ok:#16a34a;
+    --warn:#d97706;
+    --border:#dbe3ef;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:linear-gradient(180deg,#eef2ff 0,#f8fafc 260px,#f4f7fb 100%);
+    color:var(--text);
+  }
+  header{
+    padding:22px 18px 14px;
+    max-width:1100px;
+    margin:auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .logo{
+    width:54px;height:54px;border-radius:16px;
+    display:grid;place-items:center;
+    background:var(--primary);
+    color:white;font-size:30px;
+    box-shadow:0 8px 24px rgba(79,70,229,.25);
+  }
+  h1{font-size:28px;margin:0}
+  .sub{color:var(--muted);margin-top:4px}
+  nav{
+    max-width:1100px;margin:0 auto 16px;padding:0 18px;
+    display:flex;gap:10px;flex-wrap:wrap;
+  }
+  .tab{
+    border:1px solid var(--border);background:white;color:var(--text);
+    padding:10px 16px;border-radius:999px;font-weight:700;cursor:pointer;
+  }
+  .tab.active{background:var(--primary);color:white;border-color:var(--primary)}
+  main{max-width:1100px;margin:auto;padding:0 18px 40px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:20px;
+    padding:20px;box-shadow:0 8px 28px rgba(31,41,55,.06);
+  }
+  .wide{grid-column:1/-1}
+  .hidden{display:none!important}
+  h2{font-size:21px;margin:0 0 14px}
+  h3{font-size:17px;margin:18px 0 8px}
+  label{display:block;font-weight:700;margin:12px 0 6px}
+  input,textarea,select{
+    width:100%;border:1px solid var(--border);border-radius:12px;
+    padding:11px 12px;font:inherit;background:#fff;
+  }
+  textarea{min-height:110px;resize:vertical}
+  button{
+    border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;
+  }
+  .primary{background:var(--primary);color:#fff}
+  .secondary{background:var(--primary-soft);color:var(--primary)}
+  .ghost{background:#f3f4f6;color:#374151}
+  .danger{background:#fee2e2;color:#991b1b}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .row > *{flex:1}
+  .character{
+    display:flex;gap:14px;align-items:flex-start;
+    background:#fff7ed;border:1px solid #fed7aa;border-radius:18px;padding:16px;
+  }
+  .face{
+    min-width:64px;width:64px;height:64px;border-radius:50%;
+    display:grid;place-items:center;background:#fbbf24;font-size:34px;
+    border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,.08)
+  }
+  .speech{font-weight:700;line-height:1.7}
+  .question-box{
+    background:#f8fafc;border:1px dashed #94a3b8;border-radius:16px;padding:16px;
+  }
+  .rubric-item{
+    display:grid;grid-template-columns:1.5fr 1.5fr .7fr auto;
+    gap:8px;align-items:end;margin-bottom:10px;
+  }
+  .pill{
+    display:inline-block;padding:5px 9px;border-radius:999px;
+    background:#eef2ff;color:#4338ca;font-size:13px;font-weight:800;margin:3px 4px 3px 0;
+  }
+  .result{
+    border-left:6px solid var(--primary);background:#f8fafc;border-radius:12px;padding:15px;
+  }
+  .score{font-size:32px;font-weight:900;color:var(--primary)}
+  .small{font-size:13px;color:var(--muted)}
+  .list{padding-left:20px;line-height:1.8}
+  .status-ok{color:var(--ok);font-weight:800}
+  .status-warn{color:var(--warn);font-weight:800}
+
+  .problem-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:14px;
+    margin-top:16px;
+  }
+  .problem-card{
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    background:#fff;
+    cursor:pointer;
+    transition:.18s ease;
+  }
+  .problem-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(31,41,55,.08);
+    border-color:#a5b4fc;
+  }
+  .problem-card h3{margin:8px 0}
+  .problem-card .start{
+    margin-top:12px;
+    display:inline-block;
+    color:var(--primary);
+    font-weight:800;
+  }
+  footer{max-width:1100px;margin:0 auto;padding:0 18px 30px;color:var(--muted);font-size:13px}
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr}
+    .rubric-item{grid-template-columns:1fr}
+    h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">Σ</div>
+    <div>
+      <h1>算数大学</h1>
+      <div class="sub">算数のことばを、自分のことばで説明しよう</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" data-tab="student">児童用画面</button>
+  <button class="tab" data-tab="teacher">教師用画面</button>
+</nav>
+
+<main>
+<section id="studentSection">
+  <div id="problemListView" class="grid">
+    <div class="card wide">
+      <div class="character">
+        <div class="face">🦉</div>
+        <div>
+          <div class="small">さんすう教授</div>
+          <div class="speech" id="characterSpeech">
+            ようこそ、算数大学へ！ 挑戦する問題を選ぼう。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <div class="row" style="align-items:center">
+        <div>
+          <h2 style="margin-bottom:4px">問題一覧</h2>
+          <div class="small">問題を選ぶと、回答画面に進みます。</div>
+        </div>
+        <div style="text-align:right">
+          <span class="pill" id="problemCountPill">0問</span>
+        </div>
+      </div>
+      <div id="problemCards" class="problem-cards"></div>
+    </div>
+  </div>
+
+  <div id="problemDetailView" class="grid hidden">
+    <div class="card wide">
+      <div class="row">
+        <button class="ghost" id="backToListBtn" style="flex:0 0 auto">← 問題一覧へ</button>
+        <div class="small" id="progressText">問題</div>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <div class="character">
+        <div class="face">🦉</div>
+        <div>
+          <div class="small">さんすう教授</div>
+          <div class="speech" id="detailCharacterSpeech">
+            自分のことばで、ていねいに説明してみよう。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>今日の問題</h2>
+      <div class="question-box">
+        <div class="small" id="studentUnit">5年生・平均</div>
+        <h3 id="studentTitle">平均とは何か</h3>
+        <div id="studentQuestion">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</div>
+        <div id="studentHints" style="margin-top:10px"></div>
+      </div>
+
+      <label for="studentAnswer">あなたの説明</label>
+      <textarea id="studentAnswer" placeholder="ここに自分のことばで書こう"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="secondary" id="hintBtn">ヒントを見る</button>
+        <button class="primary" id="scoreBtn">採点する</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>採点結果</h2>
+      <div id="emptyResult" class="small">回答を送ると、ここに結果が表示されます。</div>
+      <div id="resultBox" class="result hidden">
+        <div class="score"><span id="scoreValue">0</span>点</div>
+        <div id="levelText" class="status-warn"></div>
+        <h3>できているところ</h3>
+        <ul id="goodList" class="list"></ul>
+        <h3>もう一歩のところ</h3>
+        <ul id="improveList" class="list"></ul>
+        <h3>さんすう教授から</h3>
+        <div id="feedbackText"></div>
+        <button class="ghost" id="retryBtn" style="margin-top:12px">書き直す</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="teacherSection" class="hidden">
+  <div class="grid">
+    <div class="card">
+      <h2>問題の基本設定</h2>
+
+      <label>学年</label>
+      <select id="grade">
+        <option>5年生</option>
+      </select>
+
+      <label>単元名</label>
+      <input id="unit" value="平均" />
+
+      <label>問題タイトル</label>
+      <input id="title" value="平均とは何か" />
+
+      <label>問題文</label>
+      <textarea id="question">「平均」とは、どのような数ですか。自分の言葉で説明しましょう。</textarea>
+
+      <label>模範解答</label>
+      <textarea id="modelAnswer">平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。</textarea>
+
+      <label>児童向けヒント</label>
+      <input id="hint" value="全部の数をどうして、そのあと何で割るか考えよう。" />
+    </div>
+
+    <div class="card">
+      <h2>採点基準</h2>
+      <div class="small">キーワードは「,」で区切って入力します。意味の近い言葉も複数登録できます。</div>
+
+      <div id="rubricList"></div>
+
+      <button class="secondary" id="addRubricBtn">＋ 評価項目を追加</button>
+
+      <h3>返却設定</h3>
+      <label>満点</label>
+      <input id="maxScore" type="number" value="8" min="1" />
+
+      <label>キャラクター名</label>
+      <input id="characterName" value="さんすう教授" />
+
+      <label>正解時のコメント</label>
+      <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！" />
+    </div>
+
+    <div class="card wide">
+      <div class="row">
+        <button class="primary" id="addProblemBtn">問題一覧に追加する</button>
+        <button class="secondary" id="publishBtn">現在の問題を開く</button>
+        <button class="ghost" id="saveBtn">この端末に保存する</button>
+        <button class="danger" id="resetBtn">初期設定に戻す</button>
+      </div>
+      <div id="saveMessage" class="small" style="margin-top:10px"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  プロトタイプ版：採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+</footer>
+
+<script>
+const defaultRubrics = [
+  {name:"合計について", keywords:"合計,全部足す,すべて足す,たす", points:2},
+  {name:"個数について", keywords:"個数で割る,数で割る,人数で割る,わる", points:2},
+  {name:"平均の意味", keywords:"同じ大きさ,ならす,等しくする", points:2},
+  {name:"文章として説明", keywords:"", points:2}
+];
+
+const defaultProblems = [
+  {
+    id:"p1", grade:"5年生", unit:"平均", title:"平均とは何か",
+    question:"「平均」とは、どのような数ですか。自分の言葉で説明しましょう。",
+    modelAnswer:"平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。",
+    hint:"全部の数をどうして、そのあと何で割るか考えよう。",
+    maxScore:8,
+    characterName:"さんすう教授",
+    successComment:"大切な言葉を使って、わかりやすく説明できたね！",
+    rubrics:structuredClone(defaultRubrics)
+  },
+  {
+    id:"p2", grade:"5年生", unit:"小数のわり算", title:"小数点を移す理由",
+    question:"小数でわる計算では、なぜわる数を整数にして考えてよいのでしょうか。説明しましょう。",
+    modelAnswer:"わられる数とわる数を同じ数だけ10倍や100倍しても、商は変わらないからです。",
+    hint:"わられる数とわる数を、同じ数だけ大きくするとどうなるか考えよう。",
+    maxScore:8,
+    characterName:"さんすう教授",
+    successComment:"商が変わらない理由まで説明できているね！",
+    rubrics:[
+      {name:"同じ数だけ大きくする",keywords:"同じ数だけ,両方,どちらも",points:2},
+      {name:"10倍や100倍",keywords:"10倍,100倍,十倍,百倍",points:2},
+      {name:"商が変わらない",keywords:"商は変わらない,答えは変わらない",points:2},
+      {name:"文章として説明",keywords:"",points:2}
+    ]
+  },
+  {
+    id:"p3", grade:"5年生", unit:"合同な図形", title:"合同とは何か",
+    question:"2つの図形が「合同である」とは、どのようなことですか。説明しましょう。",
+    modelAnswer:"2つの図形を重ねたとき、形も大きさもぴったり重なることです。",
+    hint:"形と大きさの両方に注目しよう。",
+    maxScore:8,
+    characterName:"さんすう教授",
+    successComment:"合同の大切な意味を正しく説明できたね！",
+    rubrics:[
+      {name:"形が同じ",keywords:"形が同じ,形",points:2},
+      {name:"大きさが同じ",keywords:"大きさが同じ,大きさ",points:2},
+      {name:"重ねると一致",keywords:"重なる,ぴったり,一致",points:2},
+      {name:"文章として説明",keywords:"",points:2}
+    ]
+  }
+];
+
+let rubrics = JSON.parse(localStorage.getItem("sansuDaigakuRubrics") || "null") || structuredClone(defaultRubrics);
+let problems = JSON.parse(localStorage.getItem("sansuDaigakuProblems") || "null") || structuredClone(defaultProblems);
+let currentProblemId = problems[0]?.id || null;
+let hintShown = false;
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function renderRubrics(){
+  const list = document.getElementById("rubricList");
+  list.innerHTML = "";
+  rubrics.forEach((r,i)=>{
+    const wrap = document.createElement("div");
+    wrap.className = "rubric-item";
+    wrap.innerHTML = `
+      <div><label>評価項目</label><input data-i="${i}" data-k="name" value="${escapeHtml(r.name)}"></div>
+      <div><label>認める言葉</label><input data-i="${i}" data-k="keywords" value="${escapeHtml(r.keywords)}"></div>
+      <div><label>配点</label><input type="number" min="0" data-i="${i}" data-k="points" value="${r.points}"></div>
+      <button class="danger" data-remove="${i}">削除</button>
+    `;
+    list.appendChild(wrap);
+  });
+  list.querySelectorAll("input").forEach(el=>{
+    el.addEventListener("input", e=>{
+      const i = Number(e.target.dataset.i);
+      const k = e.target.dataset.k;
+      rubrics[i][k] = k === "points" ? Number(e.target.value) : e.target.value;
+    });
+  });
+  list.querySelectorAll("[data-remove]").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      rubrics.splice(Number(e.target.dataset.remove),1);
+      renderRubrics();
+    });
+  });
+}
+
+function renderProblemList(){
+  const cards = document.getElementById("problemCards");
+  cards.innerHTML = "";
+  document.getElementById("problemCountPill").textContent = `${problems.length}問`;
+
+  problems.forEach((p,index)=>{
+    const card = document.createElement("div");
+    card.className = "problem-card";
+    card.innerHTML = `
+      <div class="small">問題 ${index+1}</div>
+      <div><span class="pill">${escapeHtml(p.unit)}</span></div>
+      <h3>${escapeHtml(p.title)}</h3>
+      <div class="small">${escapeHtml(p.question)}</div>
+      <div class="start">この問題に挑戦する →</div>
+    `;
+    card.addEventListener("click",()=>openProblem(p.id));
+    cards.appendChild(card);
+  });
+}
+
+function showProblemList(){
+  document.getElementById("problemListView").classList.remove("hidden");
+  document.getElementById("problemDetailView").classList.add("hidden");
+  document.getElementById("characterSpeech").textContent = "挑戦する問題を選ぼう。どの問題から始めても大丈夫だよ！";
+  renderProblemList();
+}
+
+function openProblem(id){
+  const p = problems.find(x=>x.id===id);
+  if(!p) return;
+  currentProblemId = id;
+  document.getElementById("studentUnit").textContent = `${p.grade}・${p.unit}`;
+  document.getElementById("studentTitle").textContent = p.title;
+  document.getElementById("studentQuestion").textContent = p.question;
+  document.getElementById("studentHints").innerHTML = "";
+  document.getElementById("studentAnswer").value = "";
+  document.getElementById("emptyResult").classList.remove("hidden");
+  document.getElementById("resultBox").classList.add("hidden");
+  document.getElementById("detailCharacterSpeech").textContent = `「${p.title}」に挑戦しよう。自分のことばで書いてみてね。`;
+  const index = problems.findIndex(x=>x.id===id);
+  document.getElementById("progressText").textContent = `問題 ${index+1} / ${problems.length}`;
+  hintShown = false;
+  document.getElementById("hintBtn").textContent = "ヒントを見る";
+  document.getElementById("problemListView").classList.add("hidden");
+  document.getElementById("problemDetailView").classList.remove("hidden");
+}
+
+function getCurrentProblem(){
+  return problems.find(x=>x.id===currentProblemId) || problems[0];
+}
+
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  document.getElementById("studentSection").classList.toggle("hidden", tab!=="student");
+  document.getElementById("teacherSection").classList.toggle("hidden", tab!=="teacher");
+  if(tab==="student") showProblemList();
+}
+
+function currentTeacherProblem(){
+  return {
+    id:"p"+Date.now(),
+    grade:document.getElementById("grade").value,
+    unit:document.getElementById("unit").value.trim() || "未設定",
+    title:document.getElementById("title").value.trim() || "新しい問題",
+    question:document.getElementById("question").value.trim(),
+    modelAnswer:document.getElementById("modelAnswer").value.trim(),
+    hint:document.getElementById("hint").value.trim(),
+    maxScore:Number(document.getElementById("maxScore").value)||8,
+    characterName:document.getElementById("characterName").value.trim() || "さんすう教授",
+    successComment:document.getElementById("successComment").value.trim(),
+    rubrics:structuredClone(rubrics)
+  };
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+document.getElementById("backToListBtn").addEventListener("click",showProblemList);
+
+document.getElementById("addRubricBtn").addEventListener("click",()=>{
+  rubrics.push({name:"新しい評価項目",keywords:"",points:1});
+  renderRubrics();
+});
+
+document.getElementById("addProblemBtn").addEventListener("click",()=>{
+  const p = currentTeacherProblem();
+  problems.push(p);
+  currentProblemId = p.id;
+  localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  document.getElementById("saveMessage").textContent = `「${p.title}」を問題一覧に追加しました。`;
+  renderProblemList();
+});
+
+document.getElementById("publishBtn").addEventListener("click",()=>{
+  const p = currentTeacherProblem();
+  problems.push(p);
+  currentProblemId = p.id;
+  localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  switchTab("student");
+  openProblem(p.id);
+});
+
+document.getElementById("hintBtn").addEventListener("click",()=>{
+  const p = getCurrentProblem();
+  hintShown = !hintShown;
+  document.getElementById("studentHints").innerHTML = hintShown
+    ? `<span class="pill">ヒント</span> ${escapeHtml(p.hint)}`
+    : "";
+  document.getElementById("hintBtn").textContent = hintShown ? "ヒントを閉じる" : "ヒントを見る";
+});
+
+document.getElementById("scoreBtn").addEventListener("click",()=>{
+  const p = getCurrentProblem();
+  const answer = document.getElementById("studentAnswer").value.trim();
+  if(!answer){
+    alert("まず、自分の説明を書いてください。");
+    return;
+  }
+
+  let score = 0;
+  const good = [];
+  const improve = [];
+  const scoringRubrics = p.rubrics || rubrics;
+
+  scoringRubrics.forEach(r=>{
+    const keys = String(r.keywords||"").split(",").map(s=>s.trim()).filter(Boolean);
+    let hit = false;
+    if(keys.length === 0){
+      hit = answer.length >= 20 && /[。.!！?？]/.test(answer);
+    } else {
+      hit = keys.some(k=>answer.includes(k));
+    }
+    if(hit){
+      score += Number(r.points)||0;
+      good.push(`${r.name}が書けています。`);
+    } else {
+      improve.push(`${r.name}を、もう少しくわしく書いてみよう。`);
+    }
+  });
+
+  const max = Number(p.maxScore) || scoringRubrics.reduce((a,b)=>a+(Number(b.points)||0),0);
+  score = Math.min(score,max);
+  const ratio = max ? score/max : 0;
+
+  let level = "ヒントを見て考えよう";
+  let cls = "status-warn";
+  let feedback = "書けているところはあります。足りない考えを一つずつ加えてみよう。";
+
+  if(ratio >= .85){
+    level = "ばっちり説明できた！";
+    cls = "status-ok";
+    feedback = p.successComment || "大切な言葉を使って、わかりやすく説明できたね！";
+  } else if(ratio >= .55){
+    level = "あと一歩！";
+    feedback = "大切な考えがいくつか書けています。もう一つ言葉を足すと、さらに伝わりやすくなります。";
+  } else if(ratio < .25){
+    level = "先生といっしょに確認しよう";
+    feedback = "まずは、問題に出てくる大切な言葉を一つ使って説明してみよう。";
+  }
+
+  document.getElementById("scoreValue").textContent = `${score} / ${max}`;
+  const levelText = document.getElementById("levelText");
+  levelText.textContent = level;
+  levelText.className = cls;
+  document.getElementById("goodList").innerHTML = good.length ? good.map(x=>`<li>${escapeHtml(x)}</li>`).join("") : "<li>これから見つけていこう。</li>";
+  document.getElementById("improveList").innerHTML = improve.length ? improve.map(x=>`<li>${escapeHtml(x)}</li>`).join("") : "<li>大きな不足はありません。</li>";
+  document.getElementById("feedbackText").textContent = feedback;
+  document.getElementById("detailCharacterSpeech").textContent = `${p.characterName || "さんすう教授"}：${feedback}`;
+  document.getElementById("emptyResult").classList.add("hidden");
+  document.getElementById("resultBox").classList.remove("hidden");
+});
+
+document.getElementById("retryBtn").addEventListener("click",()=>{
+  document.getElementById("studentAnswer").focus();
+  document.getElementById("detailCharacterSpeech").textContent = "書き直しは、学びが深まっている証拠だよ。もう一度挑戦しよう！";
+});
+
+document.getElementById("saveBtn").addEventListener("click",()=>{
+  const config = currentTeacherProblem();
+  localStorage.setItem("sansuDaigakuConfig",JSON.stringify(config));
+  localStorage.setItem("sansuDaigakuRubrics",JSON.stringify(rubrics));
+  localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  document.getElementById("saveMessage").textContent = "問題一覧と教師用設定を、このブラウザに保存しました。";
+});
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  localStorage.removeItem("sansuDaigakuConfig");
+  localStorage.removeItem("sansuDaigakuRubrics");
+  localStorage.removeItem("sansuDaigakuProblems");
+  location.reload();
+});
+
+(function load(){
+  const config = JSON.parse(localStorage.getItem("sansuDaigakuConfig") || "null");
+  if(config){
+    ["grade","unit","title","question","modelAnswer","hint","maxScore","characterName","successComment"].forEach(k=>{
+      const el = document.getElementById(k);
+      if(el && config[k] !== undefined) el.value = config[k];
+    });
+  }
+  renderRubrics();
+  renderProblemList();
+  showProblemList();
+})();
+</script>
+</body>
+</html>
