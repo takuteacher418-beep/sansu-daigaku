@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 1.2</title>
+<title>算数大学｜Version 2.0</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -314,6 +314,26 @@
   }
   .level-up-banner.show{transform:translate(-50%,0)}
 
+
+  .login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef2ff,#ecfeff,#fff7ed)}
+  .login-screen.hidden{display:none}
+  .login-card{width:min(680px,100%);background:#fff;border:1px solid #c7d2fe;border-radius:28px;padding:26px;box-shadow:0 24px 70px rgba(15,23,42,.18)}
+  .login-grid,.class-tools{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .login-choice{border:2px solid #dbeafe;border-radius:20px;padding:18px;background:#fff}
+  .session-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;margin:14px auto 0;max-width:1120px;background:#fff;border:1px solid var(--border);border-radius:14px}
+  .session-user{font-weight:900;color:#1d4ed8}
+  .student-list{display:grid;gap:8px;margin-top:12px}
+  .student-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#fff}
+  .dashboard-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  .dashboard-table th,.dashboard-table td{border:1px solid var(--border);padding:8px;text-align:center}
+  .dashboard-table th{background:#eef2ff}
+  .progress-dot{display:inline-flex;min-width:34px;height:26px;align-items:center;justify-content:center;border-radius:999px;font-weight:900}
+  .progress-dot.done{background:#dcfce7;color:#166534}.progress-dot.trying{background:#fef3c7;color:#92400e}.progress-dot.none{background:#f1f5f9;color:#64748b}
+  .hint-panel{margin-top:14px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:16px;padding:14px}
+  .hint-steps{display:grid;gap:8px;margin-top:10px}.hint-step{border-left:4px solid #60a5fa;padding:9px 11px;border-radius:8px;background:white}.hint-step.locked{opacity:.45}
+  .teacher-note{padding:10px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:13px;line-height:1.6}
+  @media(max-width:760px){.login-grid,.class-tools{grid-template-columns:1fr}.dashboard-table{font-size:12px}}
+
   .unit-filter{
     display:flex;
     gap:8px;
@@ -392,6 +412,29 @@
 </style>
 </head>
 <body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <h1>🧪 算数大学</h1>
+    <div class="small">学習する人を選んでください。データはこの端末のブラウザに保存されます。</div>
+    <div class="login-grid">
+      <div class="login-choice">
+        <h3>🎒 児童として入る</h3>
+        <label>クラス</label><select id="loginClassSelect"></select>
+        <label>名前</label><select id="loginStudentSelect"></select>
+        <button class="primary" id="studentLoginBtn">学習を始める</button>
+      </div>
+      <div class="login-choice">
+        <h3>🧑‍🏫 先生として入る</h3>
+        <label>先生用パスコード</label>
+        <input id="teacherPassInput" type="password" placeholder="初期設定：4180">
+        <button class="secondary" id="teacherLoginBtn">教師画面を開く</button>
+        <div class="small" style="margin-top:8px">※この版では簡易保護です。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="levelUpBanner" class="level-up-banner">🎉 レベルアップ！</div>
 <header>
   <div class="brand">
@@ -407,6 +450,7 @@
   <button class="tab active" data-tab="student">児童用画面</button>
   <button class="tab" data-tab="teacher">教師用画面</button>
 </nav>
+<div id="sessionBar" class="session-bar" style="display:none"><span>ログイン中：</span><span id="sessionUser" class="session-user"></span><button id="logoutBtn" class="ghost" style="margin-left:auto">切り替える</button></div>
 
 <main>
 <section id="studentSection">
@@ -509,6 +553,32 @@
 </section>
 
 <section id="teacherSection" class="hidden">
+
+  <div class="grid">
+    <div class="card wide">
+      <h2>クラス・児童管理</h2>
+      <div class="teacher-note">このVersion 2.0は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="class-tools">
+        <div>
+          <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
+          <button id="addClassBtn" class="secondary">クラスを追加</button>
+        </div>
+        <div>
+          <label>児童を追加するクラス</label><select id="manageClassSelect"></select>
+          <label>児童名</label><input id="newStudentName" placeholder="例：あおい">
+          <button id="addStudentBtn" class="secondary">児童を追加</button>
+        </div>
+      </div>
+      <div id="managedStudentList" class="student-list"></div>
+    </div>
+    <div class="card wide">
+      <h2>クラス進捗ダッシュボード</h2>
+      <label>表示するクラス</label><select id="dashboardClassSelect"></select>
+      <div id="classSummary" class="small" style="margin-top:10px"></div>
+      <div style="overflow-x:auto"><table class="dashboard-table"><thead id="dashboardHead"></thead><tbody id="dashboardBody"></tbody></table></div>
+    </div>
+  </div>
+
   <div class="grid">
     <div class="card">
       <h2>問題の基本設定</h2>
@@ -574,7 +644,7 @@
 </main>
 
 <footer>
-  Version 1.2：たっくん教授・単元別表示・難易度・称号・学習記録を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 2.0：クラス管理・児童別履歴・教師ダッシュボード・段階式ヒントを搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
@@ -632,13 +702,17 @@ let rubrics = JSON.parse(localStorage.getItem("sansuDaigakuRubrics") || "null") 
 let problems = JSON.parse(localStorage.getItem("sansuDaigakuProblems") || "null") || structuredClone(defaultProblems);
 let currentProblemId = problems[0]?.id || null;
 let hintShown = false;
-let progress = JSON.parse(localStorage.getItem("sansuDaigakuProgress") || "null") || {
-  totalXp: 0,
-  completedProblems: [],
-  problemStats: {}
-};
-if(!progress.problemStats) progress.problemStats = {};
-let activeUnit = "すべて";
+const DEFAULT_CLASSES=[{id:"c1",name:"5年1組",students:[{id:"s1",name:"あおい"},{id:"s2",name:"けんた"},{id:"s3",name:"さくら"}]}];
+let classes=JSON.parse(localStorage.getItem("sansuDaigakuClasses")||"null")||DEFAULT_CLASSES;
+let session=JSON.parse(sessionStorage.getItem("sansuDaigakuSession")||"null");
+let progress={totalXp:0,completedProblems:[],problemStats:{}};
+let activeUnit="すべて";
+let currentHintIndex=0;
+function saveClasses(){localStorage.setItem("sansuDaigakuClasses",JSON.stringify(classes))}
+function studentProgressKey(id){return "sansuDaigakuProgress_"+id}
+function loadStudentProgress(id){return JSON.parse(localStorage.getItem(studentProgressKey(id))||"null")||{totalXp:0,completedProblems:[],problemStats:{}}}
+function saveStudentProgress(){if(session?.role==="student"&&session.studentId)localStorage.setItem(studentProgressKey(session.studentId),JSON.stringify(progress))}
+
 
 function levelFromXp(totalXp){
   return Math.floor(totalXp / 100) + 1;
@@ -673,7 +747,7 @@ function awardExperience(problemId, amount){
   const oldLevel = levelFromXp(progress.totalXp);
   progress.completedProblems.push(problemId);
   progress.totalXp += amount;
-  localStorage.setItem("sansuDaigakuProgress", JSON.stringify(progress));
+  saveStudentProgress();
   const newLevel = levelFromXp(progress.totalXp);
   updateExperienceUI();
   renderUnitFilter();
@@ -719,6 +793,44 @@ function renderRubrics(){
     });
   });
 }
+
+
+function refreshSelectors(){
+  const ids=["loginClassSelect","manageClassSelect","dashboardClassSelect"];
+  ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;const old=el.value;el.innerHTML=classes.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");if(classes.some(c=>c.id===old))el.value=old});
+  refreshStudentSelect();renderManagedStudents();renderDashboard();
+}
+function refreshStudentSelect(){
+  const cid=document.getElementById("loginClassSelect").value;
+  const c=classes.find(x=>x.id===cid);
+  document.getElementById("loginStudentSelect").innerHTML=(c?.students||[]).map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+}
+function startSession(s){
+  session=s;sessionStorage.setItem("sansuDaigakuSession",JSON.stringify(s));
+  document.getElementById("loginScreen").classList.add("hidden");document.getElementById("sessionBar").style.display="flex";
+  if(s.role==="student"){const c=classes.find(x=>x.id===s.classId);const st=c?.students.find(x=>x.id===s.studentId);document.getElementById("sessionUser").textContent=`${c?.name||""} ${st?.name||""}`;progress=loadStudentProgress(s.studentId);switchTab("student")}
+  else{document.getElementById("sessionUser").textContent="先生";switchTab("teacher")}
+  updateExperienceUI();renderUnitFilter();renderProblemList();refreshSelectors();
+}
+function logout(){sessionStorage.removeItem("sansuDaigakuSession");session=null;document.getElementById("sessionBar").style.display="none";document.getElementById("loginScreen").classList.remove("hidden");refreshSelectors()}
+function renderManagedStudents(){
+  const h=document.getElementById("managedStudentList");if(!h)return;
+  const cid=document.getElementById("manageClassSelect")?.value||classes[0]?.id;const c=classes.find(x=>x.id===cid);
+  h.innerHTML=`<strong>${escapeHtml(c?.name||"")}</strong>`+(c?.students||[]).map(s=>`<div class="student-row"><span><strong>${escapeHtml(s.name)}</strong></span><button class="ghost" onclick="removeStudent('${c.id}','${s.id}')">削除</button></div>`).join("");
+}
+function removeStudent(cid,sid){if(!confirm("この児童を削除しますか？"))return;const c=classes.find(x=>x.id===cid);c.students=c.students.filter(s=>s.id!==sid);saveClasses();refreshSelectors()}
+function renderDashboard(){
+  const cid=document.getElementById("dashboardClassSelect")?.value||classes[0]?.id;const c=classes.find(x=>x.id===cid);if(!c)return;
+  document.getElementById("dashboardHead").innerHTML=`<tr><th>児童</th><th>Lv.</th><th>EXP</th>${problems.map(p=>`<th>${escapeHtml(p.title)}</th>`).join("")}</tr>`;
+  document.getElementById("dashboardBody").innerHTML=c.students.map(st=>{const sp=loadStudentProgress(st.id);const cells=problems.map(p=>{const ps=sp.problemStats?.[p.id];if(sp.completedProblems?.includes(p.id))return `<td><span class="progress-dot done">${ps?.bestScore||0}</span></td>`;if((ps?.attempts||0)>0)return `<td><span class="progress-dot trying">${ps.bestScore||0}</span></td>`;return `<td><span class="progress-dot none">―</span></td>`}).join("");return `<tr><td><strong>${escapeHtml(st.name)}</strong></td><td>${levelFromXp(sp.totalXp||0)}</td><td>${sp.totalXp||0}</td>${cells}</tr>`}).join("");
+  document.getElementById("classSummary").textContent=`${c.students.length}人・完了問題数合計 ${c.students.reduce((a,s)=>a+(loadStudentProgress(s.id).completedProblems?.length||0),0)}件`;
+}
+function buildHints(p){
+  const rs=(p.rubrics||[]).map(r=>r.name).filter(Boolean);
+  const ks=(p.rubrics||[]).flatMap(r=>String(r.keywords||"").split(",")).map(s=>s.trim()).filter(Boolean);
+  return ["問題文の中で、説明すべき大切な言葉を見つけよう。",rs.length?`「${rs.slice(0,2).join("」「")}」の観点を入れてみよう。`:"何を、どのようにするか順番に書こう。",ks.length?`使えそうな言葉：${ks.slice(0,4).join("・")}`:"算数の言葉を一つ使ってみよう。",p.hint||"具体的な数や図を思い浮かべよう。"];
+}
+function renderHintSteps(){const p=getCurrentProblem();const hs=buildHints(p);document.getElementById("hintSteps").innerHTML=hs.map((h,i)=>`<div class="hint-step ${i<=currentHintIndex?"":"locked"}">${i<=currentHintIndex?escapeHtml(h):"🔒 まだ見られません"}</div>`).join("");document.getElementById("nextHintBtn").disabled=currentHintIndex>=hs.length-1}
 
 function renderUnitFilter(){
   const units = ["すべて", ...new Set(problems.map(p=>p.unit))];
@@ -783,6 +895,7 @@ function openProblem(id){
   const p = problems.find(x=>x.id===id);
   if(!p) return;
   currentProblemId = id;
+  currentHintIndex = 0;
   document.getElementById("studentUnit").textContent = `${p.grade}・${p.unit}`;
   document.getElementById("studentTitle").textContent = p.title;
   document.getElementById("studentQuestion").textContent = p.question;
@@ -797,6 +910,7 @@ function openProblem(id){
   document.getElementById("hintBtn").textContent = "ヒントを見る";
   document.getElementById("problemListView").classList.add("hidden");
   document.getElementById("problemDetailView").classList.remove("hidden");
+  renderHintSteps();
 }
 
 function getCurrentProblem(){
@@ -804,7 +918,19 @@ function getCurrentProblem(){
 }
 
 function switchTab(tab){
-  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  if(tab==="teacher" && session?.role!=="teacher"){alert("教師としてログインしてください。");return;}
+  
+document.getElementById("loginClassSelect").addEventListener("change",refreshStudentSelect);
+document.getElementById("studentLoginBtn").addEventListener("click",()=>{const classId=document.getElementById("loginClassSelect").value;const studentId=document.getElementById("loginStudentSelect").value;if(!studentId)return alert("児童を選んでください。");startSession({role:"student",classId,studentId})});
+document.getElementById("teacherLoginBtn").addEventListener("click",()=>{if(document.getElementById("teacherPassInput").value!=="4180")return alert("パスコードが違います。");startSession({role:"teacher"})});
+document.getElementById("logoutBtn").addEventListener("click",logout);
+document.getElementById("addClassBtn").addEventListener("click",()=>{const name=document.getElementById("newClassName").value.trim();if(!name)return;classes.push({id:"c"+Date.now(),name,students:[]});document.getElementById("newClassName").value="";saveClasses();refreshSelectors()});
+document.getElementById("addStudentBtn").addEventListener("click",()=>{const cid=document.getElementById("manageClassSelect").value;const name=document.getElementById("newStudentName").value.trim();if(!name)return;classes.find(c=>c.id===cid)?.students.push({id:"s"+Date.now(),name});document.getElementById("newStudentName").value="";saveClasses();refreshSelectors()});
+document.getElementById("manageClassSelect").addEventListener("change",renderManagedStudents);
+document.getElementById("dashboardClassSelect").addEventListener("change",renderDashboard);
+document.getElementById("nextHintBtn").addEventListener("click",()=>{currentHintIndex++;renderHintSteps()});
+
+document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   document.getElementById("studentSection").classList.toggle("hidden", tab!=="student");
   document.getElementById("teacherSection").classList.toggle("hidden", tab!=="teacher");
   if(tab==="student") showProblemList();
@@ -900,7 +1026,7 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   previousStat.bestScore = Math.max(previousStat.bestScore || 0, score);
   previousStat.maxScore = max;
   progress.problemStats[p.id] = previousStat;
-  localStorage.setItem("sansuDaigakuProgress", JSON.stringify(progress));
+  saveStudentProgress();
 
   let level = "ヒントを見て考えよう";
   let cls = "status-warn";
@@ -949,7 +1075,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   localStorage.removeItem("sansuDaigakuConfig");
   localStorage.removeItem("sansuDaigakuRubrics");
   localStorage.removeItem("sansuDaigakuProblems");
-  localStorage.removeItem("sansuDaigakuProgress");
+  if(session?.studentId)localStorage.removeItem(studentProgressKey(session.studentId));
   location.reload();
 });
 
@@ -962,10 +1088,10 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
     });
   }
   renderRubrics();
-  updateExperienceUI();
-  renderUnitFilter();
-  renderProblemList();
-  showProblemList();
+  refreshSelectors();
+  if(session){startSession(session);}else{
+    document.getElementById("loginScreen").classList.remove("hidden");
+  }
 })();
 </script>
 </body>
