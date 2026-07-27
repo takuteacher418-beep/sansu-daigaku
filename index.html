@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 4.0</title>
+<title>算数大学｜Version 4.1</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -370,7 +370,7 @@
   }
 
 
-  /* Version 4.0: 学習開始を中央に置いたコンパクトホーム */
+  /* Version 4.1: 学習開始を中央に置いたコンパクトホーム */
   #problemListView.home-layout,
   #problemListView{
     display:grid;
@@ -503,7 +503,7 @@
   }
 
 
-  /* Version 4.0: 参考デザインを反映したゲーム型ダッシュボード */
+  /* Version 4.1: 参考デザインを反映したゲーム型ダッシュボード */
   body{
     background:
       radial-gradient(circle at 50% 0,rgba(255,248,220,.95),transparent 34%),
@@ -727,7 +727,7 @@
   }
 
 
-  /* Version 4.0: 問題作成テンプレートと研究レベル評価 */
+  /* Version 4.1: 問題作成テンプレートと研究レベル評価 */
   .template-panel{
     margin:0 0 16px;
     padding:14px;
@@ -1079,7 +1079,7 @@
   <div class="grid">
     <div class="card wide">
       <h2>クラス・児童管理</h2>
-      <div class="teacher-note">このVersion 4.0は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
+      <div class="teacher-note">このVersion 4.1は端末内保存です。複数端末で同じデータを共有するには、今後クラウド化が必要です。</div>
       <div class="class-tools">
         <div>
           <label>新しいクラス名</label><input id="newClassName" placeholder="例：5年1組">
@@ -1174,11 +1174,12 @@
 </main>
 
 <footer>
-  Version 4.0：問題選択を中央に配置したコンパクト画面・算数大学キャンパス・無料版AI教授を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 4.1：問題選択を中央に配置したコンパクト画面・算数大学キャンパス・無料版AI教授を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
 function migrateFriendlyRubrics(){
+  ensureProblemData();
   let changed=false;
   problems.forEach(p=>{
     const key=Object.keys(UNIT_TEMPLATES).find(k=>String(p.unit||"").includes(k)||k.includes(String(p.unit||"")));
@@ -1441,7 +1442,48 @@ const defaultProblems = [
 ];
 
 let rubrics = JSON.parse(localStorage.getItem("sansuDaigakuRubrics") || "null") || structuredClone(defaultRubrics);
-let problems = JSON.parse(localStorage.getItem("sansuDaigakuProblems") || "null") || structuredClone(defaultProblems);
+let problems;
+try{
+  const savedProblems=JSON.parse(localStorage.getItem("sansuDaigakuProblems")||"null");
+  problems=Array.isArray(savedProblems)&&savedProblems.length
+    ? savedProblems
+    : structuredClone(defaultProblems);
+}catch(error){
+  problems=structuredClone(defaultProblems);
+  console.warn("問題データを初期問題から復元しました。",error);
+}
+
+function ensureProblemData(){
+  let repaired=false;
+  if(!Array.isArray(problems)||problems.length===0){
+    problems=structuredClone(defaultProblems);
+    repaired=true;
+  }else{
+    problems=problems.filter(p=>p&&typeof p==="object").map((p,index)=>({
+      id:p.id||`restored-${Date.now()}-${index}`,
+      grade:p.grade||"5年",
+      unit:p.unit||"未設定",
+      title:p.title||`問題${index+1}`,
+      difficulty:Number(p.difficulty||2),
+      question:p.question||"問題文が登録されていません。",
+      modelAnswer:p.modelAnswer||"",
+      hint:p.hint||"問題文の大切な言葉に注目しよう。",
+      maxScore:Number(p.maxScore||8),
+      characterName:p.characterName||"たっくん教授",
+      successComment:p.successComment||"考え方が伝わっています。",
+      rubrics:Array.isArray(p.rubrics)?p.rubrics:[]
+    }));
+    if(problems.length===0){
+      problems=structuredClone(defaultProblems);
+      repaired=true;
+    }
+  }
+  if(repaired){
+    localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+  }
+  currentProblemId=problems[0]?.id||null;
+}
+
 let currentProblemId = problems[0]?.id || null;
 let hintShown = false;
 const DEFAULT_CLASSES=[{id:"c1",name:"5年1組",students:[{id:"s1",name:"あおい",loginId:"aoi01",password:"1234"},{id:"s2",name:"けんた",loginId:"kenta01",password:"1234"},{id:"s3",name:"さくら",loginId:"sakura01",password:"1234"}]}];
@@ -1862,8 +1904,10 @@ function renderHintSteps(){
 }
 
 function renderUnitFilter(){
-  const units = ["すべて", ...new Set(problems.map(p=>p.unit))];
+  ensureProblemData();
+  const units = ["すべて", ...new Set(problems.map(p=>p.unit).filter(Boolean))];
   const holder = document.getElementById("unitFilter");
+  if(!holder)return;
   holder.innerHTML = "";
   units.forEach(unit=>{
     const btn = document.createElement("button");
@@ -1879,6 +1923,7 @@ function renderUnitFilter(){
 }
 
 function renderProblemList(){
+  ensureProblemData();
   const cards=document.getElementById("problemCards");
   const countPill=document.getElementById("problemCountPill");
   if(!cards)return;
@@ -1891,7 +1936,22 @@ function renderProblemList(){
   if(countPill)countPill.textContent=`${visibleProblems.length}問`;
 
   if(!visibleProblems.length){
-    cards.innerHTML='<div class="empty-problem-message">表示できる問題がありません。先生画面で問題を登録してください。</div>';
+    cards.innerHTML=`<div class="empty-problem-message">
+      問題データを読み込めませんでした。<br>
+      <button type="button" class="secondary" id="restoreDefaultProblemsBtn" style="margin-top:12px">初期問題を復元する</button>
+    </div>`;
+    const restoreBtn=document.getElementById("restoreDefaultProblemsBtn");
+    if(restoreBtn){
+      restoreBtn.addEventListener("click",()=>{
+        problems=structuredClone(defaultProblems);
+        localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+        activeUnit="すべて";
+        currentProblemId=problems[0]?.id||null;
+        renderUnitFilter();
+        renderProblemList();
+        refreshSelectors();
+      });
+    }
     return;
   }
 
@@ -2255,6 +2315,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 });
 
 (function load(){
+  ensureProblemData();
   const config = JSON.parse(localStorage.getItem("sansuDaigakuConfig") || "null");
   if(config){
     ["grade","unit","title","difficulty","question","modelAnswer","hint","maxScore","characterName","successComment"].forEach(k=>{
