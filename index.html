@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜プロトタイプ</title>
+<title>算数大学｜Version 1.1</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -134,14 +134,200 @@
     font-weight:800;
   }
   footer{max-width:1100px;margin:0 auto;padding:0 18px 30px;color:var(--muted);font-size:13px}
+
+  .student-dashboard{
+    position:relative;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 85% 5%, rgba(253,224,71,.30), transparent 28%),
+      radial-gradient(circle at 10% 95%, rgba(56,189,248,.24), transparent 34%),
+      linear-gradient(135deg,#ecfeff 0%,#eef2ff 48%,#fff7ed 100%);
+    border:1px solid #c7d2fe;
+    min-height:390px;
+  }
+  .student-dashboard::before,
+  .student-dashboard::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    border:3px solid rgba(79,70,229,.08);
+  }
+  .student-dashboard::before{width:140px;height:140px;right:-45px;top:-40px}
+  .student-dashboard::after{width:90px;height:90px;left:-32px;bottom:-30px}
+  .dashboard-layout{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:minmax(220px,330px) 1fr;
+    gap:26px;
+    align-items:end;
+  }
+  .professor-stage{
+    min-height:335px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .professor-image{
+    width:min(100%,310px);
+    max-height:350px;
+    object-fit:contain;
+    filter:drop-shadow(0 16px 16px rgba(15,23,42,.18));
+  }
+  .welcome-panel{align-self:center}
+  .university-logo{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 14px;
+    border-radius:16px;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(245,158,11,.32);
+    box-shadow:0 8px 18px rgba(31,41,55,.08);
+    font-size:29px;
+    font-weight:900;
+    color:#4338ca;
+  }
+  .university-logo span{color:#d97706}
+  .welcome-bubble{
+    position:relative;
+    margin-top:18px;
+    background:rgba(255,255,255,.92);
+    border:2px solid #fdba74;
+    border-radius:22px;
+    padding:17px 19px;
+    line-height:1.7;
+    font-weight:800;
+    box-shadow:0 10px 24px rgba(31,41,55,.08);
+  }
+  .welcome-bubble::before{
+    content:"";
+    position:absolute;
+    left:-16px;
+    bottom:30px;
+    border-width:11px 16px 11px 0;
+    border-style:solid;
+    border-color:transparent #fdba74 transparent transparent;
+  }
+  .welcome-bubble::after{
+    content:"";
+    position:absolute;
+    left:-12px;
+    bottom:32px;
+    border-width:9px 13px 9px 0;
+    border-style:solid;
+    border-color:transparent white transparent transparent;
+  }
+  .level-panel{
+    margin-top:18px;
+    background:rgba(255,255,255,.91);
+    border:1px solid #bfdbfe;
+    border-radius:18px;
+    padding:14px 16px;
+  }
+  .level-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:9px;
+  }
+  .level-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:20px;
+    font-weight:900;
+    color:#1d4ed8;
+  }
+  .xp-text{font-weight:900;color:#475569}
+  .xp-track{
+    height:20px;
+    border-radius:999px;
+    overflow:hidden;
+    background:#dbeafe;
+    border:2px solid #93c5fd;
+  }
+  .xp-fill{
+    height:100%;
+    width:0;
+    border-radius:999px;
+    background:linear-gradient(90deg,#22c55e,#a3e635);
+    transition:width .6s ease;
+  }
+  .dashboard-actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:14px;
+  }
+  .dashboard-action{
+    padding:11px 9px;
+    border-radius:14px;
+    text-align:center;
+    background:rgba(255,255,255,.88);
+    border:1px solid #dbeafe;
+    font-weight:850;
+    font-size:14px;
+  }
+  .dashboard-action strong{
+    display:block;
+    font-size:20px;
+    margin-bottom:3px;
+  }
+  .problem-card.completed{
+    background:linear-gradient(145deg,#f0fdf4,#ffffff);
+    border-color:#86efac;
+  }
+  .complete-mark{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin-top:9px;
+    color:#15803d;
+    font-weight:900;
+    font-size:13px;
+  }
+  .xp-reward{
+    float:right;
+    font-size:12px;
+    color:#b45309;
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    padding:4px 7px;
+    border-radius:999px;
+    font-weight:800;
+  }
+  .level-up-banner{
+    position:fixed;
+    z-index:100;
+    left:50%;
+    top:24px;
+    transform:translate(-50%,-140%);
+    padding:14px 22px;
+    border-radius:16px;
+    color:white;
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    box-shadow:0 16px 40px rgba(79,70,229,.35);
+    font-weight:900;
+    transition:transform .35s ease;
+  }
+  .level-up-banner.show{transform:translate(-50%,0)}
+
   @media(max-width:760px){
     .grid{grid-template-columns:1fr}
     .rubric-item{grid-template-columns:1fr}
     h1{font-size:24px}
+    .dashboard-layout{grid-template-columns:1fr;gap:6px}
+    .professor-stage{min-height:260px}
+    .professor-image{max-height:280px}
+    .welcome-bubble::before,.welcome-bubble::after{display:none}
+    .dashboard-actions{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
+<div id="levelUpBanner" class="level-up-banner">🎉 レベルアップ！</div>
 <header>
   <div class="brand">
     <div class="logo">Σ</div>
@@ -160,13 +346,28 @@
 <main>
 <section id="studentSection">
   <div id="problemListView" class="grid">
-    <div class="card wide">
-      <div class="character">
-        <div class="face">🦉</div>
-        <div>
-          <div class="small">さんすう教授</div>
-          <div class="speech" id="characterSpeech">
-            ようこそ、算数大学へ！ 挑戦する問題を選ぼう。
+    <div class="card wide student-dashboard">
+      <div class="dashboard-layout">
+        <div class="professor-stage">
+          <img class="professor-image" src="assets/takkun-professor.png" alt="たっくん教授">
+        </div>
+        <div class="welcome-panel">
+          <div class="university-logo">🧪 算数<span>大学</span></div>
+          <div class="welcome-bubble">
+            <div class="small">たっくん教授</div>
+            <div id="characterSpeech">算数大学へようこそ！ 問題に挑戦して、説明マスターを目指そう！</div>
+          </div>
+          <div class="level-panel">
+            <div class="level-row">
+              <div class="level-badge">⭐ Lv.<span id="studentLevel">1</span></div>
+              <div class="xp-text">EXP：<span id="studentXp">0</span> / <span id="xpNext">100</span></div>
+            </div>
+            <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+            <div class="dashboard-actions">
+              <div class="dashboard-action"><strong id="completedCount">0</strong>クリアした問題</div>
+              <div class="dashboard-action"><strong id="totalXpDisplay">0</strong>合計EXP</div>
+              <div class="dashboard-action"><strong id="nextRewardLevel">2</strong>次の目標Lv.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -196,9 +397,9 @@
 
     <div class="card wide">
       <div class="character">
-        <div class="face">🦉</div>
+        <img src="assets/takkun-professor.png" alt="たっくん教授" style="width:74px;height:74px;object-fit:contain;flex:0 0 auto">
         <div>
-          <div class="small">さんすう教授</div>
+          <div class="small">たっくん教授</div>
           <div class="speech" id="detailCharacterSpeech">
             自分のことばで、ていねいに説明してみよう。
           </div>
@@ -280,7 +481,7 @@
       <input id="maxScore" type="number" value="8" min="1" />
 
       <label>キャラクター名</label>
-      <input id="characterName" value="さんすう教授" />
+      <input id="characterName" value="たっくん教授" />
 
       <label>正解時のコメント</label>
       <input id="successComment" value="大切な言葉を使って、わかりやすく説明できたね！" />
@@ -300,7 +501,7 @@
 </main>
 
 <footer>
-  プロトタイプ版：採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
+  Version 1.1：たっくん教授・問題一覧・経験値制度を搭載。採点は登録された評価基準とキーワードを使った簡易判定です。実運用では生成AI API、ログイン、回答保存、教師確認機能などを追加します。
 </footer>
 
 <script>
@@ -318,7 +519,7 @@ const defaultProblems = [
     modelAnswer:"平均とは、いくつかの数の合計を個数で割って、同じ大きさにならした数です。",
     hint:"全部の数をどうして、そのあと何で割るか考えよう。",
     maxScore:8,
-    characterName:"さんすう教授",
+    characterName:"たっくん教授",
     successComment:"大切な言葉を使って、わかりやすく説明できたね！",
     rubrics:structuredClone(defaultRubrics)
   },
@@ -328,7 +529,7 @@ const defaultProblems = [
     modelAnswer:"わられる数とわる数を同じ数だけ10倍や100倍しても、商は変わらないからです。",
     hint:"わられる数とわる数を、同じ数だけ大きくするとどうなるか考えよう。",
     maxScore:8,
-    characterName:"さんすう教授",
+    characterName:"たっくん教授",
     successComment:"商が変わらない理由まで説明できているね！",
     rubrics:[
       {name:"同じ数だけ大きくする",keywords:"同じ数だけ,両方,どちらも",points:2},
@@ -343,7 +544,7 @@ const defaultProblems = [
     modelAnswer:"2つの図形を重ねたとき、形も大きさもぴったり重なることです。",
     hint:"形と大きさの両方に注目しよう。",
     maxScore:8,
-    characterName:"さんすう教授",
+    characterName:"たっくん教授",
     successComment:"合同の大切な意味を正しく説明できたね！",
     rubrics:[
       {name:"形が同じ",keywords:"形が同じ,形",points:2},
@@ -358,6 +559,45 @@ let rubrics = JSON.parse(localStorage.getItem("sansuDaigakuRubrics") || "null") 
 let problems = JSON.parse(localStorage.getItem("sansuDaigakuProblems") || "null") || structuredClone(defaultProblems);
 let currentProblemId = problems[0]?.id || null;
 let hintShown = false;
+let progress = JSON.parse(localStorage.getItem("sansuDaigakuProgress") || "null") || {
+  totalXp: 0,
+  completedProblems: []
+};
+
+function levelFromXp(totalXp){
+  return Math.floor(totalXp / 100) + 1;
+}
+
+function updateExperienceUI(){
+  const level = levelFromXp(progress.totalXp);
+  const currentXp = progress.totalXp % 100;
+  const completed = progress.completedProblems.length;
+  document.getElementById("studentLevel").textContent = level;
+  document.getElementById("studentXp").textContent = currentXp;
+  document.getElementById("xpNext").textContent = 100;
+  document.getElementById("xpFill").style.width = `${currentXp}%`;
+  document.getElementById("completedCount").textContent = completed;
+  document.getElementById("totalXpDisplay").textContent = progress.totalXp;
+  document.getElementById("nextRewardLevel").textContent = level + 1;
+}
+
+function awardExperience(problemId, amount){
+  if(progress.completedProblems.includes(problemId)) return false;
+  const oldLevel = levelFromXp(progress.totalXp);
+  progress.completedProblems.push(problemId);
+  progress.totalXp += amount;
+  localStorage.setItem("sansuDaigakuProgress", JSON.stringify(progress));
+  const newLevel = levelFromXp(progress.totalXp);
+  updateExperienceUI();
+  renderProblemList();
+  if(newLevel > oldLevel){
+    const banner = document.getElementById("levelUpBanner");
+    banner.textContent = `🎉 レベルアップ！ Lv.${newLevel}`;
+    banner.classList.add("show");
+    setTimeout(()=>banner.classList.remove("show"), 2600);
+  }
+  return true;
+}
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -400,12 +640,15 @@ function renderProblemList(){
   problems.forEach((p,index)=>{
     const card = document.createElement("div");
     card.className = "problem-card";
+    const completed = progress.completedProblems.includes(p.id);
+    if(completed) card.classList.add("completed");
     card.innerHTML = `
-      <div class="small">問題 ${index+1}</div>
+      <div class="small">問題 ${index+1}<span class="xp-reward">＋50 EXP</span></div>
       <div><span class="pill">${escapeHtml(p.unit)}</span></div>
       <h3>${escapeHtml(p.title)}</h3>
       <div class="small">${escapeHtml(p.question)}</div>
-      <div class="start">この問題に挑戦する →</div>
+      ${completed ? '<div class="complete-mark">✅ クリア済み</div>' : ''}
+      <div class="start">${completed ? 'もう一度挑戦する' : 'この問題に挑戦する'} →</div>
     `;
     card.addEventListener("click",()=>openProblem(p.id));
     cards.appendChild(card);
@@ -415,7 +658,8 @@ function renderProblemList(){
 function showProblemList(){
   document.getElementById("problemListView").classList.remove("hidden");
   document.getElementById("problemDetailView").classList.add("hidden");
-  document.getElementById("characterSpeech").textContent = "挑戦する問題を選ぼう。どの問題から始めても大丈夫だよ！";
+  document.getElementById("characterSpeech").textContent = "挑戦する問題を選ぼう。正しく説明できると50EXP獲得だよ！";
+  updateExperienceUI();
   renderProblemList();
 }
 
@@ -460,7 +704,7 @@ function currentTeacherProblem(){
     modelAnswer:document.getElementById("modelAnswer").value.trim(),
     hint:document.getElementById("hint").value.trim(),
     maxScore:Number(document.getElementById("maxScore").value)||8,
-    characterName:document.getElementById("characterName").value.trim() || "さんすう教授",
+    characterName:document.getElementById("characterName").value.trim() || "たっくん教授",
     successComment:document.getElementById("successComment").value.trim(),
     rubrics:structuredClone(rubrics)
   };
@@ -541,7 +785,9 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   if(ratio >= .85){
     level = "ばっちり説明できた！";
     cls = "status-ok";
+    const gained = awardExperience(p.id, 50);
     feedback = p.successComment || "大切な言葉を使って、わかりやすく説明できたね！";
+    if(gained) feedback += " 初回クリアで50EXPを獲得したよ！";
   } else if(ratio >= .55){
     level = "あと一歩！";
     feedback = "大切な考えがいくつか書けています。もう一つ言葉を足すと、さらに伝わりやすくなります。";
@@ -557,7 +803,7 @@ document.getElementById("scoreBtn").addEventListener("click",()=>{
   document.getElementById("goodList").innerHTML = good.length ? good.map(x=>`<li>${escapeHtml(x)}</li>`).join("") : "<li>これから見つけていこう。</li>";
   document.getElementById("improveList").innerHTML = improve.length ? improve.map(x=>`<li>${escapeHtml(x)}</li>`).join("") : "<li>大きな不足はありません。</li>";
   document.getElementById("feedbackText").textContent = feedback;
-  document.getElementById("detailCharacterSpeech").textContent = `${p.characterName || "さんすう教授"}：${feedback}`;
+  document.getElementById("detailCharacterSpeech").textContent = `${p.characterName || "たっくん教授"}：${feedback}`;
   document.getElementById("emptyResult").classList.add("hidden");
   document.getElementById("resultBox").classList.remove("hidden");
 });
@@ -579,6 +825,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   localStorage.removeItem("sansuDaigakuConfig");
   localStorage.removeItem("sansuDaigakuRubrics");
   localStorage.removeItem("sansuDaigakuProblems");
+  localStorage.removeItem("sansuDaigakuProgress");
   location.reload();
 });
 
@@ -591,6 +838,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
     });
   }
   renderRubrics();
+  updateExperienceUI();
   renderProblemList();
   showProblemList();
 })();
