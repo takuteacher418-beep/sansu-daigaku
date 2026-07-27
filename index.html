@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>算数大学｜Version 5.0</title>
+<title>算数大学｜Version 5.1</title>
 <style>
   :root{
     --bg:#f4f7fb;
@@ -370,7 +370,7 @@
   }
 
 
-  /* Version 5.0: 学習開始を中央に置いたコンパクトホーム */
+  /* Version 5.1: 学習開始を中央に置いたコンパクトホーム */
   #problemListView.home-layout,
   #problemListView{
     display:grid;
@@ -503,7 +503,7 @@
   }
 
 
-  /* Version 5.0: 参考デザインを反映したゲーム型ダッシュボード */
+  /* Version 5.1: 参考デザインを反映したゲーム型ダッシュボード */
   body{
     background:
       radial-gradient(circle at 50% 0,rgba(255,248,220,.95),transparent 34%),
@@ -727,7 +727,7 @@
   }
 
 
-  /* Version 5.0: 問題作成テンプレートと研究レベル評価 */
+  /* Version 5.1: 問題作成テンプレートと研究レベル評価 */
   .template-panel{
     margin:0 0 16px;
     padding:14px;
@@ -780,7 +780,7 @@
   }
 
 
-  /* Version 5.0: 見やすい問題作成ウィザード */
+  /* Version 5.1: 見やすい問題作成ウィザード */
   .problem-maker{
     display:grid;
     gap:16px;
@@ -953,7 +953,7 @@
   }
 
 
-  /* Version 5.0: かんたん問題作成 */
+  /* Version 5.1: かんたん問題作成 */
   .simple-maker-shell{
     display:grid;
     grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);
@@ -1113,6 +1113,48 @@
 .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.summary-box{padding:14px;text-align:center;border:1px solid #dbe3ef;border-radius:14px;background:#f8fafc}
 .summary-number{font-size:24px;font-weight:900;color:#4f46e5}.hidden-v5{display:none!important}
 @media(max-width:900px){.unit-layout,.question-grid{grid-template-columns:1fr}.unit-form{position:static}}@media(max-width:700px){.inline-admin,.summary-grid{grid-template-columns:1fr}}
+
+
+  /* Version 5.1: 単元保存・削除の安定化 */
+  .unit-delete-modal{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:none;
+    place-items:center;
+    padding:20px;
+    background:rgba(15,23,42,.55);
+  }
+  .unit-delete-modal.show{display:grid}
+  .unit-delete-dialog{
+    width:min(560px,100%);
+    padding:20px;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 20px 50px rgba(15,23,42,.3);
+  }
+  .unit-delete-dialog h3{margin:0 0 8px}
+  .unit-delete-options{display:grid;gap:10px;margin-top:16px}
+  .unit-delete-option{
+    width:100%;
+    text-align:left;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#1e293b;
+  }
+  .unit-delete-option strong{display:block;margin-bottom:4px}
+  .unit-delete-option.danger-choice{
+    border-color:#fca5a5;
+    background:#fff1f2;
+    color:#991b1b;
+  }
+  .unit-delete-option.safe-choice{
+    border-color:#93c5fd;
+    background:#eff6ff;
+    color:#1d4ed8;
+  }
 
   .login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#eef2ff,#ecfeff,#fff7ed)}
   .login-screen.hidden{display:none}
@@ -1489,7 +1531,28 @@
 </section>
 </main>
 
-<footer>Version 5.0：単元管理・児童管理・問題作成・結果確認・設定をタブで切り替える構成。</footer>
+
+<div id="unitDeleteModal" class="unit-delete-modal" aria-hidden="true">
+  <div class="unit-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="unitDeleteTitle">
+    <h3 id="unitDeleteTitle">単元を削除しますか？</h3>
+    <div id="unitDeleteSummary" class="small"></div>
+    <div class="unit-delete-options">
+      <button type="button" id="deleteUnitOnlyBtn" class="unit-delete-option safe-choice">
+        <strong>単元だけ削除する</strong>
+        問題は削除せず、「未所属」に移します。
+      </button>
+      <button type="button" id="deleteUnitAndProblemsBtn" class="unit-delete-option danger-choice">
+        <strong>単元と問題をすべて削除する</strong>
+        この単元に入っている問題も削除します。
+      </button>
+      <button type="button" id="cancelDeleteUnitBtn" class="unit-delete-option">
+        キャンセル
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer>Version 5.1：単元保存ボタンを修正し、単元だけ削除／単元と問題を削除できる機能を追加。</footer>
 
 <script>
 function updateProblemPreview(){
@@ -2781,7 +2844,7 @@ const DEFAULT_UNITS=[
 {id:"unit-rate",grade:"5年生",name:"割合",description:"割合の意味と求め方を理解する。"},
 {id:"unit-speed",grade:"5年生",name:"速さ",description:"速さ・道のり・時間の関係を理解する。"},
 {id:"unit-volume",grade:"5年生",name:"体積",description:"直方体や立方体の体積を理解する。"}];
-let units=[],editingUnitId=null;
+let units=[],editingUnitId=null,pendingDeleteUnitId=null;
 function normV5(v){return String(v||"").trim().replace(/\s+/g,"").toLowerCase()}
 function unitIdV5(){return "unit-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)}
 function saveUnitsV5(){localStorage.setItem("sansuDaigakuUnits",JSON.stringify(units))}
@@ -2796,16 +2859,79 @@ function renderUnitsV5(){
  h.innerHTML=units.length?units.map(u=>`<div class="unit-card"><div class="unit-title">${escapeHtml(u.name)}</div><div class="unit-meta">${escapeHtml(u.grade)}・問題 ${countUnitV5(u.id)}問</div><div class="unit-desc">${escapeHtml(u.description||"説明はありません。")}</div><div class="unit-actions"><button class="secondary" data-uq="${u.id}">この単元に問題を作る</button><button class="ghost" data-ue="${u.id}">編集</button><button class="danger" data-ud="${u.id}">削除</button></div></div>`).join(""):'<div class="empty-admin">まだ単元がありません。</div>';
  h.querySelectorAll("[data-uq]").forEach(b=>b.onclick=()=>{document.querySelector('[data-teacher-panel="questions"]').click();document.getElementById("questionUnitSelect").value=b.dataset.uq;applyUnitV5()});
  h.querySelectorAll("[data-ue]").forEach(b=>b.onclick=()=>{const u=units.find(x=>x.id===b.dataset.ue);editingUnitId=u.id;unitGrade.value=u.grade;unitName.value=u.name;unitDescription.value=u.description||"";saveUnitBtn.textContent="変更を保存する"});
- h.querySelectorAll("[data-ud]").forEach(b=>b.onclick=()=>{if(countUnitV5(b.dataset.ud)){unitSaveMessage.textContent="問題が入っている単元は削除できません。";return}units=units.filter(u=>u.id!==b.dataset.ud);saveUnitsV5();renderUnitsV5();renderUnitSelectV5()});
+ h.querySelectorAll("[data-ud]").forEach(b=>b.onclick=()=>openDeleteUnitModalV5(b.dataset.ud));
 }
-function resetUnitV5(){editingUnitId=null;unitGrade.value="5年生";unitName.value="";unitDescription.value="";saveUnitBtn.textContent="この単元を保存する"}
+function resetUnitV5(){
+ const gradeEl=document.getElementById("unitGrade");
+ const nameEl=document.getElementById("unitName");
+ const descEl=document.getElementById("unitDescription");
+ const saveBtn=document.getElementById("saveUnitBtn");
+ editingUnitId=null;
+ if(gradeEl)gradeEl.value="5年生";
+ if(nameEl)nameEl.value="";
+ if(descEl)descEl.value="";
+ if(saveBtn)saveBtn.textContent="この単元を保存する";
+}
 function saveUnitV5(){
- const grade=unitGrade.value,name=unitName.value.trim(),description=unitDescription.value.trim();
- if(!name){unitSaveMessage.textContent="単元名を入力してください。";return}
- if(units.some(u=>u.id!==editingUnitId&&normV5(u.grade)===normV5(grade)&&normV5(u.name)===normV5(name))){unitSaveMessage.textContent="同じ単元があります。";return}
- if(editingUnitId){const u=units.find(x=>x.id===editingUnitId);u.grade=grade;u.name=name;u.description=description;problems.filter(p=>p.unitId===u.id).forEach(p=>{p.grade=grade;p.unit=name});unitSaveMessage.textContent="変更を保存しました。"}
- else{units.push({id:unitIdV5(),grade,name,description});unitSaveMessage.textContent="単元を作成しました。"}
- saveUnitsV5();localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));resetUnitV5();renderUnitsV5();renderUnitSelectV5();
+ const gradeEl=document.getElementById("unitGrade");
+ const nameEl=document.getElementById("unitName");
+ const descEl=document.getElementById("unitDescription");
+ const message=document.getElementById("unitSaveMessage");
+
+ if(!gradeEl||!nameEl||!descEl||!message){
+   console.error("単元作成画面の要素を取得できません。");
+   return;
+ }
+
+ const gradeValue=gradeEl.value;
+ const nameValue=nameEl.value.trim();
+ const descriptionValue=descEl.value.trim();
+
+ if(!nameValue){
+   message.textContent="単元名を入力してください。";
+   nameEl.focus();
+   return;
+ }
+
+ const duplicate=units.find(u=>
+   u.id!==editingUnitId &&
+   normV5(u.grade)===normV5(gradeValue) &&
+   normV5(u.name)===normV5(nameValue)
+ );
+ if(duplicate){
+   message.textContent="同じ学年・同じ名前の単元がすでにあります。";
+   return;
+ }
+
+ if(editingUnitId){
+   const target=units.find(u=>u.id===editingUnitId);
+   if(!target){
+     message.textContent="編集対象の単元が見つかりませんでした。";
+     return;
+   }
+   target.grade=gradeValue;
+   target.name=nameValue;
+   target.description=descriptionValue;
+   problems.filter(p=>p.unitId===target.id).forEach(p=>{
+     p.grade=gradeValue;
+     p.unit=nameValue;
+   });
+   message.textContent=`「${nameValue}」の変更を保存しました。`;
+ }else{
+   units.push({
+     id:unitIdV5(),
+     grade:gradeValue,
+     name:nameValue,
+     description:descriptionValue
+   });
+   message.textContent=`「${nameValue}」を作成しました。`;
+ }
+
+ saveUnitsV5();
+ localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+ resetUnitV5();
+ renderUnitsV5();
+ renderUnitSelectV5();
 }
 function renderUnitSelectV5(){
  const s=document.getElementById("questionUnitSelect");if(!s)return;const old=s.value;
@@ -2834,11 +2960,119 @@ function renderResultsV5(){
  resultStudentCount.textContent=students.length;resultUnitCount.textContent=units.length;resultAnswerCount.textContent=hist.length;
  resultAdminList.innerHTML=hist.length?hist.slice().reverse().map(x=>`<div class="admin-row"><div><strong>${escapeHtml(x.studentName||x.student||"児童")}｜${escapeHtml(x.problemTitle||x.title||"問題")}</strong><div class="small">${escapeHtml(x.unit||"単元未設定")}</div></div></div>`).join(""):'<div class="empty-admin">まだ回答記録がありません。</div>';
 }
+
+function openDeleteUnitModalV5(unitId){
+ const unitData=units.find(u=>u.id===unitId);
+ if(!unitData)return;
+ pendingDeleteUnitId=unitId;
+ const count=countUnitV5(unitId);
+ const modal=document.getElementById("unitDeleteModal");
+ const summary=document.getElementById("unitDeleteSummary");
+ if(summary){
+   summary.textContent=`${unitData.grade}「${unitData.name}」には、問題が${count}問あります。`;
+ }
+ if(modal){
+   modal.classList.add("show");
+   modal.setAttribute("aria-hidden","false");
+ }
+}
+function closeDeleteUnitModalV5(){
+ pendingDeleteUnitId=null;
+ const modal=document.getElementById("unitDeleteModal");
+ if(modal){
+   modal.classList.remove("show");
+   modal.setAttribute("aria-hidden","true");
+ }
+}
+function deleteUnitOnlyV5(){
+ const unitData=units.find(u=>u.id===pendingDeleteUnitId);
+ if(!unitData)return;
+ problems.filter(p=>p.unitId===unitData.id).forEach(p=>{
+   p.unitId="";
+   p.unit="未所属";
+ });
+ units=units.filter(u=>u.id!==unitData.id);
+ saveUnitsV5();
+ localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+ closeDeleteUnitModalV5();
+ renderUnitsV5();
+ renderUnitSelectV5();
+ renderProblemList();
+ document.getElementById("unitSaveMessage").textContent=`「${unitData.name}」を削除し、問題は未所属に移しました。`;
+}
+function deleteUnitAndProblemsV5(){
+ const unitData=units.find(u=>u.id===pendingDeleteUnitId);
+ if(!unitData)return;
+ problems=problems.filter(p=>p.unitId!==unitData.id);
+ units=units.filter(u=>u.id!==unitData.id);
+ saveUnitsV5();
+ localStorage.setItem("sansuDaigakuProblems",JSON.stringify(problems));
+ closeDeleteUnitModalV5();
+ renderUnitsV5();
+ renderUnitSelectV5();
+ renderProblemList();
+ refreshSelectors();
+ document.getElementById("unitSaveMessage").textContent=`「${unitData.name}」と、その問題を削除しました。`;
+}
+
 function bindV5(){
- document.querySelectorAll("[data-teacher-panel]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".teacher-nav-btn").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".teacher-panel").forEach(x=>x.classList.remove("active"));document.getElementById("teacherPanel-"+b.dataset.teacherPanel).classList.add("active");if(b.dataset.teacherPanel==="results")renderResultsV5()});
- saveUnitBtn.onclick=saveUnitV5;cancelUnitEditBtn.onclick=()=>{resetUnitV5();renderUnitsV5()};questionUnitSelect.onchange=applyUnitV5;addStudentAdminBtn.onclick=addStudentV5;
- saveTeacherSettingsBtn.onclick=()=>{localStorage.setItem("sansuDaigakuSchoolName",teacherSchoolName.value.trim());teacherSettingsMessage.textContent="設定を保存しました。"};
- teacherSchoolName.value=localStorage.getItem("sansuDaigakuSchoolName")||"";renderUnitsV5();renderUnitSelectV5();renderStudentsV5();
+ document.querySelectorAll("[data-teacher-panel]").forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     document.querySelectorAll(".teacher-nav-btn").forEach(x=>x.classList.toggle("active",x===btn));
+     document.querySelectorAll(".teacher-panel").forEach(x=>x.classList.remove("active"));
+     document.getElementById("teacherPanel-"+btn.dataset.teacherPanel)?.classList.add("active");
+     if(btn.dataset.teacherPanel==="units")renderUnitsV5();
+     if(btn.dataset.teacherPanel==="students")renderStudentsV5();
+     if(btn.dataset.teacherPanel==="questions")renderUnitSelectV5();
+     if(btn.dataset.teacherPanel==="results")renderResultsV5();
+   });
+ });
+
+ const saveUnitButton=document.getElementById("saveUnitBtn");
+ const cancelUnitButton=document.getElementById("cancelUnitEditBtn");
+ const unitNameInput=document.getElementById("unitName");
+ const unitDescriptionInput=document.getElementById("unitDescription");
+
+ if(saveUnitButton)saveUnitButton.addEventListener("click",saveUnitV5);
+ if(cancelUnitButton)cancelUnitButton.addEventListener("click",()=>{
+   resetUnitV5();
+   renderUnitsV5();
+   document.getElementById("unitSaveMessage").textContent="";
+ });
+ if(unitNameInput)unitNameInput.addEventListener("keydown",event=>{
+   if(event.key==="Enter"){
+     event.preventDefault();
+     saveUnitV5();
+   }
+ });
+ if(unitDescriptionInput)unitDescriptionInput.addEventListener("keydown",event=>{
+   if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){
+     event.preventDefault();
+     saveUnitV5();
+   }
+ });
+
+ document.getElementById("questionUnitSelect")?.addEventListener("change",applyUnitV5);
+ document.getElementById("addStudentAdminBtn")?.addEventListener("click",addStudentV5);
+ document.getElementById("saveTeacherSettingsBtn")?.addEventListener("click",()=>{
+   localStorage.setItem("sansuDaigakuSchoolName",document.getElementById("teacherSchoolName")?.value.trim()||"");
+   const message=document.getElementById("teacherSettingsMessage");
+   if(message)message.textContent="設定を保存しました。";
+ });
+
+ document.getElementById("deleteUnitOnlyBtn")?.addEventListener("click",deleteUnitOnlyV5);
+ document.getElementById("deleteUnitAndProblemsBtn")?.addEventListener("click",deleteUnitAndProblemsV5);
+ document.getElementById("cancelDeleteUnitBtn")?.addEventListener("click",closeDeleteUnitModalV5);
+ document.getElementById("unitDeleteModal")?.addEventListener("click",event=>{
+   if(event.target.id==="unitDeleteModal")closeDeleteUnitModalV5();
+ });
+
+ const schoolInput=document.getElementById("teacherSchoolName");
+ if(schoolInput)schoolInput.value=localStorage.getItem("sansuDaigakuSchoolName")||"";
+
+ renderUnitsV5();
+ renderUnitSelectV5();
+ renderStudentsV5();
 }
 
 (function load(){
