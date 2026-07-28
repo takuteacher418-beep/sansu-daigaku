@@ -1707,7 +1707,7 @@ h1,h2,h3,h4,strong,.game-title,.teacher-title{
   z-index:1;
   background-image:
     linear-gradient(180deg,rgba(255,255,255,0) 55%,rgba(18,70,83,.12)),
-    url("assets/campus-map-v10.jpg");
+    var(--campus-map-image);
   background-size:cover;
   background-position:center 46%;
 }
@@ -1842,4 +1842,10 @@ button{
   .campus-buildings-v10 .campus-building-v9{width:118px;padding:6px 7px}
   .campus-buildings-v10 .campus-building-v9 strong{font-size:12px}
   .campus-buildings-v10 .campus-building-v9 small{font-size:9px}
+}
+
+
+/* Version 10.1: embedded campus artwork fallback */
+.campus-artwork-v10{
+  background-color:#dff1fa;
 }
