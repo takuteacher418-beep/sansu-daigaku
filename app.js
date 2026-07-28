@@ -349,8 +349,8 @@ function renderHomeCampusScene(student){
     const facilityLevel=unlocked?Math.max(1,Math.floor((campusLevel-requiredLevel)/3)+1):0;
     return `<article class="campus-building-v9 ${unlocked?"":"locked"}">
       <div class="campus-building-icon-v9">${unlocked?building.icon:"🔒"}</div>
-      <strong>${escapeHtml(building.name)}</strong>
-      <small>${unlocked?`施設 Lv.${facilityLevel}`:`キャンパス Lv.${requiredLevel}で解放`}</small>
+      <strong>${escapeHtml(building.name)}　Lv.${facilityLevel||"-"}</strong>
+      <small>${unlocked?`${"★".repeat(Math.min(5,facilityLevel))}${"☆".repeat(Math.max(0,5-facilityLevel))}`:`キャンパス Lv.${requiredLevel}で解放`}</small>
     </article>`;
   }).join("");
 

@@ -1482,3 +1482,364 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   .home-info-grid-v9{grid-template-columns:1fr}
   .campus-buildings-v9{grid-template-columns:repeat(2,1fr)}
 }
+
+
+/* =========================================================
+   Version 10.0 Stage 1 — Bright UD visual redesign
+   ========================================================= */
+:root{
+  --v10-blue:#1769b2;
+  --v10-blue-deep:#0b4f91;
+  --v10-blue-soft:#eaf5ff;
+  --v10-green:#36a85b;
+  --v10-gold:#e5a923;
+  --v10-purple:#7655bd;
+  --v10-ink:#18324b;
+  --v10-muted:#60788f;
+  --v10-line:#cbd9e6;
+  --v10-card:#ffffff;
+  --v10-shadow:0 10px 28px rgba(37,79,116,.13);
+}
+html,body,button,input,textarea,select{
+  font-family:
+    "BIZ UDPGothic",
+    "BIZ UDPゴシック",
+    "UD デジタル 教科書体 N-R",
+    "Yu Gothic UI",
+    "Yu Gothic",
+    "Hiragino Sans",
+    "Noto Sans JP",
+    sans-serif!important;
+  font-feature-settings:"palt" 0;
+}
+body{
+  color:var(--v10-ink);
+  background:#eef6fc;
+  letter-spacing:.01em;
+}
+button,input,textarea,select{font-weight:600}
+h1,h2,h3,h4,strong,.game-title,.teacher-title{
+  letter-spacing:.015em;
+}
+.campus-home-v9{
+  min-height:100vh;
+  padding:12px;
+  background:
+    radial-gradient(circle at 8% 3%,rgba(76,176,237,.18),transparent 27%),
+    linear-gradient(180deg,#f7fbff 0%,#eaf4fb 100%);
+}
+.campus-shell-v9{max-width:1460px}
+.campus-topbar-v9{
+  min-height:72px;
+  margin-bottom:12px;
+  padding:9px 18px;
+  border:1px solid #d5e1ec;
+  border-radius:17px;
+  background:rgba(255,255,255,.96);
+  box-shadow:var(--v10-shadow);
+}
+.campus-brand-v10{gap:13px}
+.campus-brand-v10 strong{
+  color:#174f88;
+  font-size:27px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.campus-brand-v10 small{
+  margin-top:1px;
+  color:#173a63;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.16em;
+}
+.campus-crest-v10{
+  width:46px;height:52px;
+  display:grid;place-items:center;
+  position:relative;
+  color:white;
+  border:3px solid #dba723;
+  border-radius:7px 7px 18px 18px;
+  background:linear-gradient(145deg,#2579bf,#0b4c8b);
+  box-shadow:0 3px 0 #12406e,0 8px 18px rgba(25,73,112,.19);
+}
+.campus-crest-v10::before,.campus-crest-v10::after{
+  content:"";
+  position:absolute;bottom:-8px;width:20px;height:25px;
+  border-bottom:4px solid #3b8f4c;
+}
+.campus-crest-v10::before{left:-13px;border-left:5px solid #3b8f4c;border-radius:0 0 0 20px;transform:rotate(-19deg)}
+.campus-crest-v10::after{right:-13px;border-right:5px solid #3b8f4c;border-radius:0 0 20px 0;transform:rotate(19deg)}
+.crest-book-v10{font-size:25px;font-weight:900}
+.topbar-actions-v10{display:flex;align-items:center;gap:10px}
+.ud-label-v10{
+  padding:6px 10px;
+  border:1px solid #c9d9e6;
+  border-radius:999px;
+  color:#557188;
+  background:#f4f9fd;
+  font-size:11px;
+  font-weight:800;
+}
+.compact-logout-v9{
+  border:1px solid #bdccda!important;
+  color:#294b68!important;
+  background:white!important;
+}
+.campus-dashboard-v9{grid-template-columns:318px minmax(0,1fr);gap:14px}
+.student-card-v9,.campus-map-card-v9,.home-info-card-v9{
+  border:1px solid #d4e0eb;
+  background:#fff;
+  box-shadow:var(--v10-shadow);
+}
+.student-card-v9{
+  padding:0;
+  overflow:hidden;
+}
+.student-profile-v9{
+  padding:17px;
+  color:white;
+  background:linear-gradient(135deg,#2676c3,#11569e);
+}
+.student-avatar-v9{
+  width:68px;height:68px;
+  border:4px solid rgba(255,255,255,.9);
+  background:linear-gradient(145deg,#fff,#eaf3fb);
+  color:#1c619f;
+  box-shadow:0 6px 15px rgba(3,41,76,.18);
+  font-size:35px;
+}
+.student-name-v9{font-size:21px;color:#fff}
+.student-title-v9{
+  display:inline-block;
+  margin-top:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  color:#174c7c;
+  background:#fff;
+  font-size:11px;
+  font-weight:800;
+}
+.student-level-v9{
+  margin:14px 14px 0;
+  padding:14px;
+  border:0;
+  background:#fff;
+}
+.level-label-v9 strong{color:#1764ae;font-size:34px}
+.level-label-v9 span{color:#47677f;font-size:13px;font-weight:800}
+.xp-track-v9{height:11px;background:#dbeaf5}
+.xp-fill-v9{background:linear-gradient(90deg,#297bd4,#5bb7ed)}
+.student-stats-v9{
+  margin:4px 14px 0;
+  gap:0;
+  border-top:1px solid #d8e3ec;
+  border-bottom:1px solid #d8e3ec;
+}
+.student-stats-v9 div{
+  padding:12px 4px;
+  border:0;
+  border-right:1px solid #d8e3ec;
+  border-radius:0;
+  background:#fff;
+}
+.student-stats-v9 div:last-child{border-right:0}
+.student-stats-v9 strong{color:#163e63;font-size:20px}
+.student-stats-v9 span{color:#60788f;font-size:11px;font-weight:700}
+.home-actions-v9{padding:14px;margin:0;gap:9px}
+.home-action-v9{
+  min-height:64px;
+  padding:10px 12px;
+  border:1px solid #c5d8e8;
+  border-radius:13px;
+  color:#1d405e;
+  background:#fff;
+  box-shadow:0 4px 11px rgba(28,75,112,.07);
+}
+.home-action-v9:hover,.home-action-v9:focus-visible{
+  transform:translateY(-2px);
+  border-color:#62a6d9;
+  background:#f4faff;
+  box-shadow:0 7px 16px rgba(28,75,112,.13);
+}
+.home-action-v9>span{
+  width:38px;height:38px;
+  display:grid;place-items:center;
+  border-radius:10px;
+  color:white;
+  background:var(--v10-blue);
+  font-size:21px;
+}
+.home-action-v9 strong{font-size:15px;color:#1a405f}
+.home-action-v9 small{font-size:11px;color:#698096}
+.home-action-v9 b{color:#3177ac}
+.primary-action-v9{
+  border-color:#8abce3;
+  background:linear-gradient(180deg,#f7fcff,#eaf6ff);
+}
+.primary-action-v9>span{background:linear-gradient(145deg,#2b82d6,#075ba8)}
+.campus-map-card-v9{
+  min-height:470px;
+  padding:0;
+  overflow:hidden;
+  background:#dff0fa;
+}
+.campus-map-card-v9::after{display:none}
+.campus-map-header-v9{
+  position:absolute;
+  z-index:5;
+  left:0;right:0;top:0;
+  min-height:64px;
+  padding:14px 18px;
+  align-items:center;
+  background:linear-gradient(90deg,rgba(13,80,150,.96),rgba(23,106,178,.88),rgba(23,106,178,.32));
+}
+.campus-map-header-v9 h2{color:white;font-size:23px;text-shadow:0 2px 6px rgba(0,0,0,.18)}
+.campus-map-header-v9 p{color:#e6f4ff;font-size:12px}
+.campus-level-badge-v9{
+  color:#18334c;
+  background:linear-gradient(180deg,#fff5be,#f0c348);
+  border:1px solid #fff4c4;
+  box-shadow:0 4px 12px rgba(62,48,9,.17);
+}
+.campus-artwork-v10{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background-image:
+    linear-gradient(180deg,rgba(255,255,255,0) 55%,rgba(18,70,83,.12)),
+    url("assets/campus-map-v10.jpg");
+  background-size:cover;
+  background-position:center 46%;
+}
+.campus-buildings-v10{
+  position:absolute;
+  z-index:4;
+  inset:78px 16px 17px;
+  display:block;
+  margin:0;
+  pointer-events:none;
+}
+.campus-buildings-v10 .campus-building-v9{
+  position:absolute;
+  min-height:auto;
+  width:155px;
+  padding:8px 10px;
+  display:block;
+  border:1px solid rgba(193,210,220,.94);
+  border-radius:12px;
+  background:rgba(255,255,255,.93);
+  box-shadow:0 7px 18px rgba(31,72,94,.19);
+  backdrop-filter:blur(4px);
+}
+.campus-buildings-v10 .campus-building-v9:nth-child(1){left:42%;top:31%}
+.campus-buildings-v10 .campus-building-v9:nth-child(2){left:8%;top:42%}
+.campus-buildings-v10 .campus-building-v9:nth-child(3){right:6%;top:40%}
+.campus-buildings-v10 .campus-building-v9:nth-child(4){left:10%;bottom:4%}
+.campus-buildings-v10 .campus-building-v9:nth-child(5){right:8%;bottom:5%}
+.campus-buildings-v10 .campus-building-icon-v9{display:none}
+.campus-buildings-v10 .campus-building-v9 strong{
+  display:block;
+  color:#26384a;
+  font-size:14px;
+  font-weight:900;
+}
+.campus-buildings-v10 .campus-building-v9 small{
+  color:#516b80;
+  font-size:11px;
+  font-weight:700;
+}
+.campus-buildings-v10 .campus-building-v9.locked{
+  filter:grayscale(.75);
+  opacity:.64;
+}
+.home-info-grid-v9{gap:14px}
+.home-info-card-v9{
+  min-height:170px;
+  padding:0;
+  overflow:hidden;
+}
+.home-info-card-v9 h3{
+  margin:0;
+  padding:12px 14px;
+  color:white;
+  background:linear-gradient(90deg,#1768b1,#2785ca);
+  font-size:16px;
+}
+.home-info-card-v9:nth-child(2) h3{background:linear-gradient(90deg,#279c4b,#43b968)}
+.home-info-card-v9:nth-child(3) h3{background:linear-gradient(90deg,#6c4eb2,#8b68cb)}
+.home-info-card-v9>div{padding:8px 11px 11px}
+.mission-item-v9,.achievement-item-v9,.next-growth-v9{
+  margin-top:6px;
+  padding:9px;
+  border:0;
+  border-bottom:1px solid #dbe5ed;
+  border-radius:0;
+  background:white;
+}
+.mission-item-v9:last-child,.achievement-item-v9:last-child{border-bottom:0}
+.mission-item-v9 strong,.achievement-item-v9 strong{
+  color:#263e55;
+  font-size:13px;
+}
+.mission-item-v9 small,.achievement-item-v9 small,.next-growth-v9 small{
+  color:#718597;
+  font-size:11px;
+}
+.mission-bar-v9{height:7px;background:#dcebf5}
+.mission-bar-v9 div{background:linear-gradient(90deg,#31a756,#68ca7d)}
+.next-growth-number-v9{color:#3869ac}
+.campus-level-modal-v9{
+  border-color:#f0c24f;
+  background:linear-gradient(180deg,#fff,#edf7ff);
+  box-shadow:0 20px 70px rgba(31,70,105,.28);
+}
+.level-caption-v9{color:#1c67ae}
+.campus-level-modal-v9 h2{color:#183e62}
+.campus-level-modal-v9 p{color:#5e778d}
+
+/* Brighten the rest of the application while retaining existing layout */
+.student-game-screen:not(.campus-home-v9),
+#teacherApp,
+#studentLoginScreen,
+#teacherLoginScreen{
+  background:linear-gradient(180deg,#f8fcff,#eaf4fb)!important;
+}
+.panel,.card,.teacher-card,.form-section,.problem-card,.professor-card,
+.record-card,.facility-card,.battle-card,.question-card{
+  border-color:#d1dfeb!important;
+  background:#fff!important;
+  box-shadow:0 8px 23px rgba(33,76,109,.10)!important;
+}
+input,textarea,select{
+  border:1px solid #bfcfdd!important;
+  color:#203f59!important;
+  background:#fff!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:#3f92cf!important;
+  box-shadow:0 0 0 3px rgba(63,146,207,.16)!important;
+  outline:none;
+}
+button{
+  border-radius:10px;
+}
+.gold-btn,.primary,.primary-btn{
+  border-color:#1766aa!important;
+  background:linear-gradient(180deg,#2d87d3,#1464ad)!important;
+  color:white!important;
+  box-shadow:0 5px 12px rgba(19,91,151,.20)!important;
+}
+.muted{color:#698096!important}
+@media(max-width:900px){
+  .campus-dashboard-v9{grid-template-columns:1fr}
+  .campus-map-card-v9{min-height:450px}
+  .campus-buildings-v10 .campus-building-v9{width:138px}
+}
+@media(max-width:620px){
+  .ud-label-v10{display:none}
+  .campus-brand-v10 strong{font-size:22px}
+  .campus-map-card-v9{min-height:430px}
+  .campus-buildings-v10 .campus-building-v9{width:118px;padding:6px 7px}
+  .campus-buildings-v10 .campus-building-v9 strong{font-size:12px}
+  .campus-buildings-v10 .campus-building-v9 small{font-size:9px}
+}

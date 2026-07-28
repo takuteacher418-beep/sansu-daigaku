@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 9.0</title>
+<title>算数大学｜Version 10.0</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -44,7 +44,7 @@
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>9.0</strong>★★★★</div>
+    <div class="version-badge">Version<strong>10.0</strong>★★★★</div>
   </header>
   <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
@@ -251,14 +251,19 @@
   <section id="studentScreen-home" class="student-game-screen campus-home-v9 active">
     <div class="campus-shell-v9">
       <header class="campus-topbar-v9">
-        <div class="campus-brand-v9">
-          <span class="campus-brand-icon-v9">🏛</span>
+        <div class="campus-brand-v9 campus-brand-v10">
+          <span class="campus-crest-v10" aria-hidden="true">
+            <span class="crest-book-v10">▤</span>
+          </span>
           <div>
             <strong>算数大学</strong>
-            <small>自分の考えでキャンパスを育てよう</small>
+            <small>SANSU UNIVERSITY</small>
           </div>
         </div>
-        <button id="studentLogoutBtn" class="ghost compact-logout-v9">ログアウト</button>
+        <div class="topbar-actions-v10">
+          <span class="ud-label-v10">UDデザイン</span>
+          <button id="studentLogoutBtn" class="ghost compact-logout-v9">ログアウト</button>
+        </div>
       </header>
 
       <div class="campus-dashboard-v9">
@@ -313,7 +318,8 @@
               </div>
               <span id="campusRankBadge" class="campus-level-badge-v9">キャンパス Lv.1</span>
             </div>
-            <div id="homeCampusScene" class="campus-buildings-v9"></div>
+            <div class="campus-artwork-v10" aria-hidden="true"></div>
+            <div id="homeCampusScene" class="campus-buildings-v9 campus-buildings-v10"></div>
           </section>
 
           <div class="home-info-grid-v9">
