@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 7.1</title>
+<title>算数大学｜Version 7.2</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 7.1: 成長・経験値システム */
+/* Version 7.2: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -495,7 +495,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 /* =========================================================
-   Version 7.1 - Full-screen educational RPG / SPA
+   Version 7.2 - Full-screen educational RPG / SPA
    ========================================================= */
 #studentApp{
   min-height:100vh;
@@ -982,7 +982,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 7.1: screen visibility and draft save */
+/* Version 7.2: screen visibility and draft save */
 .student-game-screen:not(.active){
   display:none !important;
 }
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 7.1: unique professor reactions and subject effects */
+/* Version 7.2: unique professor reactions and subject effects */
 .professor-portrait-wrap{
   position:relative;
   justify-self:center;
@@ -1093,6 +1093,114 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   font-size:12px;
 }
 
+
+/* Version 7.2: teacher review and retry learning */
+.review-filters{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+.review-card{
+  border:1px solid #315b93;
+  border-radius:15px;
+  overflow:hidden;
+  background:linear-gradient(180deg,#0b2856,#06162f);
+}
+.review-card-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  padding:15px;
+  border-bottom:1px solid #31558c;
+}
+.review-card-body{padding:15px}
+.review-status{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+}
+.review-status.pending{color:#2b220c;background:#f3ce68}
+.review-status.approved{color:#eafff1;background:#177849}
+.review-status.retry{color:#fff0f2;background:#9c3345}
+.review-status.partial{color:#eef4ff;background:#415d91}
+.answer-history{
+  display:grid;
+  gap:9px;
+  margin:12px 0;
+}
+.answer-attempt{
+  padding:12px;
+  border:1px solid #34598d;
+  border-radius:11px;
+  background:#071831;
+}
+.answer-attempt.latest{
+  border-color:#e0b94f;
+  box-shadow:0 0 0 2px rgba(224,185,79,.1);
+}
+.answer-attempt-text{
+  margin-top:7px;
+  color:#f3f7ff;
+  line-height:1.75;
+  white-space:pre-wrap;
+}
+.teacher-review-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.teacher-review-actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:13px;
+}
+.teacher-feedback-box{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid #836721;
+  border-radius:11px;
+  color:#ffe7a1;
+  background:rgba(99,67,10,.2);
+}
+.retry-guide{
+  margin-top:13px;
+  padding:15px;
+  border:1px solid #d1a744;
+  border-radius:13px;
+  color:#fff0b6;
+  background:linear-gradient(180deg,rgba(120,80,11,.32),rgba(70,46,5,.18));
+}
+.retry-count{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 9px;
+  border-radius:999px;
+  color:#ddecff;
+  background:#15396d;
+  font-size:12px;
+}
+.revision-highlight{
+  margin-top:10px;
+  padding:10px;
+  border-left:4px solid #62b2ff;
+  color:#cfe4ff;
+  background:rgba(29,86,151,.18);
+}
+.review-correction-note{
+  color:#ffd979;
+  font-weight:900;
+}
+@media(max-width:850px){
+  .review-filters,.teacher-review-grid{grid-template-columns:1fr}
+  .teacher-review-actions{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1133,7 +1241,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>7.1</strong>★★★</div>
+    <div class="version-badge">Version<strong>7.2</strong>★★★</div>
   </header>
   <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
@@ -1265,8 +1373,28 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 
     <section id="panel-results" class="panel">
       <div class="card">
-        <div class="card-head"><h2>📊 結果確認</h2><button id="clearResultsBtn" class="danger">回答履歴を消去</button></div>
-        <div class="card-body"><div id="resultList" class="list"></div></div>
+        <div class="card-head">
+          <div>
+            <h2>📊 採点・回答確認</h2>
+            <div class="muted">自動判定を確認し、正解・部分正解・再提出へ修正できます。</div>
+          </div>
+          <button id="clearResultsBtn" class="danger">回答履歴を消去</button>
+        </div>
+        <div class="card-body">
+          <div class="review-filters">
+            <select id="resultStudentFilter"><option value="">すべての児童</option></select>
+            <select id="resultUnitFilter"><option value="">すべての単元</option></select>
+            <select id="resultStatusFilter">
+              <option value="">すべての状態</option>
+              <option value="pending">未確認</option>
+              <option value="approved">正解</option>
+              <option value="partial">部分正解</option>
+              <option value="retry">再提出</option>
+            </select>
+            <input id="resultSearchInput" placeholder="問題名・回答を検索">
+          </div>
+          <div id="resultList" class="list"></div>
+        </div>
       </div>
     </section>
 
@@ -1449,6 +1577,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
           <button id="showBattleHintBtn" class="secondary">💡 ヒントを見る</button>
           <button id="submitAnswerBtn" class="battle-submit">🎓 教授を納得させる！</button>
         </div>
+        <div id="retryGuide" class="retry-guide hidden"></div>
         <div id="studentScoreBox" class="battle-feedback hidden"></div>
         <div id="researchLevelCard" class="research-level-card hidden"></div>
       </div>
@@ -1612,7 +1741,14 @@ function loadData(){
             ...(student.progress||{})
           }
         })):[],
-        results:Array.isArray(saved.results)?saved.results:[],
+        results:Array.isArray(saved.results)?saved.results.map(result=>({
+          reviewStatus:"pending",
+          teacherScore:null,
+          teacherComment:"",
+          teacherReviewedAt:"",
+          attemptNumber:1,
+          ...result
+        })):[],
         drafts:saved.drafts&&typeof saved.drafts==="object"?saved.drafts:{}
       };
     }
@@ -1891,22 +2027,156 @@ function renderStudents(){
     </div>
   </div>`).join("");
 }
+
+function getResultStatus(result){
+  return result.reviewStatus||"pending";
+}
+function getStatusLabel(status){
+  return {
+    pending:"未確認",
+    approved:"正解",
+    partial:"部分正解",
+    retry:"再提出"
+  }[status]||"未確認";
+}
+function populateResultFilters(){
+  const studentSelect=document.getElementById("resultStudentFilter");
+  const unitSelect=document.getElementById("resultUnitFilter");
+  if(!studentSelect||!unitSelect)return;
+  const currentStudent=studentSelect.value;
+  const currentUnit=unitSelect.value;
+  studentSelect.innerHTML='<option value="">すべての児童</option>'+
+    data.students.map(student=>`<option value="${student.id}">${escapeHtml(student.name)}</option>`).join("");
+  unitSelect.innerHTML='<option value="">すべての単元</option>'+
+    data.units.map(unit=>`<option value="${unit.id}">${escapeHtml(unit.grade)}｜${escapeHtml(unit.name)}</option>`).join("");
+  if(data.students.some(student=>student.id===currentStudent))studentSelect.value=currentStudent;
+  if(data.units.some(unit=>unit.id===currentUnit))unitSelect.value=currentUnit;
+}
+function getProblemAttemptHistory(studentId,problemId){
+  return data.results
+    .filter(result=>result.studentId===studentId&&result.problemId===problemId)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+}
+function updateTeacherReview(resultId,status){
+  const result=data.results.find(item=>item.id===resultId);
+  if(!result)return;
+  const scoreInput=document.querySelector(`[data-review-score="${resultId}"]`);
+  const commentInput=document.querySelector(`[data-review-comment="${resultId}"]`);
+  const score=scoreInput?.value===""?null:Number(scoreInput?.value);
+  result.reviewStatus=status;
+  result.teacherScore=Number.isFinite(score)?score:null;
+  result.teacherComment=commentInput?.value.trim()||"";
+  result.teacherReviewedAt=new Date().toLocaleString("ja-JP");
+
+  const student=data.students.find(item=>item.id===result.studentId);
+  const problem=data.problems.find(item=>item.id===result.problemId);
+  if(student&&problem){
+    const progress=ensureStudentProgress(student);
+    if(status==="approved"){
+      if(!progress.completedProblems.includes(problem.id)){
+        awardExperience(student,problem,Number(problem.difficulty||2)*25);
+      }
+    }
+    if(status==="retry"){
+      progress.completedProblems=progress.completedProblems.filter(id=>id!==problem.id);
+    }
+  }
+  saveData();
+  showToast(`採点を「${getStatusLabel(status)}」として保存しました。`);
+}
+function saveTeacherComment(resultId){
+  const result=data.results.find(item=>item.id===resultId);
+  if(!result)return;
+  const scoreInput=document.querySelector(`[data-review-score="${resultId}"]`);
+  const commentInput=document.querySelector(`[data-review-comment="${resultId}"]`);
+  const score=scoreInput?.value===""?null:Number(scoreInput?.value);
+  result.teacherScore=Number.isFinite(score)?score:null;
+  result.teacherComment=commentInput?.value.trim()||"";
+  result.teacherReviewedAt=new Date().toLocaleString("ja-JP");
+  saveData();
+  showToast("教師コメントと得点を保存しました。");
+}
+
 function renderResults(){
+  populateResultFilters();
   const holder=document.getElementById("resultList");
-  if(!data.results.length){
-    holder.innerHTML='<div class="empty">まだ回答履歴がありません。</div>';
+  const studentFilter=document.getElementById("resultStudentFilter")?.value||"";
+  const unitFilter=document.getElementById("resultUnitFilter")?.value||"";
+  const statusFilter=document.getElementById("resultStatusFilter")?.value||"";
+  const search=normalize(document.getElementById("resultSearchInput")?.value||"");
+
+  let results=[...data.results].reverse().filter(result=>{
+    const problem=data.problems.find(item=>item.id===result.problemId);
+    if(studentFilter&&result.studentId!==studentFilter)return false;
+    if(unitFilter&&problem?.unitId!==unitFilter)return false;
+    if(statusFilter&&getResultStatus(result)!==statusFilter)return false;
+    if(search){
+      const student=data.students.find(item=>item.id===result.studentId);
+      const text=normalize(`${student?.name||""}${problem?.title||""}${result.response||""}${result.teacherComment||""}`);
+      if(!text.includes(search))return false;
+    }
+    return true;
+  });
+
+  if(!results.length){
+    holder.innerHTML='<div class="empty">条件に合う回答はありません。</div>';
     return;
   }
-  holder.innerHTML=[...data.results].reverse().map(result=>{
-    const student=data.students.find(s=>s.id===result.studentId);
-    const problem=data.problems.find(p=>p.id===result.problemId);
-    return `<div class="result-card">
-      <div>
-        <strong>${escapeHtml(student?.name||"削除された児童")}｜${escapeHtml(problem?.title||"削除された問題")}</strong>
-        <div class="muted">${escapeHtml(result.date)}｜${escapeHtml(result.score)} / ${escapeHtml(result.maxScore||"")}点｜研究Lv.${escapeHtml(result.researchLevel||1)}${result.xpGained?`｜+${escapeHtml(result.xpGained)}EXP`:""}</div>
+
+  holder.innerHTML=results.map(result=>{
+    const student=data.students.find(item=>item.id===result.studentId);
+    const problem=data.problems.find(item=>item.id===result.problemId);
+    const unit=data.units.find(item=>item.id===problem?.unitId);
+    const status=getResultStatus(result);
+    const history=getProblemAttemptHistory(result.studentId,result.problemId);
+    const latest=history[history.length-1]?.id===result.id;
+    const displayedScore=result.teacherScore??result.score;
+    const historyHtml=history.map((attempt,index)=>`
+      <div class="answer-attempt ${attempt.id===result.id?"latest":""}">
+        <div style="display:flex;justify-content:space-between;gap:10px">
+          <strong>第${index+1}回の回答</strong>
+          <span class="muted">${escapeHtml(attempt.date)}</span>
+        </div>
+        <div class="answer-attempt-text">${escapeHtml(attempt.response||"")}</div>
+        <div class="muted" style="margin-top:7px">自動判定：${escapeHtml(attempt.score)}/${escapeHtml(attempt.maxScore||"")}点｜納得度 ${escapeHtml(attempt.persuasion||0)}%</div>
+      </div>`).join("");
+
+    return `<article class="review-card">
+      <div class="review-card-head">
+        <div>
+          <strong>${escapeHtml(student?.name||"削除された児童")}｜${escapeHtml(problem?.title||"削除された問題")}</strong>
+          <div class="muted">${escapeHtml(unit?.name||"未所属")}｜第${result.attemptNumber||history.findIndex(item=>item.id===result.id)+1}回提出</div>
+        </div>
+        <span class="review-status ${status}">${getStatusLabel(status)}</span>
       </div>
-      <button class="danger" data-delete-result="${result.id}">削除</button>
-    </div>`;
+      <div class="review-card-body">
+        <details ${latest?"open":""}>
+          <summary>回答の変化を見る（${history.length}回）</summary>
+          <div class="answer-history">${historyHtml}</div>
+        </details>
+
+        <div class="teacher-review-grid">
+          <div>
+            <label>教師による得点</label>
+            <input type="number" min="0" max="${escapeHtml(result.maxScore||10)}"
+              value="${result.teacherScore??result.score??""}" data-review-score="${result.id}">
+          </div>
+          <div>
+            <label>教師コメント・再提出の助言</label>
+            <textarea data-review-comment="${result.id}" placeholder="例：『個数で等しく分ける』という考えを加えてみよう。">${escapeHtml(result.teacherComment||"")}</textarea>
+          </div>
+        </div>
+
+        ${result.teacherComment?`<div class="teacher-feedback-box"><span class="review-correction-note">教師コメント：</span>${escapeHtml(result.teacherComment)}</div>`:""}
+
+        <div class="teacher-review-actions">
+          <button class="green-btn" data-review-action="approved" data-result-id="${result.id}">正解にする</button>
+          <button class="secondary" data-review-action="partial" data-result-id="${result.id}">部分正解にする</button>
+          <button class="danger" data-review-action="retry" data-result-id="${result.id}">再提出にする</button>
+        </div>
+        <button class="ghost" style="width:100%;margin-top:8px" data-save-review="${result.id}">得点・コメントだけ保存</button>
+      </div>
+    </article>`;
   }).join("");
 }
 function renderLoginStudents(){
@@ -2268,6 +2538,40 @@ function chooseProfessor(professorId){
   selectedProfessorId=professorId;
   renderProfessorSelection();
 }
+
+function getLatestResultForCurrentProblem(){
+  return [...data.results].reverse().find(result=>
+    result.studentId===activeStudentId&&result.problemId===selectedMissionProblemId
+  )||null;
+}
+function renderRetryGuidance(){
+  const box=document.getElementById("retryGuide");
+  if(!box)return;
+  const latest=getLatestResultForCurrentProblem();
+  if(!latest){
+    box.classList.add("hidden");
+    box.innerHTML="";
+    return;
+  }
+  const attempts=getProblemAttemptHistory(activeStudentId,selectedMissionProblemId);
+  const needsRetry=getResultStatus(latest)==="retry"||!latest.passed;
+  if(!needsRetry){
+    box.classList.add("hidden");
+    return;
+  }
+  const teacherComment=latest.teacherComment?.trim();
+  const missingKeywords=(latest.missingKeywords||[]).slice(0,4);
+  box.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <strong>🔄 再挑戦モード</strong>
+      <span class="retry-count">${attempts.length}回挑戦済み</span>
+    </div>
+    <div style="margin-top:8px">${teacherComment
+      ?`先生からの助言：${escapeHtml(teacherComment)}`
+      :"教授の助言を参考に、前の回答を残したまま説明を書き直そう。"}</div>
+    ${missingKeywords.length?`<div class="revision-highlight">加えるとよい考え：${missingKeywords.map(escapeHtml).join("・")}</div>`:""}`;
+  box.classList.remove("hidden");
+}
+
 function startProfessorBattle(){
   const problem=data.problems.find(item=>item.id===selectedMissionProblemId);
   const professor=PROFESSORS[selectedProfessorId];
@@ -2286,6 +2590,7 @@ function startProfessorBattle(){
   document.getElementById("persuasionFill").style.width="0%";
   document.getElementById("persuasionText").textContent="0%";
   restoreCurrentDraft();
+  renderRetryGuidance();
   document.getElementById("studentScoreBox").classList.add("hidden");
   document.getElementById("researchLevelCard").classList.add("hidden");
   showStudentScreen("battle");
@@ -2339,12 +2644,22 @@ function submitStudentAnswer(){
   if(evaluation.passed)gained=awardExperience(student,problem,xpReward);
   const researchPointReward=evaluation.passed?Math.max(15,Math.round(persuasion/2)):5;
 
+  const previousAttempts=getProblemAttemptHistory(activeStudentId,problem.id);
+  const missingKeywords=evaluation.checks.filter(check=>!check.hit).map(check=>check.keyword);
   const result={
     id:uid("result"),studentId:activeStudentId,problemId:problem.id,
     professorId:selectedProfessorId,response,score,maxScore,researchLevel,
     xpGained:gained?xpReward:0,researchPointsGained:researchPointReward,
     keywordRatio:evaluation.keywordRatio,passed:evaluation.passed,
-    persuasion,date:new Date().toLocaleString("ja-JP")
+    persuasion,
+    attemptNumber:previousAttempts.length+1,
+    previousResponse:previousAttempts.length?previousAttempts[previousAttempts.length-1].response:"",
+    missingKeywords,
+    reviewStatus:evaluation.passed?"pending":"retry",
+    teacherScore:null,
+    teacherComment:"",
+    teacherReviewedAt:"",
+    date:new Date().toLocaleString("ja-JP")
   };
   data.results.push(result);
   saveData();
@@ -2382,6 +2697,7 @@ function submitStudentAnswer(){
     setTimeout(()=>showVictoryScreen(result),1500);
   }else{
     saveCurrentDraft(false);
+    renderRetryGuidance();
   }
 }
 function showVictoryScreen(result){
@@ -2428,6 +2744,8 @@ function renderStudentRecords(){
     return `<div class="records-result-row">
       <strong>${escapeHtml(problem?.title||"削除された問題")}</strong>
       <div class="muted">${escapeHtml(professor.name)}｜納得度 ${result.persuasion||0}%｜${escapeHtml(result.date)}</div>
+      <div style="margin-top:5px">教師確認：<span class="review-status ${getResultStatus(result)}">${getStatusLabel(getResultStatus(result))}</span></div>
+      ${result.teacherComment?`<div class="teacher-feedback-box">先生から：${escapeHtml(result.teacherComment)}</div>`:""}
     </div>`;
   }).join(""):'<div class="empty">まだ教授バトルの記録がありません。</div>';
 }
@@ -2516,6 +2834,10 @@ function bindEvents(){
   document.getElementById("showBattleHintBtn").addEventListener("click",toggleBattleHint);
   document.getElementById("submitAnswerBtn").addEventListener("click",submitStudentAnswer);
   document.getElementById("nextProblemBtn").addEventListener("click",moveToNextProblem);
+  ["resultStudentFilter","resultUnitFilter","resultStatusFilter"].forEach(id=>{
+    document.getElementById(id).addEventListener("change",renderResults);
+  });
+  document.getElementById("resultSearchInput").addEventListener("input",renderResults);
   document.getElementById("saveDraftBtn").addEventListener("click",()=>saveCurrentDraft(true));
   document.getElementById("studentResponse").addEventListener("input",event=>{
     const length=event.target.value.length;
@@ -2532,6 +2854,8 @@ function bindEvents(){
     const selectUnit=event.target.closest("[data-select-unit]");
     const selectProblem=event.target.closest("[data-select-problem]");
     const selectProfessor=event.target.closest("[data-select-professor]");
+    const reviewAction=event.target.closest("[data-review-action]");
+    const saveReview=event.target.closest("[data-save-review]");
     const editUnit=event.target.closest("[data-edit-unit]");
     const deleteUnit=event.target.closest("[data-delete-unit]");
     const createProblem=event.target.closest("[data-create-problem]");
@@ -2547,6 +2871,8 @@ function bindEvents(){
     if(selectUnit)chooseStudentUnit(selectUnit.dataset.selectUnit);
     if(selectProblem)chooseStudentProblem(selectProblem.dataset.selectProblem);
     if(selectProfessor)chooseProfessor(selectProfessor.dataset.selectProfessor);
+    if(reviewAction)updateTeacherReview(reviewAction.dataset.resultId,reviewAction.dataset.reviewAction);
+    if(saveReview)saveTeacherComment(saveReview.dataset.saveReview);
     if(editUnit)openUnitModal(editUnit.dataset.editUnit);
     if(deleteUnit)openDeleteUnit(deleteUnit.dataset.deleteUnit);
     if(createProblem){setPanel("problems");document.getElementById("problemUnit").value=createProblem.dataset.createProblem;document.getElementById("problemTitle").focus()}
