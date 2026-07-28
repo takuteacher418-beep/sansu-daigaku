@@ -1849,3 +1849,187 @@ button{
 .campus-artwork-v10{
   background-color:#dff1fa;
 }
+
+
+/* =========================================================
+   Version 10.5 — Original world art and game identity
+   ========================================================= */
+:root{
+  --v105-gold:#e4ad2a;
+  --v105-gold-deep:#a96c0e;
+  --v105-navy:#123d69;
+  --v105-sky:#dff4ff;
+}
+.campus-header-badges-v105{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.world-badge-v105{
+  padding:6px 10px;border:1px solid rgba(255,255,255,.7);border-radius:999px;
+  color:white;background:rgba(13,55,96,.38);backdrop-filter:blur(5px);
+  font-size:9px;font-weight:900;letter-spacing:.13em;
+}
+.vector-menu-icon-v105 svg{width:27px;height:27px;display:block}
+.student-avatar-v9 svg{width:43px;height:43px;display:block}
+.home-action-v9>span.vector-menu-icon-v105{
+  color:#fff;
+  background:linear-gradient(145deg,#378fd7,#125da5);
+  border:2px solid rgba(255,255,255,.8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 5px 12px rgba(25,80,126,.18);
+}
+.home-action-v9[data-student-nav="records"]>span{background:linear-gradient(145deg,#805fc0,#5b3c99)}
+.home-action-v9[data-student-nav="facilities"]>span{background:linear-gradient(145deg,#45b56d,#23884a)}
+.section-emblem-v105{
+  display:inline-grid;place-items:center;width:25px;height:25px;margin-right:6px;
+  border-radius:8px;color:#174b78;background:linear-gradient(180deg,#fff6bf,#eab835);
+  box-shadow:0 2px 5px rgba(36,49,62,.18);font-size:13px;
+}
+.home-info-card-v9:nth-child(2) .section-emblem-v105{color:#4d3388;background:linear-gradient(180deg,#eee6ff,#c4adf0)}
+.home-info-card-v9:nth-child(3) .section-emblem-v105{color:#17643b;background:linear-gradient(180deg,#dcffe9,#82dca1)}
+.mission-seal-v105{
+  display:inline-grid;place-items:center;width:21px;height:21px;margin-right:5px;
+  border:2px solid #8fa6b9;border-radius:7px;color:#6d8496;background:#f2f7fa;font-size:10px;
+}
+.mission-seal-v105.complete{border-color:#32a75a;color:#fff;background:#32a75a}
+
+/* Campus becomes a layered game world rather than labels over a photograph */
+.campus-map-card-v9{
+  min-height:540px;
+  background:
+    radial-gradient(circle at 50% 8%,rgba(255,255,255,.95),transparent 35%),
+    linear-gradient(180deg,#9ee0ff 0 35%,#80cb70 35% 72%,#72b561 72% 100%);
+}
+.campus-artwork-v10{
+  opacity:.25;
+  filter:saturate(.8) brightness(1.12);
+  mix-blend-mode:soft-light;
+}
+.campus-map-card-v9::before{
+  content:"";position:absolute;z-index:2;left:-5%;right:-5%;bottom:-3%;height:58%;
+  background:
+    radial-gradient(ellipse at 17% 35%,#82c96e 0 7%,transparent 7.5%),
+    radial-gradient(ellipse at 80% 38%,#77c164 0 8%,transparent 8.5%),
+    linear-gradient(150deg,transparent 0 44%,rgba(244,224,180,.88) 45% 51%,transparent 52%),
+    linear-gradient(30deg,transparent 0 43%,rgba(244,224,180,.85) 44% 51%,transparent 52%);
+  pointer-events:none;
+}
+.campus-buildings-v10{
+  inset:72px 10px 8px;
+  z-index:4;
+}
+.campus-building-v105{
+  position:absolute;width:30%;max-width:255px;min-width:175px;
+  transition:transform .35s ease,filter .35s ease,opacity .35s ease;
+  pointer-events:auto;
+}
+.campus-building-v105:hover{transform:translateY(-6px) scale(1.025);z-index:8}
+.campus-building-v105.building-slot-1{left:35%;top:8%;z-index:5}
+.campus-building-v105.building-slot-2{left:2%;top:30%}
+.campus-building-v105.building-slot-3{right:1%;top:30%}
+.campus-building-v105.building-slot-4{left:10%;bottom:0}
+.campus-building-v105.building-slot-5{right:9%;bottom:0}
+.building-art-v105{
+  width:100%;aspect-ratio:400/230;background-position:center;background-size:contain;background-repeat:no-repeat;
+  filter:drop-shadow(0 9px 8px rgba(35,70,55,.21));
+}
+.building-status-v105{
+  width:82%;margin:-15px auto 0;padding:7px 10px;position:relative;
+  border:1px solid rgba(184,205,217,.95);border-radius:12px;text-align:center;
+  background:rgba(255,255,255,.94);box-shadow:0 6px 15px rgba(30,74,91,.15);
+}
+.building-status-v105 strong,.building-status-v105 span,.building-status-v105 small{display:block}
+.building-status-v105 strong{color:#203b52;font-size:13px;font-weight:900}
+.building-status-v105 span{color:#557086;font-size:10px;font-weight:800}
+.building-status-v105 small{color:#d39112;font-size:11px;letter-spacing:.04em}
+.campus-building-v105.locked{filter:grayscale(.82);opacity:.58}
+.campus-building-v105.locked .building-status-v105 small{color:#788c9b}
+
+/* Level-based living-campus effects */
+.campus-map-card-v9 .campus-season-effect-v105{display:none}
+.campus-map-card-v9.campus-stage-fountain::after{
+  content:"";position:absolute;z-index:3;left:48%;bottom:22%;width:44px;height:44px;border-radius:50%;
+  border:7px solid rgba(245,252,255,.92);background:radial-gradient(circle,#e7fbff 0 25%,#6fc7e5 27% 58%,#e9fdff 60%);
+  box-shadow:0 5px 11px rgba(31,86,101,.22);
+}
+.campus-map-card-v9.campus-stage-flowers{
+  box-shadow:inset 0 -13px 0 rgba(255,255,255,.08),var(--v10-shadow);
+}
+.campus-map-card-v9.campus-stage-flowers .campus-buildings-v10::before{
+  content:"✿  ✦  ✿     ✦  ✿     ✿  ✦";
+  position:absolute;left:7%;right:7%;bottom:6%;color:#fff0a5;font-size:23px;letter-spacing:24px;
+  text-shadow:0 2px 0 #e6879b;opacity:.92;
+}
+.campus-map-card-v9.campus-stage-clock .campus-buildings-v10::after{
+  content:"Ⅻ";position:absolute;left:48%;top:14%;display:grid;place-items:center;width:38px;height:38px;
+  border:5px solid #d8a72d;border-radius:50%;color:#24455f;background:#fff;font-family:serif;font-size:12px;font-weight:900;
+  box-shadow:0 5px 11px rgba(35,62,78,.2);
+}
+.campus-map-card-v9.campus-stage-festival .campus-map-header-v9{
+  background:linear-gradient(90deg,#7444a8,#277ec0,#29a267);
+}
+.campus-map-card-v9.campus-stage-festival .campus-map-header-v9::after{
+  content:"★ CAMPUS FESTIVAL ★";position:absolute;right:22px;bottom:-29px;padding:5px 13px;
+  border-radius:0 0 10px 10px;color:#563f0a;background:#ffe17a;font-size:10px;font-weight:900;letter-spacing:.1em;
+}
+
+/* Professor selection and battle presentation */
+.professor-select-grid{gap:16px}
+.professor-select-card{
+  overflow:hidden!important;padding:0!important;border:1px solid #cad9e5!important;border-radius:18px!important;
+  background:#fff!important;box-shadow:0 10px 25px rgba(31,71,104,.13)!important;
+  transition:transform .25s ease,box-shadow .25s ease!important;
+}
+.professor-select-card:hover{transform:translateY(-6px);box-shadow:0 17px 33px rgba(31,71,104,.2)!important}
+.professor-select-card.selected{outline:4px solid rgba(228,173,42,.55)!important;border-color:#dba52a!important}
+.professor-select-art{
+  width:100%!important;height:245px!important;object-fit:cover!important;object-position:center 18%!important;
+  background:#d9efff!important;
+}
+.professor-select-info{padding:14px 15px 17px!important}
+.professor-select-info h3{color:#173d61!important;font-size:18px!important}
+.professor-recommended{
+  top:10px!important;right:10px!important;padding:6px 11px!important;border-radius:999px!important;
+  color:#614307!important;background:linear-gradient(180deg,#fff2a6,#eab934)!important;
+  border:2px solid #fff!important;box-shadow:0 4px 10px rgba(51,47,19,.18)!important;
+}
+.professor-portrait-wrap{
+  border:5px solid rgba(255,255,255,.92)!important;border-radius:25px!important;
+  background:linear-gradient(180deg,#dff2ff,#bcdaf0)!important;
+  box-shadow:0 18px 45px rgba(16,53,82,.26)!important;
+}
+.battle-professor-image{object-fit:cover!important;object-position:center 16%!important}
+.professor-state-label{
+  color:#1d4361!important;background:linear-gradient(180deg,#fff5b9,#e7b632)!important;
+  border:2px solid white!important;box-shadow:0 4px 11px rgba(42,49,54,.2)!important;
+}
+.battle-nameplate{
+  color:#fff!important;background:linear-gradient(90deg,#153f6a,#2d78b8)!important;
+  border:1px solid #75b4e5!important;box-shadow:0 7px 16px rgba(17,58,94,.22)!important;
+}
+.professor-special-move{
+  border-left:5px solid var(--v105-gold)!important;background:#fff8dc!important;color:#654711!important;
+}
+.xp-reward,.challenge-reward{
+  background:linear-gradient(180deg,#fff2a0,#e4ad2a)!important;color:#583c05!important;
+  border:2px solid #fff8d6!important;box-shadow:0 4px 11px rgba(85,62,9,.2)!important;
+}
+
+/* Small motion, with reduced-motion support */
+@keyframes v105-arrive{0%{opacity:0;transform:translateY(12px) scale(.97)}100%{opacity:1;transform:none}}
+.professor-select-card,.campus-building-v105{animation:v105-arrive .45s both}
+.professor-select-card:nth-child(2),.campus-building-v105:nth-child(2){animation-delay:.05s}
+.professor-select-card:nth-child(3),.campus-building-v105:nth-child(3){animation-delay:.1s}
+.professor-select-card:nth-child(4),.campus-building-v105:nth-child(4){animation-delay:.15s}
+.professor-select-card:nth-child(5),.campus-building-v105:nth-child(5){animation-delay:.2s}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+@media(max-width:760px){
+  .campus-map-card-v9{min-height:660px}
+  .campus-building-v105{width:43%;min-width:125px}
+  .campus-building-v105.building-slot-1{left:29%;top:8%}
+  .campus-building-v105.building-slot-2{left:0;top:31%}
+  .campus-building-v105.building-slot-3{right:0;top:31%}
+  .campus-building-v105.building-slot-4{left:4%;bottom:2%}
+  .campus-building-v105.building-slot-5{right:4%;bottom:2%}
+  .building-status-v105{width:95%}
+  .building-status-v105 strong{font-size:11px}
+  .professor-select-art{height:220px!important}
+}
