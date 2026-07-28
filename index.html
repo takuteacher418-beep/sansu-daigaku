@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 8.1</title>
+<title>算数大学｜Version 9.0</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 8.1: 成長・経験値システム */
+/* Version 9.0: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -495,7 +495,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 /* =========================================================
-   Version 8.1 - Full-screen educational RPG / SPA
+   Version 9.0 - Full-screen educational RPG / SPA
    ========================================================= */
 #studentApp{
   min-height:100vh;
@@ -982,7 +982,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 8.1: screen visibility and draft save */
+/* Version 9.0: screen visibility and draft save */
 .student-game-screen:not(.active){
   display:none !important;
 }
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 8.1: unique professor reactions and subject effects */
+/* Version 9.0: unique professor reactions and subject effects */
 .professor-portrait-wrap{
   position:relative;
   justify-self:center;
@@ -1094,7 +1094,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 8.1: teacher review and retry learning */
+/* Version 9.0: teacher review and retry learning */
 .review-filters{
   display:grid;
   grid-template-columns:repeat(4,minmax(150px,1fr));
@@ -1202,7 +1202,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 8.1: problem creation wizard */
+/* Version 9.0: problem creation wizard */
 .wizard-launch{
   margin-bottom:16px;
   padding:18px;
@@ -1321,7 +1321,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 8.1: flexible answer support */
+/* Version 9.0: flexible answer support */
 .answer-mode-panel{margin:14px 0;padding:15px;border:1px solid #3a649e;border-radius:14px;background:linear-gradient(180deg,#0a2856,#061731)}
 .answer-mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}
 .answer-mode-btn{min-height:72px;padding:10px;border:1px solid #426ca7;border-radius:12px;color:#e8f2ff;background:#07182f;font-weight:900}
@@ -1336,6 +1336,39 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 .dialogue-line{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:start;margin-bottom:10px}.dialogue-name{padding:7px;border-radius:8px;text-align:center;color:#17213b;background:#e3b344;font-weight:900}.dialogue-bubble{padding:11px;border:1px solid #3d659b;border-radius:12px;color:#eef4ff;background:#0a2245}
 .fill-blank-line{line-height:2.1;color:#edf5ff;font-size:17px}.fill-blank-select{width:auto;min-width:130px;display:inline-block;margin:0 5px}.support-note{margin-top:9px;color:#b8c9e6;font-size:13px}
 @media(max-width:820px){.answer-mode-grid{grid-template-columns:1fr 1fr}}
+
+
+/* Version 9.0: compact campus dashboard */
+.campus-home{padding:12px;background:radial-gradient(circle at 20% 10%,rgba(255,216,107,.16),transparent 28%),linear-gradient(180deg,#071a39,#041023)}
+.campus-home .game-frame{max-width:1220px;margin:auto}
+.campus-dashboard{display:grid;grid-template-columns:310px 1fr;gap:14px}
+.campus-profile-card,.campus-main-card,.dashboard-card{border:1px solid #365d91;border-radius:16px;background:linear-gradient(180deg,rgba(10,37,77,.96),rgba(5,20,43,.96));box-shadow:0 12px 32px rgba(0,0,0,.24)}
+.campus-profile-card{padding:15px}
+.compact-campus-brand{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #2e527f}
+.compact-campus-brand strong{font-size:21px;color:#ffe29a}.version-mini{padding:4px 8px;border-radius:999px;background:#142e58;color:#bcd1ee;font-size:11px}
+.compact-player{display:flex;align-items:center;gap:10px}.compact-avatar{width:54px;height:54px;display:grid;place-items:center;border-radius:14px;background:#e3b444;font-size:29px}
+.compact-player-name{font-size:19px;font-weight:900;color:#fff}.compact-level-row{display:flex;align-items:end;justify-content:space-between;margin-top:12px}
+.compact-level{font-size:31px;font-weight:1000;color:#ffe29b}.exp-until{font-size:13px;color:#c5d5ed}
+.compact-xp-track{height:13px;margin-top:7px;border-radius:999px;background:#102d54;overflow:hidden}.compact-xp-fill{height:100%;width:0;background:linear-gradient(90deg,#f0b735,#fff0a9);transition:width .6s ease}
+.compact-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.compact-stat{padding:9px 5px;text-align:center;border:1px solid #2c507f;border-radius:10px;background:#071a36}
+.compact-stat strong{display:block;color:#ffe6a6;font-size:18px}.compact-actions{display:grid;gap:8px;margin-top:13px}
+.compact-action{display:flex;gap:9px;align-items:center;padding:11px;border:1px solid #376093;border-radius:11px;background:#0a2349;color:#eef5ff;text-align:left;font-weight:900}.compact-action span{font-size:21px}
+.campus-main{display:grid;gap:14px}.campus-main-card{position:relative;min-height:330px;padding:16px;overflow:hidden}
+.campus-scene-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:relative;z-index:2}.campus-scene-head h2{margin:0;color:#ffe49e;font-size:23px}.campus-scene-head p{margin:4px 0 0;color:#b9cbe5}
+.campus-rank-badge{padding:7px 11px;border-radius:999px;background:#e1ad39;color:#152039;font-weight:1000}
+.campus-scene{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;margin-top:28px;position:relative;z-index:2}
+.scene-building{min-height:150px;padding:12px 8px 10px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;border:1px solid #416b9e;border-radius:16px;background:linear-gradient(180deg,#174173,#09254a)}
+.scene-building .icon{font-size:48px;filter:drop-shadow(0 8px 7px rgba(0,0,0,.3))}.scene-building strong{margin-top:7px;color:#fff2bc}.scene-building small{color:#bed0e8}
+.scene-building.locked{filter:grayscale(.85);opacity:.5}.scene-building.newly-unlocked{animation:buildingGlow 1.3s ease-in-out 2}
+@keyframes buildingGlow{50%{transform:translateY(-7px);box-shadow:0 0 28px rgba(255,220,100,.85)}}
+.campus-ground{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(180deg,#326f4a,#17432e);opacity:.6}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.dashboard-card{padding:14px}.dashboard-card h3{margin:0 0 10px;color:#ffe3a0;font-size:16px}
+.mission-row,.achievement-row,.recent-row{padding:9px;border:1px solid #2f537f;border-radius:10px;background:#071a36;margin-top:7px}.mission-progress{height:7px;border-radius:999px;background:#15355e;overflow:hidden;margin-top:7px}.mission-progress div{height:100%;background:#e4b342}
+.home-level-up{position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(1,8,20,.78);backdrop-filter:blur(5px)}.home-level-up.show{display:grid}
+.home-level-up-card{width:min(430px,90vw);padding:30px;text-align:center;border:2px solid #ffe49a;border-radius:22px;background:radial-gradient(circle at 50% 0%,#26599c,#07182f 68%);box-shadow:0 0 60px rgba(255,215,92,.45);animation:levelPop .55s ease}
+.home-level-up-card .big{font-size:58px}.home-level-up-card h2{color:#ffe398;font-size:32px}@keyframes levelPop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+@media(max-width:900px){.campus-dashboard{grid-template-columns:1fr}.dashboard-grid{grid-template-columns:1fr}.campus-scene{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.campus-scene{grid-template-columns:repeat(2,1fr)}}
 
 </style>
 </head>
@@ -1377,7 +1410,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>8.1</strong>★★★</div>
+    <div class="version-badge">Version<strong>9.0</strong>★★★★</div>
   </header>
   <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
@@ -1583,51 +1616,40 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   <!-- 1. Campus home -->
   <section id="studentScreen-home" class="student-game-screen campus-home active">
     <div class="game-frame">
-      <div class="campus-layout">
-        <aside class="campus-side">
-          <div class="campus-identity">
-            <div class="campus-logo">算数大学</div>
-            <div class="home-player-row">
-              <div class="home-player-avatar">🎓</div>
-              <div>
-                <div id="studentWelcome" class="home-player-name">学生</div>
-                <div id="growthTitle" class="growth-title">算数大学 新入生</div>
-              </div>
-            </div>
-            <div class="level-line">
-              <div id="growthLevel" class="level-value">Lv.1</div>
-              <div id="growthXpText" class="muted">0 / 100 EXP</div>
-            </div>
-            <div class="xp-track"><div id="growthXpFill" class="xp-fill"></div></div>
+      <div class="campus-dashboard">
+        <aside class="campus-profile-card">
+          <div class="compact-campus-brand"><strong>🏛 算数大学</strong><span class="version-mini">CAMPUS</span></div>
+          <div class="compact-player">
+            <div class="compact-avatar">🎓</div>
+            <div><div id="studentWelcome" class="compact-player-name">学生</div><div id="growthTitle" class="growth-title">算数大学 新入生</div></div>
           </div>
-
-          <div class="home-menu">
-            <button class="home-menu-button" data-student-nav="units">
-              <span class="home-menu-icon">⚔️</span>
-              <span><strong>問題に挑戦する</strong><span>教授を納得させて経験値を獲得しよう。</span></span>
-            </button>
-            <button class="home-menu-button" data-student-nav="records">
-              <span class="home-menu-icon">📖</span>
-              <span><strong>成長の記録</strong><span>レベル・称号・挑戦履歴を確認しよう。</span></span>
-            </button>
-            <button class="home-menu-button" data-student-nav="facilities">
-              <span class="home-menu-icon">🏛️</span>
-              <span><strong>大学の施設</strong><span>研究ポイントで成長したキャンパスを見る。</span></span>
-            </button>
+          <div class="compact-level-row"><div id="growthLevel" class="compact-level">Lv.1</div><div id="growthXpText" class="exp-until">あと100EXP</div></div>
+          <div class="compact-xp-track"><div id="growthXpFill" class="compact-xp-fill"></div></div>
+          <div class="compact-stats">
+            <div class="compact-stat"><strong id="growthTotalXp">0</strong>総EXP</div>
+            <div class="compact-stat"><strong id="growthResearchPoints">0</strong>研究P</div>
+            <div class="compact-stat"><strong id="growthCompleted">0</strong>納得済</div>
           </div>
-          <button id="studentLogoutBtn" class="danger" style="width:100%">ログアウト</button>
+          <div class="compact-actions">
+            <button class="compact-action" data-student-nav="units"><span>⚔️</span>問題に挑戦する</button>
+            <button class="compact-action" data-student-nav="records"><span>📖</span>成長の記録を見る</button>
+            <button class="compact-action" data-student-nav="facilities"><span>🏛️</span>施設を詳しく見る</button>
+          </div>
+          <button id="studentLogoutBtn" class="danger" style="width:100%;margin-top:12px">ログアウト</button>
         </aside>
-
-        <main class="campus-visual">
-          <div class="campus-sky-title">
-            <div class="castle">🏰</div>
-            <h2>算数大学キャンパス</h2>
-            <div class="muted">数学的に考える力を育てる</div>
-          </div>
-          <div class="home-summary-row">
-            <div class="home-summary-box"><strong id="growthTotalXp">0</strong>総EXP</div>
-            <div class="home-summary-box"><strong id="growthResearchPoints">0</strong>研究ポイント</div>
-            <div class="home-summary-box"><strong id="growthCompleted">0</strong>クリア問題</div>
+        <main class="campus-main">
+          <section class="campus-main-card">
+            <div class="campus-ground"></div>
+            <div class="campus-scene-head">
+              <div><h2>キャンパス成長マップ</h2><p id="campusGrowthMessage">教授を納得させて大学を成長させよう。</p></div>
+              <div id="campusRankBadge" class="campus-rank-badge">キャンパス Lv.1</div>
+            </div>
+            <div id="homeCampusScene" class="campus-scene"></div>
+          </section>
+          <div class="dashboard-grid">
+            <section class="dashboard-card"><h3>🎯 今日のミッション</h3><div id="dailyMissionList"></div></section>
+            <section class="dashboard-card"><h3>🏆 最近の成果</h3><div id="recentAchievementList"></div></section>
+            <section class="dashboard-card"><h3>🔬 次の成長</h3><div id="nextGrowthCard"></div></section>
           </div>
         </main>
       </div>
@@ -1939,6 +1961,16 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   </div>
 </div>
 
+
+<div id="homeLevelUpOverlay" class="home-level-up">
+  <div class="home-level-up-card">
+    <div class="big">🎉</div><h2>LEVEL UP!</h2>
+    <div id="homeLevelUpText" style="font-size:20px;color:#fff"></div>
+    <div id="homeUnlockText" style="margin-top:12px;color:#ffe7a4"></div>
+    <button id="closeHomeLevelUpBtn" class="gold-btn" style="width:100%;margin-top:20px">キャンパスを見る</button>
+  </div>
+</div>
+
 <div id="levelUpBanner" class="level-up-banner">🎉 レベルアップ！</div>
 <div id="toast" class="toast"></div>
 
@@ -2222,8 +2254,12 @@ function ensureStudentProgress(student){
   if(!student)return null;
   student.progress=student.progress||{};
   student.progress.totalXp=Number(student.progress.totalXp||0);
+  student.progress.researchPoints=Number(student.progress.researchPoints||0);
+  student.progress.campusXp=Number(student.progress.campusXp||student.progress.totalXp||0);
   student.progress.completedProblems=Array.isArray(student.progress.completedProblems)?student.progress.completedProblems:[];
   student.progress.problemStats=student.progress.problemStats&&typeof student.progress.problemStats==="object"?student.progress.problemStats:{};
+  student.progress.recentAchievements=Array.isArray(student.progress.recentAchievements)?student.progress.recentAchievements:[];
+  student.progress.lastLevel=Number(student.progress.lastLevel||levelFromXp(student.progress.totalXp));
   return student.progress;
 }
 function levelFromXp(totalXp){
@@ -2241,46 +2277,59 @@ function titleFromLevel(level){
 }
 function researchPointsFor(student){
   const progress=ensureStudentProgress(student);
-  if(!progress)return 0;
-  const attempts=Object.values(progress.problemStats).reduce((sum,stat)=>sum+Number(stat.attempts||0),0);
-  return progress.totalXp+(attempts*5);
+  return progress?Number(progress.researchPoints||0):0;
+}
+function campusLevelFromXp(campusXp){return Math.floor(Number(campusXp||0)/120)+1}
+function resultsToday(studentId){
+  const key=new Date().toLocaleDateString("ja-JP");
+  return data.results.filter(r=>r.studentId===studentId&&String(r.date||"").startsWith(key));
 }
 function renderGrowthDashboard(){
-  const student=data.students.find(s=>s.id===activeStudentId);
-  if(!student)return;
-  const progress=ensureStudentProgress(student);
-  const level=levelFromXp(progress.totalXp);
-  const currentXp=progress.totalXp%100;
-  const nextXp=level*100;
-  document.getElementById("growthStudentName").textContent=student.name;
+  const student=data.students.find(s=>s.id===activeStudentId);if(!student)return;
+  const progress=ensureStudentProgress(student),level=levelFromXp(progress.totalXp);
+  const currentXp=progress.totalXp-(level-1)*100,needed=100-currentXp,campusLevel=campusLevelFromXp(progress.campusXp);
+  document.getElementById("studentWelcome").textContent=student.name;
   document.getElementById("growthTitle").textContent=titleFromLevel(level);
   document.getElementById("growthLevel").textContent=`Lv.${level}`;
-  document.getElementById("growthXpText").textContent=`${progress.totalXp} / ${nextXp} EXP`;
-  document.getElementById("growthXpFill").style.width=`${currentXp}%`;
+  document.getElementById("growthXpText").textContent=`あと${needed}EXPでレベルアップ`;
+  document.getElementById("growthXpFill").style.width=`${Math.min(100,currentXp)}%`;
   document.getElementById("growthTotalXp").textContent=progress.totalXp;
   document.getElementById("growthCompleted").textContent=progress.completedProblems.length;
   document.getElementById("growthResearchPoints").textContent=researchPointsFor(student);
-  renderCampus(student);
+  document.getElementById("campusRankBadge").textContent=`キャンパス Lv.${campusLevel}`;
+  renderHomeCampus(student);renderDailyMissions(student);renderRecentAchievements(student);renderNextGrowth(student);renderCampus(student);
+}
+function renderHomeCampus(student){
+  const progress=ensureStudentProgress(student),campusLevel=campusLevelFromXp(progress.campusXp);
+  const holder=document.getElementById("homeCampusScene");if(!holder)return;
+  holder.innerHTML=CAMPUS_BUILDINGS.slice(0,5).map((building,index)=>{
+    const requiredLevel=index*2+1,unlocked=campusLevel>=requiredLevel,justUnlocked=progress.lastUnlockedCampusLevel===requiredLevel;
+    return `<div class="scene-building ${unlocked?"":"locked"} ${justUnlocked?"newly-unlocked":""}">
+      <div class="icon">${unlocked?building.icon:"🔒"}</div><strong>${escapeHtml(building.name)}</strong>
+      <small>${unlocked?`施設 Lv.${Math.max(1,Math.floor((campusLevel-requiredLevel)/3)+1)}`:`キャンパスLv.${requiredLevel}で解放`}</small></div>`;
+  }).join("");
+  document.getElementById("campusGrowthMessage").textContent=campusLevel>=9?"立派な算数大学になりました。さらに研究を続けよう！":`キャンパスEXP ${progress.campusXp}。教授を納得させるたびに施設が成長します。`;
+}
+function renderDailyMissions(student){
+  const today=resultsToday(student.id),passed=today.filter(r=>r.passed).length,high=today.filter(r=>Number(r.persuasion||0)>=80).length;
+  const missions=[{label:"教授を1人納得させる",now:passed,max:1},{label:"問題に2回挑戦する",now:today.length,max:2},{label:"納得度80%以上を達成",now:high,max:1}];
+  document.getElementById("dailyMissionList").innerHTML=missions.map(m=>{const pct=Math.min(100,m.now/m.max*100);return `<div class="mission-row"><strong>${m.now>=m.max?"✅":"⬜"} ${escapeHtml(m.label)}</strong><div class="muted">${Math.min(m.now,m.max)} / ${m.max}</div><div class="mission-progress"><div style="width:${pct}%"></div></div></div>`}).join("");
+}
+function renderRecentAchievements(student){
+  const items=ensureStudentProgress(student).recentAchievements.slice(-3).reverse();
+  document.getElementById("recentAchievementList").innerHTML=items.length?items.map(item=>`<div class="achievement-row"><strong>${escapeHtml(item.title)}</strong><div class="muted">${escapeHtml(item.detail)}｜${escapeHtml(item.date)}</div></div>`).join(""):'<div class="achievement-row muted">最初の教授を納得させると、ここに成果が表示されます。</div>';
+}
+function renderNextGrowth(student){
+  const progress=ensureStudentProgress(student),campusLevel=campusLevelFromXp(progress.campusXp),remain=Math.max(0,campusLevel*120-progress.campusXp);
+  const nextBuilding=CAMPUS_BUILDINGS.find((_,index)=>campusLevel<index*2+1);
+  document.getElementById("nextGrowthCard").innerHTML=`<div class="recent-row"><strong>キャンパス Lv.${campusLevel+1}まで</strong><div style="font-size:25px;color:#ffe39b;margin:6px 0">あと ${remain} CEXP</div><div class="muted">${nextBuilding?`次の施設：${escapeHtml(nextBuilding.name)}`:"主要施設はすべて完成しています。"}</div></div>`;
 }
 function renderCampus(student){
-  const rp=researchPointsFor(student);
-  const holder=document.getElementById("campusGrid");
-  if(!holder)return;
-  holder.innerHTML=CAMPUS_BUILDINGS.map(building=>{
-    const unlocked=rp>=building.need;
-    return `<div class="campus-building ${unlocked?"":"locked"}" title="${escapeHtml(building.message)}">
-      <div class="building-icon">${unlocked?building.icon:"🔒"}</div>
-      <div class="building-name">${escapeHtml(building.name)}</div>
-      <div class="building-condition">${unlocked?"完成！":`${building.need}RPで解放`}</div>
-    </div>`;
-  }).join("");
-  const next=CAMPUS_BUILDINGS.find(building=>rp<building.need);
-  const nextBox=document.getElementById("campusNext");
-  if(next){
-    nextBox.innerHTML=`次は「<strong>${escapeHtml(next.name)}</strong>」を建設。あと <strong>${next.need-rp} RP</strong>`;
-  }else{
-    nextBox.innerHTML="<strong>🎓 算数大学キャンパス完成！</strong> これからも研究を続けよう。";
-  }
+  const rp=researchPointsFor(student),holder=document.getElementById("campusGrid");if(!holder)return;
+  holder.innerHTML=CAMPUS_BUILDINGS.map(building=>{const unlocked=rp>=building.need;return `<div class="campus-building ${unlocked?"":"locked"}" title="${escapeHtml(building.message)}"><div class="building-icon">${unlocked?building.icon:"🔒"}</div><div class="building-name">${escapeHtml(building.name)}</div><div class="building-condition">${unlocked?"完成！":`${building.need}RPで解放`}</div></div>`}).join("");
+  const next=CAMPUS_BUILDINGS.find(building=>rp<building.need),nextBox=document.getElementById("campusNext");
+  if(next)nextBox.innerHTML=`次は「<strong>${escapeHtml(next.name)}</strong>」を建設。あと <strong>${next.need-rp} RP</strong>`;
+  else nextBox.innerHTML="<strong>🎓 算数大学キャンパス完成！</strong> これからも研究を続けよう。";
 }
 function showResearchLevel(level,score,max){
   const card=document.getElementById("researchLevelCard");
@@ -2297,20 +2346,17 @@ function showResearchLevel(level,score,max){
     <div class="muted" style="margin-top:6px">今回の得点：${score} / ${max}</div>`;
   card.classList.remove("hidden");
 }
-function awardExperience(student,problem,amount){
+function awardExperience(student,problem,amount,researchPoints=0,campusXp=0){
   const progress=ensureStudentProgress(student);
-  if(progress.completedProblems.includes(problem.id))return false;
-  const oldLevel=levelFromXp(progress.totalXp);
-  progress.completedProblems.push(problem.id);
-  progress.totalXp+=amount;
-  const newLevel=levelFromXp(progress.totalXp);
-  if(newLevel>oldLevel){
-    const banner=document.getElementById("levelUpBanner");
-    banner.textContent=`🎉 レベルアップ！ Lv.${newLevel}「${titleFromLevel(newLevel)}」`;
-    banner.classList.add("show");
-    setTimeout(()=>banner.classList.remove("show"),2800);
-  }
-  return true;
+  if(progress.completedProblems.includes(problem.id))return {awarded:false,oldLevel:levelFromXp(progress.totalXp),newLevel:levelFromXp(progress.totalXp),unlocked:""};
+  const oldLevel=levelFromXp(progress.totalXp),oldCampusLevel=campusLevelFromXp(progress.campusXp);
+  progress.completedProblems.push(problem.id);progress.totalXp+=Number(amount||0);progress.researchPoints+=Number(researchPoints||0);progress.campusXp+=Number(campusXp||0);
+  const newLevel=levelFromXp(progress.totalXp),newCampusLevel=campusLevelFromXp(progress.campusXp);
+  let unlocked="";
+  if(newCampusLevel>oldCampusLevel){const index=Math.floor((newCampusLevel-1)/2);unlocked=CAMPUS_BUILDINGS[index]?.name||"キャンパス施設";progress.lastUnlockedCampusLevel=newCampusLevel}
+  progress.recentAchievements.push({title:`${problem.title}をクリア`,detail:`EXP +${amount}・研究P +${researchPoints}・キャンパスEXP +${campusXp}`,date:new Date().toLocaleDateString("ja-JP")});
+  progress.recentAchievements=progress.recentAchievements.slice(-12);progress.lastLevel=newLevel;
+  return {awarded:true,oldLevel,newLevel,oldCampusLevel,newCampusLevel,unlocked};
 }
 
 function renderStats(){
@@ -2427,7 +2473,7 @@ function updateTeacherReview(resultId,status){
     const progress=ensureStudentProgress(student);
     if(status==="approved"){
       if(!progress.completedProblems.includes(problem.id)){
-        awardExperience(student,problem,Number(problem.difficulty||2)*25);
+        awardExperience(student,problem,Number(problem.difficulty||2)*25,20,15);
       }
     }
     if(status==="retry"){
@@ -3086,16 +3132,19 @@ function submitStudentAnswer(){
   else if(scoreRatio>=.30||response.length>=10)researchLevel=2;
 
   const xpReward=Number(problem.difficulty||2)*25;
-  let gained=false;
-  if(evaluation.passed)gained=awardExperience(student,problem,xpReward);
   const researchPointReward=evaluation.passed?Math.max(15,Math.round(persuasion/2)):5;
+  const campusXpReward=evaluation.passed?Math.max(12,Math.round(persuasion/3)):3;
+  let rewardResult={awarded:false,oldLevel:levelFromXp(progress.totalXp),newLevel:levelFromXp(progress.totalXp),unlocked:""};
+  if(evaluation.passed)rewardResult=awardExperience(student,problem,xpReward,researchPointReward,campusXpReward);
+  const gained=rewardResult.awarded;
 
   const previousAttempts=getProblemAttemptHistory(activeStudentId,problem.id);
   const missingKeywords=evaluation.checks.filter(check=>!check.hit).map(check=>check.keyword);
   const result={
     id:uid("result"),studentId:activeStudentId,problemId:problem.id,
     professorId:selectedProfessorId,response,score,maxScore,researchLevel,
-    xpGained:gained?xpReward:0,researchPointsGained:researchPointReward,
+    xpGained:gained?xpReward:0,researchPointsGained:gained?researchPointReward:0,campusXpGained:gained?campusXpReward:0,
+    oldLevel:rewardResult.oldLevel,newLevel:rewardResult.newLevel,unlockedFacility:rewardResult.unlocked,
     keywordRatio:evaluation.keywordRatio,passed:evaluation.passed,
     persuasion,
     attemptNumber:previousAttempts.length+1,
@@ -3156,6 +3205,13 @@ function showVictoryScreen(result){
   document.getElementById("victoryXp").textContent=`+${result.xpGained}`;
   document.getElementById("victoryRp").textContent=`+${result.researchPointsGained}`;
   showStudentScreen("victory");
+  if(Number(result.newLevel||0)>Number(result.oldLevel||0)||result.unlockedFacility)setTimeout(()=>showHomeLevelUp(result),500);
+}
+function showHomeLevelUp(result){
+  const overlay=document.getElementById("homeLevelUpOverlay"),leveled=Number(result.newLevel||0)>Number(result.oldLevel||0);
+  document.getElementById("homeLevelUpText").textContent=leveled?`Lv.${result.oldLevel} → Lv.${result.newLevel}　${titleFromLevel(result.newLevel)}`:"キャンパスが成長しました！";
+  document.getElementById("homeUnlockText").textContent=result.unlockedFacility?`🏛 新しい施設「${result.unlockedFacility}」が成長しました。`:`キャンパスEXP +${result.campusXpGained||0}`;
+  overlay.classList.add("show");
 }
 function moveToNextProblem(){
   const problems=data.problems.filter(problem=>problem.unitId===selectedStudentUnitId);
@@ -3421,6 +3477,10 @@ function bindEvents(){
 
 
   document.getElementById("studentLogoutBtn").addEventListener("click",()=>location.reload());
+  document.getElementById("closeHomeLevelUpBtn").addEventListener("click",()=>{
+    document.getElementById("homeLevelUpOverlay").classList.remove("show");
+    renderGrowthDashboard();showStudentScreen("home");
+  });
   document.getElementById("beginProfessorBattleBtn").addEventListener("click",startProfessorBattle);
   document.getElementById("leaveBattleBtn").addEventListener("click",leaveProfessorBattle);
   document.getElementById("showBattleHintBtn").addEventListener("click",revealNextHint);
@@ -3464,6 +3524,7 @@ function bindEvents(){
     const deleteResultBtn=event.target.closest("[data-delete-result]");
     if(studentNav){
       if(document.getElementById("studentScreen-battle").classList.contains("active"))saveCurrentDraft(false);
+      if(studentNav.dataset.studentNav==="home")renderGrowthDashboard();
       showStudentScreen(studentNav.dataset.studentNav);
     }
     if(selectUnit)chooseStudentUnit(selectUnit.dataset.selectUnit);
