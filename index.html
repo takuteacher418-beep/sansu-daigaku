@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 7.2</title>
+<title>算数大学｜Version 8.0</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 7.2: 成長・経験値システム */
+/* Version 8.0: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -495,7 +495,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 /* =========================================================
-   Version 7.2 - Full-screen educational RPG / SPA
+   Version 8.0 - Full-screen educational RPG / SPA
    ========================================================= */
 #studentApp{
   min-height:100vh;
@@ -982,7 +982,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 7.2: screen visibility and draft save */
+/* Version 8.0: screen visibility and draft save */
 .student-game-screen:not(.active){
   display:none !important;
 }
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 7.2: unique professor reactions and subject effects */
+/* Version 8.0: unique professor reactions and subject effects */
 .professor-portrait-wrap{
   position:relative;
   justify-self:center;
@@ -1094,7 +1094,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 
-/* Version 7.2: teacher review and retry learning */
+/* Version 8.0: teacher review and retry learning */
 .review-filters{
   display:grid;
   grid-template-columns:repeat(4,minmax(150px,1fr));
@@ -1201,6 +1201,125 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   .teacher-review-actions{grid-template-columns:1fr}
 }
 
+
+/* Version 8.0: problem creation wizard */
+.wizard-launch{
+  margin-bottom:16px;
+  padding:18px;
+  border:1px solid #b78f30;
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 85% 0%,rgba(255,214,91,.16),transparent 30%),
+    linear-gradient(180deg,#0d2c60,#07162f);
+}
+.wizard-launch h3{margin:0;color:#ffe49a}
+.wizard-modal-box{
+  width:min(940px,100%);
+  max-height:92vh;
+  overflow:auto;
+  border:1px solid #e0b64d;
+  border-radius:18px;
+  background:#06152f;
+  box-shadow:var(--shadow);
+}
+.wizard-steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+.wizard-step{
+  padding:10px;
+  text-align:center;
+  border:1px solid #355c96;
+  border-radius:10px;
+  color:#9eb3d4;
+  background:#071831;
+  font-weight:900;
+}
+.wizard-step.active{
+  color:#17213b;
+  border-color:#ffe7a0;
+  background:linear-gradient(180deg,#fff2b7,#d9a638);
+}
+.wizard-page{display:none}
+.wizard-page.active{display:block}
+.wizard-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.wizard-choice-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.wizard-choice{
+  min-height:74px;
+  border:1px solid #315b96;
+  border-radius:12px;
+  color:#edf4ff;
+  background:#071831;
+  font-weight:900;
+}
+.wizard-choice.selected{
+  color:#17213b;
+  border-color:#ffe4a0;
+  background:linear-gradient(180deg,#fff0ae,#daa637);
+}
+.wizard-preview{
+  display:grid;
+  gap:10px;
+}
+.wizard-preview-card{
+  padding:14px;
+  border:1px solid #31588e;
+  border-radius:12px;
+  background:#071831;
+}
+.wizard-preview-card h4{margin:0 0 8px;color:#ffe49d}
+.suggestion-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.suggestion-chip{
+  padding:7px 11px;
+  border:1px solid #4771aa;
+  border-radius:999px;
+  color:#dce9ff;
+  background:#0b2854;
+}
+.suggestion-chip.selected{
+  color:#17213b;
+  border-color:#ffe28b;
+  background:#e7b344;
+}
+.wizard-footer{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:18px;
+}
+.generate-button{
+  min-height:58px;
+  font-size:19px;
+}
+.template-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  padding:11px;
+  border:1px solid #31578d;
+  border-radius:10px;
+  background:#071831;
+}
+@media(max-width:800px){
+  .wizard-grid,.wizard-choice-grid{grid-template-columns:1fr}
+  .wizard-steps{grid-template-columns:1fr 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1241,7 +1360,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>7.2</strong>★★★</div>
+    <div class="version-badge">Version<strong>8.0</strong>★★★</div>
   </header>
   <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
@@ -1302,6 +1421,11 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
         <div class="card form-card">
           <div class="card-head"><h2>✎ 問題作成</h2></div>
           <div class="card-body">
+            <div class="wizard-launch">
+              <h3>✨ 問題作成アシスタント</h3>
+              <p class="muted">学年・単元・育てたい力を選ぶだけで、問題文、模範解答、キーワード、類語、ヒント、教授を一括提案します。</p>
+              <button id="openWizardBtn" class="gold-btn" style="width:100%">問題作成ウィザードを開く</button>
+            </div>
             <label>単元</label><select id="problemUnit"></select>
             <label>問題タイトル</label><input id="problemTitle" placeholder="例：平均とは何か">
             <label>問題文</label><textarea id="problemText" placeholder="児童に説明してほしい内容を書きます。"></textarea>
@@ -1663,6 +1787,104 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   </div>
 </div>
 
+
+<div id="problemWizardModal" class="modal">
+  <div class="wizard-modal-box">
+    <div class="card-head">
+      <div>
+        <h2>✨ 問題作成アシスタント</h2>
+        <div class="muted">外部APIを使わず、算数教材向けテンプレートから自動提案します。</div>
+      </div>
+      <button id="closeWizardBtn" class="ghost">閉じる</button>
+    </div>
+    <div class="modal-body">
+      <div class="wizard-steps">
+        <div class="wizard-step active" data-step-indicator="1">1 基本設定</div>
+        <div class="wizard-step" data-step-indicator="2">2 ねらい</div>
+        <div class="wizard-step" data-step-indicator="3">3 自動生成</div>
+        <div class="wizard-step" data-step-indicator="4">4 確認</div>
+      </div>
+
+      <section class="wizard-page active" data-wizard-page="1">
+        <div class="wizard-grid">
+          <div>
+            <label>学年</label>
+            <select id="wizardGrade">
+              <option>1年生</option><option>2年生</option><option>3年生</option>
+              <option>4年生</option><option selected>5年生</option><option>6年生</option>
+            </select>
+          </div>
+          <div>
+            <label>単元</label>
+            <select id="wizardUnit"></select>
+          </div>
+        </div>
+        <label>問題タイプ</label>
+        <div class="wizard-choice-grid" id="wizardTypeChoices">
+          <button class="wizard-choice selected" data-wizard-type="explain">説明する問題</button>
+          <button class="wizard-choice" data-wizard-type="reason">理由を考える問題</button>
+          <button class="wizard-choice" data-wizard-type="compare">比較する問題</button>
+          <button class="wizard-choice" data-wizard-type="mistake">誤りを直す問題</button>
+          <button class="wizard-choice" data-wizard-type="method">解き方を説明する問題</button>
+          <button class="wizard-choice" data-wizard-type="application">生活に活用する問題</button>
+        </div>
+      </section>
+
+      <section class="wizard-page" data-wizard-page="2">
+        <label>育てたい力</label>
+        <div class="wizard-choice-grid" id="wizardSkillChoices">
+          <button class="wizard-choice selected" data-wizard-skill="explanation">説明力</button>
+          <button class="wizard-choice" data-wizard-skill="logic">論理力</button>
+          <button class="wizard-choice" data-wizard-skill="calculation">計算力</button>
+          <button class="wizard-choice" data-wizard-skill="comparison">比較する力</button>
+          <button class="wizard-choice" data-wizard-skill="representation">図や式で表す力</button>
+          <button class="wizard-choice" data-wizard-skill="reflection">振り返る力</button>
+        </div>
+        <div class="wizard-grid" style="margin-top:12px">
+          <div>
+            <label>難易度</label>
+            <select id="wizardDifficulty">
+              <option value="1">★ 基礎</option>
+              <option value="2" selected>★★ 標準</option>
+              <option value="3">★★★ 発展</option>
+            </select>
+          </div>
+          <div>
+            <label>作成数</label>
+            <select id="wizardCount">
+              <option value="1">1問</option>
+              <option value="3" selected>3問</option>
+              <option value="5">5問</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="wizard-page" data-wizard-page="3">
+        <div class="wizard-launch">
+          <h3>生成内容</h3>
+          <p class="muted">問題文・模範解答・重要語・類語・ヒント・教授設定をまとめて生成します。</p>
+          <button id="generateWizardBtn" class="primary generate-button" style="width:100%">自動生成する</button>
+        </div>
+        <div id="wizardGeneratedList" class="wizard-preview"></div>
+      </section>
+
+      <section class="wizard-page" data-wizard-page="4">
+        <div id="wizardFinalPreview" class="wizard-preview"></div>
+        <div class="wizard-launch" style="margin-top:14px">
+          <h3>使い方</h3>
+          <p class="muted">「問題作成画面へ反映」を押すと、選んだ候補が通常の入力欄へ入ります。内容を確認・修正して保存してください。</p>
+        </div>
+      </section>
+
+      <div class="wizard-footer">
+        <button id="wizardPrevBtn" class="ghost">← 戻る</button>
+        <button id="wizardNextBtn" class="gold-btn">次へ →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="deleteModal" class="modal">
   <div class="modal-box">
     <div class="card-head"><h3>単元を削除しますか？</h3></div>
@@ -1788,6 +2010,73 @@ const BUILTIN_SYNONYM_GROUPS = [
   ["比べる量","比較量","比べられる量"],
   ["単位量あたり","1あたり","一つ分あたり"]
 ];
+
+const PROBLEM_TEMPLATES={
+  "平均":{
+    professor:"average",
+    keywords:["全部の量","個数","等しくする"],
+    synonyms:[
+      ["全部の量","合計","総量","全体の量"],
+      ["個数","人数","データの数"],
+      ["等しくする","ならす","均等にする","同じ大きさにする"]
+    ],
+    hints:["全部の量を一度集めて考えよう。","何個分に分けるかに注目しよう。","同じ大きさにならすイメージをもとう。"],
+    model:"平均とは、全部の量を個数で等しく分けたときの一つ分の大きさです。"
+  },
+  "割合":{
+    professor:"ratio",
+    keywords:["比べる量","もとにする量","わり算"],
+    synonyms:[
+      ["比べる量","比較量","比べられる量"],
+      ["もとにする量","基準量","基準となる量"],
+      ["わり算","割る","除法"]
+    ],
+    hints:["何をもとに比べているかを確認しよう。","比べる量ともとにする量を分けて考えよう。","割合は二つの量の関係を表します。"],
+    model:"割合は、比べる量がもとにする量の何倍にあたるかを表した数です。"
+  },
+  "速さ":{
+    professor:"speed",
+    keywords:["道のり","時間","単位時間"],
+    synonyms:[
+      ["道のり","距離","進んだ長さ"],
+      ["時間","かかった時間"],
+      ["単位時間","1時間あたり","1分あたり","一秒あたり"]
+    ],
+    hints:["1時間あたり、1分あたりに注目しよう。","道のりと時間の関係を考えよう。","速さは同じ時間で比べると分かりやすいです。"],
+    model:"速さは、単位時間あたりに進む道のりで表します。"
+  },
+  "体積":{
+    professor:"geometry",
+    keywords:["縦","横","高さ"],
+    synonyms:[
+      ["縦","たて"],
+      ["横","よこ"],
+      ["高さ","高い方向"]
+    ],
+    hints:["1立方センチメートルの立方体が何個あるか考えよう。","底面の広さと高さに注目しよう。","縦・横・高さの三つを使います。"],
+    model:"直方体の体積は、縦、横、高さをかけて求めます。"
+  }
+};
+const GENERIC_UNIT_TEMPLATE={
+  professor:"logic",
+  keywords:["考え方","理由","答え"],
+  synonyms:[
+    ["考え方","方法","解き方"],
+    ["理由","わけ","根拠"],
+    ["答え","結果"]
+  ],
+  hints:["問題文の大切な言葉に注目しよう。","答えだけでなく理由も書こう。","図や式と結び付けて説明しよう。"],
+  model:"問題の条件を整理し、使った考え方と理由を説明します。"
+};
+const TYPE_PROMPTS={
+  explain:unit=>`${unit}とは、どのような考え方ですか。自分の言葉で説明しましょう。`,
+  reason:unit=>`${unit}の考え方を使うと、なぜ答えを求められるのですか。`,
+  compare:unit=>`${unit}について、二つの考え方を比べ、共通点と違いを説明しましょう。`,
+  mistake:unit=>`${unit}について、間違った説明を一つ考え、どこを直せばよいか説明しましょう。`,
+  method:unit=>`${unit}を使った問題の解き方を、順序が分かるように説明しましょう。`,
+  application:unit=>`${unit}の考え方は、生活のどのような場面で使えますか。例を挙げて説明しましょう。`
+};
+
 function normalizeAnswerText(value){
   return String(value||"")
     .toLowerCase()
@@ -2750,6 +3039,129 @@ function renderStudentRecords(){
   }).join(""):'<div class="empty">まだ教授バトルの記録がありません。</div>';
 }
 
+
+let wizardStep=1;
+let wizardType="explain";
+let wizardSkill="explanation";
+let wizardGenerated=[];
+let wizardSelectedIndex=0;
+
+function openProblemWizard(){
+  wizardStep=1;
+  wizardGenerated=[];
+  wizardSelectedIndex=0;
+  renderWizardUnits();
+  updateWizardStep();
+  document.getElementById("problemWizardModal").classList.add("show");
+}
+function closeProblemWizard(){
+  document.getElementById("problemWizardModal").classList.remove("show");
+}
+function renderWizardUnits(){
+  const grade=document.getElementById("wizardGrade").value;
+  const select=document.getElementById("wizardUnit");
+  const matching=data.units.filter(unit=>unit.grade===grade);
+  const units=matching.length?matching:data.units;
+  select.innerHTML=units.length
+    ?units.map(unit=>`<option value="${unit.id}">${escapeHtml(unit.name)}</option>`).join("")
+    :'<option value="">単元を先に作成してください</option>';
+}
+function updateWizardStep(){
+  document.querySelectorAll("[data-step-indicator]").forEach(el=>{
+    el.classList.toggle("active",Number(el.dataset.stepIndicator)===wizardStep);
+  });
+  document.querySelectorAll("[data-wizard-page]").forEach(el=>{
+    el.classList.toggle("active",Number(el.dataset.wizardPage)===wizardStep);
+  });
+  document.getElementById("wizardPrevBtn").disabled=wizardStep===1;
+  document.getElementById("wizardNextBtn").textContent=wizardStep===4?"問題作成画面へ反映":"次へ →";
+}
+function generateWizardProblems(){
+  const unitId=document.getElementById("wizardUnit").value;
+  const unit=data.units.find(item=>item.id===unitId);
+  if(!unit){showToast("単元を選択してください。");return}
+  const difficulty=Number(document.getElementById("wizardDifficulty").value)||2;
+  const count=Number(document.getElementById("wizardCount").value)||3;
+  const base=PROBLEM_TEMPLATES[unit.name]||GENERIC_UNIT_TEMPLATE;
+  const skillLabels={
+    explanation:"説明力",logic:"論理力",calculation:"計算力",
+    comparison:"比較する力",representation:"図や式で表す力",reflection:"振り返る力"
+  };
+  wizardGenerated=Array.from({length:count},(_,index)=>{
+    let question=TYPE_PROMPTS[wizardType](unit.name);
+    if(index===1)question=`${unit.name}について、具体的な例を一つ挙げて説明しましょう。`;
+    if(index===2)question=`${unit.name}をまだ知らない友達に、分かりやすく説明しましょう。`;
+    if(index===3)question=`${unit.name}で大切な考えを三つ選び、関係を説明しましょう。`;
+    if(index===4)question=`${unit.name}を学ぶ前と後で、自分の考えがどう変わったか説明しましょう。`;
+    return {
+      unitId:unit.id,
+      title:`${unit.name}・${skillLabels[wizardSkill]}チャレンジ${index+1}`,
+      text:question,
+      hint:base.hints[index%base.hints.length],
+      modelAnswer:base.model,
+      keywords:base.keywords.join("\n"),
+      synonymGroups:base.synonyms.map(group=>group.join("｜")).join("\n"),
+      passRate:difficulty===1?.5:difficulty===2?.6:.7,
+      professorId:base.professor,
+      professorIntro:"",
+      difficulty,
+      maxScore:10
+    };
+  });
+  wizardSelectedIndex=0;
+  renderWizardGenerated();
+  showToast(`${count}問の候補を生成しました。`);
+}
+function renderWizardGenerated(){
+  const holder=document.getElementById("wizardGeneratedList");
+  if(!wizardGenerated.length){
+    holder.innerHTML='<div class="empty">「自動生成する」を押すと候補が表示されます。</div>';
+    return;
+  }
+  holder.innerHTML=wizardGenerated.map((item,index)=>`
+    <button class="wizard-preview-card ${wizardSelectedIndex===index?"selected":""}" data-wizard-select="${index}" style="text-align:left;color:inherit;width:100%">
+      <h4>${escapeHtml(item.title)}</h4>
+      <div>${escapeHtml(item.text)}</div>
+      <div class="muted" style="margin-top:8px">教授：${escapeHtml(PROFESSORS[item.professorId]?.name||"自動選択")}｜難易度 ${"★".repeat(item.difficulty)}</div>
+    </button>`).join("");
+}
+function renderWizardFinal(){
+  const item=wizardGenerated[wizardSelectedIndex];
+  const holder=document.getElementById("wizardFinalPreview");
+  if(!item){
+    holder.innerHTML='<div class="empty">問題候補を生成してください。</div>';
+    return;
+  }
+  holder.innerHTML=`
+    <div class="wizard-preview-card"><h4>問題文</h4>${escapeHtml(item.text)}</div>
+    <div class="wizard-preview-card"><h4>模範解答</h4>${escapeHtml(item.modelAnswer)}</div>
+    <div class="wizard-preview-card"><h4>重要キーワード</h4><div class="suggestion-chips">${
+      item.keywords.split("\n").map(word=>`<span class="suggestion-chip selected">${escapeHtml(word)}</span>`).join("")
+    }</div></div>
+    <div class="wizard-preview-card"><h4>類語・言い換え</h4><pre style="white-space:pre-wrap;color:#dce9ff">${escapeHtml(item.synonymGroups)}</pre></div>
+    <div class="wizard-preview-card"><h4>ヒント</h4>${escapeHtml(item.hint)}</div>`;
+}
+function applyWizardProblem(){
+  const item=wizardGenerated[wizardSelectedIndex];
+  if(!item){showToast("反映する問題を選択してください。");return}
+  resetProblemForm();
+  document.getElementById("problemUnit").value=item.unitId;
+  document.getElementById("problemTitle").value=item.title;
+  document.getElementById("problemText").value=item.text;
+  document.getElementById("problemHint").value=item.hint;
+  document.getElementById("problemAnswer").value=item.modelAnswer;
+  document.getElementById("problemKeywords").value=item.keywords;
+  document.getElementById("problemSynonyms").value=item.synonymGroups;
+  document.getElementById("problemPassRate").value=String(item.passRate);
+  document.getElementById("problemProfessor").value=item.professorId;
+  document.getElementById("problemProfessorIntro").value=item.professorIntro;
+  document.getElementById("problemDifficulty").value=String(item.difficulty);
+  document.getElementById("problemMaxScore").value=String(item.maxScore);
+  closeProblemWizard();
+  setPanel("problems");
+  showToast("生成した内容を問題作成画面へ反映しました。");
+}
+
 function bindEvents(){
   document.querySelectorAll(".nav-btn").forEach(btn=>btn.addEventListener("click",()=>setPanel(btn.dataset.panel)));
   document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click",()=>setPanel(btn.dataset.go)));
@@ -2784,6 +3196,22 @@ function bindEvents(){
   document.getElementById("deleteUnitWithProblemsBtn").addEventListener("click",deleteUnitWithProblems);
   document.getElementById("cancelDeleteBtn").addEventListener("click",closeDeleteUnit);
 
+  document.getElementById("openWizardBtn").addEventListener("click",openProblemWizard);
+  document.getElementById("closeWizardBtn").addEventListener("click",closeProblemWizard);
+  document.getElementById("wizardGrade").addEventListener("change",renderWizardUnits);
+  document.getElementById("generateWizardBtn").addEventListener("click",generateWizardProblems);
+  document.getElementById("wizardPrevBtn").addEventListener("click",()=>{
+    if(wizardStep>1){wizardStep--;updateWizardStep()}
+  });
+  document.getElementById("wizardNextBtn").addEventListener("click",()=>{
+    if(wizardStep===3&&!wizardGenerated.length){
+      showToast("先に問題を生成してください。");return;
+    }
+    if(wizardStep===4){applyWizardProblem();return}
+    wizardStep++;
+    if(wizardStep===4)renderWizardFinal();
+    updateWizardStep();
+  });
   document.getElementById("saveProblemBtn").addEventListener("click",saveProblem);
   document.getElementById("resetProblemBtn").addEventListener("click",resetProblemForm);
   document.getElementById("saveStudentBtn").addEventListener("click",saveStudent);
@@ -2854,6 +3282,9 @@ function bindEvents(){
     const selectUnit=event.target.closest("[data-select-unit]");
     const selectProblem=event.target.closest("[data-select-problem]");
     const selectProfessor=event.target.closest("[data-select-professor]");
+    const wizardTypeChoice=event.target.closest("[data-wizard-type]");
+    const wizardSkillChoice=event.target.closest("[data-wizard-skill]");
+    const wizardSelect=event.target.closest("[data-wizard-select]");
     const reviewAction=event.target.closest("[data-review-action]");
     const saveReview=event.target.closest("[data-save-review]");
     const editUnit=event.target.closest("[data-edit-unit]");
@@ -2871,6 +3302,18 @@ function bindEvents(){
     if(selectUnit)chooseStudentUnit(selectUnit.dataset.selectUnit);
     if(selectProblem)chooseStudentProblem(selectProblem.dataset.selectProblem);
     if(selectProfessor)chooseProfessor(selectProfessor.dataset.selectProfessor);
+    if(wizardTypeChoice){
+      wizardType=wizardTypeChoice.dataset.wizardType;
+      document.querySelectorAll("[data-wizard-type]").forEach(btn=>btn.classList.toggle("selected",btn===wizardTypeChoice));
+    }
+    if(wizardSkillChoice){
+      wizardSkill=wizardSkillChoice.dataset.wizardSkill;
+      document.querySelectorAll("[data-wizard-skill]").forEach(btn=>btn.classList.toggle("selected",btn===wizardSkillChoice));
+    }
+    if(wizardSelect){
+      wizardSelectedIndex=Number(wizardSelect.dataset.wizardSelect);
+      renderWizardGenerated();
+    }
     if(reviewAction)updateTeacherReview(reviewAction.dataset.resultId,reviewAction.dataset.reviewAction);
     if(saveReview)saveTeacherComment(saveReview.dataset.saveReview);
     if(editUnit)openUnitModal(editUnit.dataset.editUnit);
