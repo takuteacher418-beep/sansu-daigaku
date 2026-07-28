@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 7.0.1</title>
+<title>算数大学｜Version 7.0.2</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 7.0.1: 成長・経験値システム */
+/* Version 7.0.2: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -495,7 +495,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
 }
 
 /* =========================================================
-   Version 7.0.1 - Full-screen educational RPG / SPA
+   Version 7.0.2 - Full-screen educational RPG / SPA
    ========================================================= */
 #studentApp{
   min-height:100vh;
@@ -981,6 +981,27 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
   .battle-answer-actions button{width:100%}
 }
 
+
+/* Version 7.0.2: screen visibility and draft save */
+.student-game-screen:not(.active){
+  display:none !important;
+}
+.draft-save-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.draft-status{
+  color:#637089;
+  font-size:13px;
+}
+.save-draft-btn{
+  min-width:150px;
+}
+
 </style>
 </head>
 <body>
@@ -1021,7 +1042,7 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>7.0.1</strong>★★★</div>
+    <div class="version-badge">Version<strong>7.0.2</strong>★★★</div>
   </header>
   <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
@@ -1324,6 +1345,10 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
           <span id="answerCharacterCount">0文字</span>
         </div>
         <div class="answer-meter"><div id="answerMeterFill" class="answer-meter-fill"></div></div>
+        <div class="draft-save-row">
+          <span id="draftSaveStatus" class="draft-status">回答は自動保存されます。</span>
+          <button id="saveDraftBtn" class="secondary save-draft-btn">💾 途中保存</button>
+        </div>
         <div class="battle-answer-actions">
           <button id="showBattleHintBtn" class="secondary">💡 ヒントを見る</button>
           <button id="submitAnswerBtn" class="battle-submit">🎓 教授を納得させる！</button>
@@ -1506,7 +1531,8 @@ const defaultData = {
   ],
   problems:[],
   students:[],
-  results:[]
+  results:[],
+  drafts:{}
 };
 
 let data = loadData();
@@ -1539,7 +1565,8 @@ function loadData(){
             ...(student.progress||{})
           }
         })):[],
-        results:Array.isArray(saved.results)?saved.results:[]
+        results:Array.isArray(saved.results)?saved.results:[],
+        drafts:saved.drafts&&typeof saved.drafts==="object"?saved.drafts:{}
       };
     }
   }catch(error){console.error(error)}
@@ -1996,6 +2023,48 @@ function editStudent(id){
   document.getElementById("saveStudentBtn").textContent="児童情報の変更を保存する";
 }
 
+
+function getDraftKey(studentId,problemId){
+  return `${studentId}::${problemId}`;
+}
+function getCurrentDraft(){
+  if(!activeStudentId||!selectedMissionProblemId)return "";
+  return data.drafts?.[getDraftKey(activeStudentId,selectedMissionProblemId)]||"";
+}
+function saveCurrentDraft(showMessage=false){
+  if(!activeStudentId||!selectedMissionProblemId)return;
+  data.drafts=data.drafts||{};
+  const text=document.getElementById("studentResponse").value;
+  const key=getDraftKey(activeStudentId,selectedMissionProblemId);
+  if(text.trim()){
+    data.drafts[key]=text;
+  }else{
+    delete data.drafts[key];
+  }
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  const status=document.getElementById("draftSaveStatus");
+  if(status){
+    const time=new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+    status.textContent=text.trim()?`保存済み：${time}`:"回答は自動保存されます。";
+  }
+  if(showMessage)showToast(text.trim()?"回答を途中保存しました。":"保存する回答はありません。");
+}
+function clearCurrentDraft(){
+  if(!activeStudentId||!selectedMissionProblemId)return;
+  data.drafts=data.drafts||{};
+  delete data.drafts[getDraftKey(activeStudentId,selectedMissionProblemId)];
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+}
+function restoreCurrentDraft(){
+  const text=getCurrentDraft();
+  const input=document.getElementById("studentResponse");
+  input.value=text;
+  document.getElementById("answerCharacterCount").textContent=`${text.length}文字`;
+  document.getElementById("answerMeterFill").style.width=`${Math.min(100,text.length/2)}%`;
+  const status=document.getElementById("draftSaveStatus");
+  if(status)status.textContent=text?"途中保存した回答を復元しました。":"回答は自動保存されます。";
+}
+
 function showStudentScreen(name){
   document.querySelectorAll(".student-game-screen").forEach(screen=>{
     screen.classList.toggle("active",screen.id===`studentScreen-${name}`);
@@ -2114,15 +2183,13 @@ function startProfessorBattle(){
   document.getElementById("studentRewardPreview").textContent=`初回クリア +${Number(problem.difficulty||2)*25}EXP`;
   document.getElementById("persuasionFill").style.width="0%";
   document.getElementById("persuasionText").textContent="0%";
-  document.getElementById("studentResponse").value="";
-  document.getElementById("answerCharacterCount").textContent="0文字";
-  document.getElementById("answerMeterFill").style.width="0%";
+  restoreCurrentDraft();
   document.getElementById("studentScoreBox").classList.add("hidden");
   document.getElementById("researchLevelCard").classList.add("hidden");
   showStudentScreen("battle");
 }
 function leaveProfessorBattle(){
-  if(document.getElementById("studentResponse").value.trim()&&!confirm("入力した回答は消えます。バトルをやめますか？"))return;
+  saveCurrentDraft(false);
   showStudentScreen("professors");
 }
 function toggleBattleHint(){
@@ -2199,7 +2266,10 @@ function submitStudentAnswer(){
   renderGrowthDashboard();
 
   if(evaluation.passed){
+    clearCurrentDraft();
     setTimeout(()=>showVictoryScreen(result),900);
+  }else{
+    saveCurrentDraft(false);
   }
 }
 function showVictoryScreen(result){
@@ -2333,10 +2403,15 @@ function bindEvents(){
   document.getElementById("showBattleHintBtn").addEventListener("click",toggleBattleHint);
   document.getElementById("submitAnswerBtn").addEventListener("click",submitStudentAnswer);
   document.getElementById("nextProblemBtn").addEventListener("click",moveToNextProblem);
+  document.getElementById("saveDraftBtn").addEventListener("click",()=>saveCurrentDraft(true));
   document.getElementById("studentResponse").addEventListener("input",event=>{
     const length=event.target.value.length;
     document.getElementById("answerCharacterCount").textContent=`${length}文字`;
     document.getElementById("answerMeterFill").style.width=`${Math.min(100,length/2)}%`;
+    const status=document.getElementById("draftSaveStatus");
+    if(status)status.textContent="保存中…";
+    clearTimeout(saveCurrentDraft.timer);
+    saveCurrentDraft.timer=setTimeout(()=>saveCurrentDraft(false),500);
   });
 
   document.body.addEventListener("click",event=>{
@@ -2352,7 +2427,10 @@ function bindEvents(){
     const editStudentBtn=event.target.closest("[data-edit-student]");
     const deleteStudentBtn=event.target.closest("[data-delete-student]");
     const deleteResultBtn=event.target.closest("[data-delete-result]");
-    if(studentNav)showStudentScreen(studentNav.dataset.studentNav);
+    if(studentNav){
+      if(document.getElementById("studentScreen-battle").classList.contains("active"))saveCurrentDraft(false);
+      showStudentScreen(studentNav.dataset.studentNav);
+    }
     if(selectUnit)chooseStudentUnit(selectUnit.dataset.selectUnit);
     if(selectProblem)chooseStudentProblem(selectProblem.dataset.selectProblem);
     if(selectProfessor)chooseProfessor(selectProfessor.dataset.selectProfessor);
