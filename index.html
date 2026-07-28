@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>算数大学｜Version 6.2</title>
+<title>算数大学｜Version 6.3</title>
 <style>
 :root{
   --navy-950:#020817;
@@ -296,7 +296,7 @@ textarea{min-height:110px;resize:vertical}
 .score-box{margin-top:16px;padding:16px;border-radius:12px;background:#0b5031;border:1px solid #66db98}
 footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19}
 
-/* Version 6.2: 成長・経験値システム */
+/* Version 6.3: 成長・経験値システム */
 .growth-dashboard{
   display:grid;
   grid-template-columns:minmax(250px,.75fr) minmax(0,1.25fr);
@@ -533,8 +533,9 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       <div class="logo-ribbon">SANSU DAIGAKU</div>
       <p class="logo-message">数学的に考える力を育てる</p>
     </div>
-    <div class="version-badge">Version<strong>6.2</strong>★★★</div>
+    <div class="version-badge">Version<strong>6.3</strong>★★★</div>
   </header>
+  <div class="teacher-account-bar"><span class="teacher-account-name">👨‍🏫 教師モード</span><button id="teacherLogoutBtn" class="ghost">ログアウト</button></div>
 
   <nav class="topbar">
     <div class="topbar-inner">
@@ -624,6 +625,8 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
               </select>
             </div>
 
+            <label>登場する教授</label><select id="problemProfessor"><option value="logic">論理のアルベルト教授</option><option value="average">平均のメディアン教授</option><option value="ratio">割合のレシオ教授</option><option value="geometry">図形のジオメト教授</option><option value="speed">速さのヴェロ教授</option><option value="number">数のニュメロ教授</option><option value="mystery">謎のゼロ教授</option></select>
+            <label>教授が最初に言う言葉</label><input id="problemProfessorIntro" placeholder="例：その説明で、私を納得させられるかな？">
             <label>難易度</label>
             <select id="problemDifficulty">
               <option value="1">★☆☆ 基礎（25EXP）</option>
@@ -738,34 +741,8 @@ footer{text-align:center;padding:26px;color:#d1b66f;border-top:1px solid #4b3c19
       </section>
     </div>
 
-    <section class="challenge-stage">
-      <div class="challenge-banner">
-        <div class="challenge-label">⚔️ 今日の研究ミッション</div>
-        <div id="studentRewardPreview" class="challenge-reward">クリア報酬 +50EXP</div>
-      </div>
-      <div class="challenge-content">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
-          <div><label>単元</label><select id="studentUnitSelect"></select></div>
-          <div><label>問題</label><select id="studentProblemSelect"></select></div>
-        </div>
-
-        <div id="studentProblemBody" class="problem-scroll"></div>
-
-        <div class="answer-zone">
-          <div class="answer-zone-title">✍️ あなたの考えを研究ノートに書こう</div>
-          <textarea id="studentResponse" placeholder="答えだけでなく、「なぜそう考えたか」も書くと研究レベルが上がりやすくなります。"></textarea>
-          <div class="answer-support">
-            <span>自分の言葉で説明して大丈夫です。</span>
-            <span id="answerCharacterCount">0文字</span>
-          </div>
-          <div class="answer-meter"><div id="answerMeterFill" class="answer-meter-fill"></div></div>
-          <button id="submitAnswerBtn" class="submit-challenge">🚀 研究結果を提出する</button>
-        </div>
-
-        <div id="studentScoreBox" class="score-box hidden"></div>
-        <div id="researchLevelCard" class="research-level-card hidden"></div>
-      </div>
-    </section>
+    <section id="missionSelectScreen" class="problem-select-stage"><div class="problem-select-head"><div><h2>📜 挑戦する問題を選ぼう</h2><div class="muted">問題を選ぶと、担当教授の研究室へ向かいます。</div></div><div style="min-width:230px"><label style="margin-top:0">単元</label><select id="studentUnitSelect"></select></div></div><div id="missionGrid" class="mission-grid"></div><div class="start-mission-wrap"><button id="startMissionBtn" class="start-mission-btn" disabled>⚔️ この教授に挑戦する</button></div><select id="studentProblemSelect" class="hidden"></select></section>
+    <section id="professorBattleScreen" class="challenge-stage hidden"><div class="challenge-banner"><button id="backToMissionsBtn" class="ghost back-to-missions">← 問題選択へ戻る</button><div id="studentRewardPreview" class="challenge-reward">クリア報酬 +50EXP</div></div><div class="challenge-content"><div class="professor-arena"><aside class="professor-panel"><div id="professorRank" class="professor-rank">算数大学 教授</div><div id="professorAvatar" class="professor-avatar">🧐</div><div id="professorName" class="professor-name">論理のアルベルト教授</div><div id="professorSpecialty" class="professor-specialty">専門：論理的な説明</div><div class="persuasion-meter"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><strong>教授の納得度</strong><span id="persuasionText">0%</span></div><div class="persuasion-track"><div id="persuasionFill" class="persuasion-fill"></div></div></div><div id="professorDialogue" class="professor-dialogue">その説明で、私を納得させられるかな？</div></aside><div><div id="studentProblemBody" class="problem-scroll"></div><div class="answer-zone"><div class="answer-zone-title">💬 教授が納得する説明を書こう</div><textarea id="studentResponse" placeholder="答えだけでなく、考え方や理由も説明して教授を納得させよう。"></textarea><div class="answer-support"><span>模範解答と同じ言い方でなくても大丈夫です。</span><span id="answerCharacterCount">0文字</span></div><div class="answer-meter"><div id="answerMeterFill" class="answer-meter-fill"></div></div><button id="submitAnswerBtn" class="submit-challenge">🎓 この説明で教授を納得させる</button></div><div id="studentScoreBox" class="score-box hidden"></div><div id="researchLevelCard" class="research-level-card hidden"></div></div></div></div></section>
   </div>
 </div>
 
@@ -809,6 +786,8 @@ const CAMPUS_BUILDINGS = [
   {name:"講堂",icon:"🏛️",need:450,message:"自分の説明を発表する場所"},
   {name:"天文台",icon:"🔭",need:700,message:"新しい考えを発見する場所"}
 ];
+const PROFESSORS={logic:{name:"論理のアルベルト教授",avatar:"🧐",specialty:"専門：論理的な説明",rank:"算数大学 論理学教授",intro:"その説明で、私を納得させられるかな？"},average:{name:"平均のメディアン教授",avatar:"⚖️",specialty:"専門：平均とデータ",rank:"算数大学 統計学教授",intro:"数字をならす意味まで説明できるかな？"},ratio:{name:"割合のレシオ教授",avatar:"📊",specialty:"専門：割合と比",rank:"算数大学 比較学教授",intro:"何をもとに比べたのか、はっきり説明したまえ。"},geometry:{name:"図形のジオメト教授",avatar:"📐",specialty:"専門：図形と空間",rank:"算数大学 図形学教授",intro:"形の秘密を、言葉で証明してみなさい。"},speed:{name:"速さのヴェロ教授",avatar:"⏱️",specialty:"専門：速さ・時間・道のり",rank:"算数大学 速度学教授",intro:"速さの関係を順序よく説明できるかな？"},number:{name:"数のニュメロ教授",avatar:"🔢",specialty:"専門：数と計算",rank:"算数大学 数理学教授",intro:"計算だけでなく、なぜそうなるかを聞かせてほしい。"},mystery:{name:"謎のゼロ教授",avatar:"🎭",specialty:"専門：未知の問題",rank:"算数大学 特別教授",intro:"君の説明に、隠された真理はあるかな？"}};
+let selectedMissionProblemId=null;
 
 const defaultData = {
   settings:{schoolName:"",passcode:"4180"},
@@ -843,7 +822,7 @@ function loadData(){
       return {
         settings:{...defaultData.settings,...(saved.settings||{})},
         units:Array.isArray(saved.units)?saved.units:clone(defaultData.units),
-        problems:Array.isArray(saved.problems)?saved.problems:[],
+        problems:Array.isArray(saved.problems)?saved.problems.map(problem=>({professorId:"logic",professorIntro:"",...problem})):[],
         students:Array.isArray(saved.students)?saved.students.map(student=>({
           ...student,
           progress:{
@@ -1223,6 +1202,8 @@ function resetProblemForm(){
   document.getElementById("problemKeywords").value="";
   document.getElementById("problemSynonyms").value="";
   document.getElementById("problemPassRate").value="0.6";
+  document.getElementById("problemProfessor").value="logic";
+  document.getElementById("problemProfessorIntro").value="";
   document.getElementById("problemDifficulty").value="2";
   document.getElementById("problemMaxScore").value="10";
   document.getElementById("saveProblemBtn").textContent="この問題を保存する";
@@ -1240,6 +1221,8 @@ function saveProblem(){
     keywords:document.getElementById("problemKeywords").value.trim(),
     synonymGroups:document.getElementById("problemSynonyms").value.trim(),
     passRate:Number(document.getElementById("problemPassRate").value)||0.6,
+    professorId:document.getElementById("problemProfessor").value||"logic",
+    professorIntro:document.getElementById("problemProfessorIntro").value.trim(),
     difficulty:Number(document.getElementById("problemDifficulty").value)||2,
     maxScore:Number(document.getElementById("problemMaxScore").value)||10
   };
@@ -1266,6 +1249,8 @@ function editProblem(id){
   document.getElementById("problemKeywords").value=p.keywords||"";
   document.getElementById("problemSynonyms").value=p.synonymGroups||"";
   document.getElementById("problemPassRate").value=String(p.passRate||0.6);
+  document.getElementById("problemProfessor").value=p.professorId||"logic";
+  document.getElementById("problemProfessorIntro").value=p.professorIntro||"";
   document.getElementById("problemDifficulty").value=String(p.difficulty||2);
   document.getElementById("problemMaxScore").value=p.maxScore||10;
   document.getElementById("saveProblemBtn").textContent="問題の変更を保存する";
@@ -1311,6 +1296,7 @@ function enterStudentApp(studentId){
   document.getElementById("studentApp").classList.remove("hidden");
   document.getElementById("studentWelcome").textContent=`${student.name}さんの学習ページ`;
   ensureStudentProgress(student);
+  document.getElementById("missionSelectScreen").classList.remove("hidden");document.getElementById("professorBattleScreen").classList.add("hidden");
   renderStudentUnits();
   renderGrowthDashboard();
 }
@@ -1320,38 +1306,12 @@ function renderStudentUnits(){
   unitSelect.innerHTML=available.length?available.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}</option>`).join(""):'<option value="">問題がありません</option>';
   renderStudentProblems();
 }
-function renderStudentProblems(){
-  const unitId=document.getElementById("studentUnitSelect").value;
-  const problems=data.problems.filter(p=>p.unitId===unitId);
-  const select=document.getElementById("studentProblemSelect");
-  select.innerHTML=problems.length?problems.map(p=>`<option value="${p.id}">${escapeHtml(p.title)}</option>`).join(""):'<option value="">問題がありません</option>';
-  renderStudentProblemBody();
-}
-function renderStudentProblemBody(){
-  const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);
-  const body=document.getElementById("studentProblemBody");
-  const reward=document.getElementById("studentRewardPreview");
-
-  if(problem){
-    const difficulty=Number(problem.difficulty||2);
-    const stars="★".repeat(difficulty)+"☆".repeat(3-difficulty);
-    const rewardXp=difficulty*25;
-    body.innerHTML=`<div class="muted" style="margin-bottom:8px">研究難易度 ${stars}</div>
-      <h2>${escapeHtml(problem.title)}</h2>
-      <p>${escapeHtml(problem.text)}</p>
-      <div class="hint-orb">💡 たっくん教授のヒント：${escapeHtml(problem.hint||"自分の考えを順序よく書こう。")}</div>`;
-    reward.textContent=`初回クリア報酬 +${rewardXp}EXP`;
-  }else{
-    body.innerHTML='<div class="empty">問題を選んでください。</div>';
-    reward.textContent="問題を選んで研究開始";
-  }
-
-  document.getElementById("studentResponse").value="";
-  document.getElementById("answerCharacterCount").textContent="0文字";
-  document.getElementById("answerMeterFill").style.width="0%";
-  document.getElementById("studentScoreBox").classList.add("hidden");
-  document.getElementById("researchLevelCard").classList.add("hidden");
-}
+function renderStudentProblems(){const unitId=document.getElementById("studentUnitSelect").value;const problems=data.problems.filter(problem=>problem.unitId===unitId);const select=document.getElementById("studentProblemSelect");select.innerHTML=problems.length?problems.map(problem=>`<option value="${problem.id}">${escapeHtml(problem.title)}</option>`).join(""):'<option value="">問題がありません</option>';selectedMissionProblemId=null;document.getElementById("startMissionBtn").disabled=true;renderMissionGrid(problems)}
+function renderMissionGrid(problems){const holder=document.getElementById("missionGrid");if(!problems.length){holder.innerHTML='<div class="empty" style="grid-column:1/-1">この単元には、まだ挑戦できる問題がありません。</div>';return}holder.innerHTML=problems.map(problem=>{const professor=PROFESSORS[problem.professorId]||PROFESSORS.logic;const difficulty=Number(problem.difficulty||2);return `<article class="mission-card ${selectedMissionProblemId===problem.id?"selected":""}" data-select-mission="${problem.id}"><div class="mission-professor-mini"><div class="professor-mini-avatar">${professor.avatar}</div><div><div class="mission-title">${escapeHtml(problem.title)}</div><div class="mission-meta">${escapeHtml(professor.name)}｜${"★".repeat(difficulty)}${"☆".repeat(3-difficulty)}｜+${difficulty*25}EXP</div></div></div><div class="mission-description">${escapeHtml(problem.text)}</div></article>`}).join("")}
+function selectMission(problemId){selectedMissionProblemId=problemId;document.getElementById("studentProblemSelect").value=problemId;document.getElementById("startMissionBtn").disabled=false;renderMissionGrid(data.problems.filter(problem=>problem.unitId===document.getElementById("studentUnitSelect").value))}
+function startProfessorBattle(){if(!selectedMissionProblemId){showToast("挑戦する問題を選んでください。");return}document.getElementById("studentProblemSelect").value=selectedMissionProblemId;document.getElementById("missionSelectScreen").classList.add("hidden");document.getElementById("professorBattleScreen").classList.remove("hidden");renderStudentProblemBody();window.scrollTo({top:0,behavior:"smooth"})}
+function returnToMissionSelect(){document.getElementById("professorBattleScreen").classList.add("hidden");document.getElementById("missionSelectScreen").classList.remove("hidden");document.getElementById("studentScoreBox").classList.add("hidden");document.getElementById("researchLevelCard").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+function renderStudentProblemBody(){const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);const body=document.getElementById("studentProblemBody");const reward=document.getElementById("studentRewardPreview");if(problem){const difficulty=Number(problem.difficulty||2),professor=PROFESSORS[problem.professorId]||PROFESSORS.logic;document.getElementById("professorRank").textContent=professor.rank;document.getElementById("professorAvatar").textContent=professor.avatar;document.getElementById("professorName").textContent=professor.name;document.getElementById("professorSpecialty").textContent=professor.specialty;document.getElementById("professorDialogue").textContent=problem.professorIntro||professor.intro;document.getElementById("persuasionFill").style.width="0%";document.getElementById("persuasionText").textContent="0%";body.innerHTML=`<div class="muted" style="margin-bottom:8px">研究難易度 ${"★".repeat(difficulty)}${"☆".repeat(3-difficulty)}</div><h2>${escapeHtml(problem.title)}</h2><p>${escapeHtml(problem.text)}</p><div class="hint-orb">💡 たっくん教授のヒント：${escapeHtml(problem.hint||"自分の考えを順序よく書こう。")}</div>`;reward.textContent=`初回クリア報酬 +${difficulty*25}EXP`}else{body.innerHTML='<div class="empty">問題を選んでください。</div>';reward.textContent="問題を選んで研究開始"}document.getElementById("studentResponse").value="";document.getElementById("answerCharacterCount").textContent="0文字";document.getElementById("answerMeterFill").style.width="0%";document.getElementById("studentScoreBox").classList.add("hidden");document.getElementById("researchLevelCard").classList.add("hidden")}
 
 function submitStudentAnswer(){
   const problem=data.problems.find(p=>p.id===document.getElementById("studentProblemSelect").value);
@@ -1423,6 +1383,7 @@ function submitStudentAnswer(){
     ${gained?`<div class="xp-reward" style="margin-top:9px">ミッションクリア！ +${xpReward}EXPを獲得しました。</div>`:
       evaluation.passed?'<div class="muted" style="margin-top:9px">この問題のEXPはすでに獲得済みです。</div>':""}`;
   box.classList.remove("hidden");
+  const persuasion=Math.round(Math.min(100,evaluation.blendedScore*100));document.getElementById("persuasionFill").style.width=`${persuasion}%`;document.getElementById("persuasionText").textContent=`${persuasion}%`;document.getElementById("professorDialogue").textContent=evaluation.passed?`なるほど……見事だ。${student.name}君の説明には、私を納得させる力がある。`:evaluation.keywordRatio>=evaluation.passRate*0.65?"ふむ、かなり良いところまで来ている。あと一つ、大切な考えを加えてみたまえ。":"まだ私は完全には納得していない。ヒントを使って、理由をもう少し説明してみよう。";
   showResearchLevel(researchLevel,score,maxScore);
   renderGrowthDashboard();
 }
@@ -1444,6 +1405,8 @@ function bindEvents(){
     document.getElementById("teacherApp").classList.remove("hidden");
     document.getElementById("teacherLoginMessage").textContent="";
   });
+  document.getElementById("teacherLogoutBtn").addEventListener("click",()=>{document.getElementById("teacherApp").classList.add("hidden");document.getElementById("teacherPasscode").value="";document.getElementById("loginOverlay").classList.remove("hidden");document.querySelector('[data-login-tab="teacher"]').click();window.scrollTo({top:0,behavior:"smooth"})});
+
   document.getElementById("studentLoginBtn").addEventListener("click",()=>{
     const id=document.getElementById("studentLoginSelect").value;
     if(!id){showToast("先に児童を登録してください。");return}
@@ -1503,7 +1466,8 @@ function bindEvents(){
   });
 
   document.getElementById("studentUnitSelect").addEventListener("change",renderStudentProblems);
-  document.getElementById("studentProblemSelect").addEventListener("change",renderStudentProblemBody);
+  document.getElementById("startMissionBtn").addEventListener("click",startProfessorBattle);
+  document.getElementById("backToMissionsBtn").addEventListener("click",returnToMissionSelect);
   document.getElementById("submitAnswerBtn").addEventListener("click",submitStudentAnswer);
 
   document.body.addEventListener("click",event=>{
@@ -1515,7 +1479,9 @@ function bindEvents(){
     const editStudentBtn=event.target.closest("[data-edit-student]");
     const deleteStudentBtn=event.target.closest("[data-delete-student]");
     const deleteResultBtn=event.target.closest("[data-delete-result]");
+    const selectMissionCard=event.target.closest("[data-select-mission]");
 
+    if(selectMissionCard)selectMission(selectMissionCard.dataset.selectMission);
     if(editUnit)openUnitModal(editUnit.dataset.editUnit);
     if(deleteUnit)openDeleteUnit(deleteUnit.dataset.deleteUnit);
     if(createProblem){setPanel("problems");document.getElementById("problemUnit").value=createProblem.dataset.createProblem;document.getElementById("problemTitle").focus()}
