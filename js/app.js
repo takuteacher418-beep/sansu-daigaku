@@ -15,6 +15,9 @@
   let supportUsage = {};
   let problemStartedAt = null;
   let hintCount = 0;
+  let practiceItems = [];
+  let practiceIndex = 0;
+  let practiceResults = [];
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -47,7 +50,12 @@
         ...clone(DEFAULT_APP_DATA.problems[index] || {}),
         ...problem,
         professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授",
-        formulaCards: problem.formulaCards || DEFAULT_APP_DATA.problems[index]?.formulaCards || [],
+        correctExplanation: problem.correctExplanation || problem.modelAnswer || DEFAULT_APP_DATA.problems[index]?.correctExplanation || "",
+        distractors: problem.distractors || (problem.choices || []).slice(1) || DEFAULT_APP_DATA.problems[index]?.distractors || [],
+        choices: problem.choices || DEFAULT_APP_DATA.problems[index]?.choices || [],
+        blankPhrase: problem.blankPhrase || DEFAULT_APP_DATA.problems[index]?.blankPhrase || "",
+        blankDistractors: problem.blankDistractors || DEFAULT_APP_DATA.problems[index]?.blankDistractors || [],
+        clozeText: problem.clozeText || DEFAULT_APP_DATA.problems[index]?.clozeText || "",
         smallSteps: problem.smallSteps || DEFAULT_APP_DATA.problems[index]?.smallSteps || []
       }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
@@ -65,7 +73,7 @@
     window.setTimeout(() => toast.classList.remove("show"), 2000);
   }
   function showPage(pageId) {
-    ["studentHomeView", "problemView", "profileView", "teacherView"].forEach((id) => {
+    ["studentHomeView", "problemView", "practiceView", "profileView", "teacherView"].forEach((id) => {
       $("#" + id).classList.toggle("hidden", id !== pageId);
     });
   }
@@ -211,7 +219,7 @@
   function openProblem(problemId) {
     activeProblem = appData.problems.find((problem) => problem.id === problemId);
     if (!activeProblem) return;
-    answerMode = currentStudent().profile.choice ? "choice" : "text";
+    answerMode = "choice";
     learningRoute = currentStudent().profile.steps ? "smallStep" : "independent";
     sentenceMode = false;
     lineFocusMode = false;
@@ -291,10 +299,7 @@
   }
 
   function renderAnswerModes() {
-    const profile = currentStudent().profile;
-    const modes = [["text", "文章で答える"], ["choice", "選んで答える"], ["formula", "式を作る"]];
-    if (profile.template) modes.push(["template", "文の型で答える"]);
-
+    const modes = [["choice", "正しい説明を選ぶ"], ["cloze", "説明の穴を埋める"]];
     $("#answerModeTabs").innerHTML = modes.map(([id, label]) =>
       `<button class="answer-tab ${answerMode === id ? "active" : ""}" data-mode="${id}" type="button">${label}</button>`
     ).join("");
@@ -304,82 +309,49 @@
       renderAnswerModes();
     }));
 
-    if (answerMode === "text") {
-      $("#answerArea").innerHTML = '<textarea id="freeAnswer" placeholder="自分の考えを書こう"></textarea>';
-    } else if (answerMode === "choice") {
+    if (answerMode === "choice") {
       $("#answerArea").innerHTML = (activeProblem.choices || []).map((choice) =>
-        `<label class="choice"><input type="radio" name="choiceAnswer" value="${choice}" />${choice}</label>`
+        `<label class="choice explanation-choice"><input type="radio" name="choiceAnswer" value="${choice}" /><span>${choice}</span></label>`
       ).join("");
-    } else if (answerMode === "formula") {
-      renderFormulaBuilder("#answerArea", activeProblem.formulaCards || [], "mainFormula");
     } else {
+      const options = shuffle([activeProblem.blankPhrase, ...(activeProblem.blankDistractors || [])].filter(Boolean));
       $("#answerArea").innerHTML = `
-        <label>まず、何をしましたか<input id="template1" /></label>
-        <label>次に、何をしましたか<input id="template2" /></label>
-        <label>だから、答えは<input id="template3" /></label>`;
+        <div class="cloze-card">
+          <p>${(activeProblem.clozeText || activeProblem.correctExplanation || "").replace("［　］", '<span id="clozeBlank" class="cloze-blank">ここを選ぶ</span>')}</p>
+          <div class="cloze-options">${options.map((option) => `<button class="cloze-option" data-value="${option}" type="button">${option}</button>`).join("")}</div>
+          <input id="clozeAnswer" type="hidden" />
+        </div>`;
+      $$(".cloze-option").forEach((button) => button.addEventListener("click", () => {
+        $$(".cloze-option").forEach((item) => item.classList.toggle("selected", item === button));
+        $("#clozeAnswer").value = button.dataset.value;
+        $("#clozeBlank").textContent = button.dataset.value;
+      }));
     }
   }
 
-  function renderFormulaBuilder(containerSelector, cards, builderId) {
-    const container = $(containerSelector);
-    container.innerHTML = `
-      <div class="formula-builder" data-builder="${builderId}">
-        <div class="formula-output" id="${builderId}Output"><span class="formula-placeholder">カードを押して式を作ろう</span></div>
-        <div class="formula-palette">
-          ${cards.map((card, index) => `<button class="formula-card" data-value="${card}" data-index="${index}" type="button">${card}</button>`).join("")}
-        </div>
-        <div class="formula-controls">
-          <button class="btn ghost formula-undo" type="button">1つ戻す</button>
-          <button class="btn ghost formula-clear" type="button">全部消す</button>
-        </div>
-      </div>`;
-    const builder = container.querySelector(".formula-builder");
-    builder.dataset.values = "[]";
-    builder.querySelectorAll(".formula-card").forEach((button) => button.addEventListener("click", () => {
-      const values = JSON.parse(builder.dataset.values);
-      values.push(button.dataset.value);
-      builder.dataset.values = JSON.stringify(values);
-      updateFormulaOutput(builder, builderId);
-    }));
-    builder.querySelector(".formula-undo").addEventListener("click", () => {
-      const values = JSON.parse(builder.dataset.values);
-      values.pop();
-      builder.dataset.values = JSON.stringify(values);
-      updateFormulaOutput(builder, builderId);
-    });
-    builder.querySelector(".formula-clear").addEventListener("click", () => {
-      builder.dataset.values = "[]";
-      updateFormulaOutput(builder, builderId);
-    });
-  }
-
-  function updateFormulaOutput(builder, builderId) {
-    const values = JSON.parse(builder.dataset.values || "[]");
-    const output = $("#" + builderId + "Output");
-    output.innerHTML = values.length
-      ? values.map((value) => `<span>${value}</span>`).join("")
-      : '<span class="formula-placeholder">カードを押して式を作ろう</span>';
-  }
-
-  function formulaValue(builderId) {
-    const builder = document.querySelector(`[data-builder="${builderId}"]`);
-    return builder ? JSON.parse(builder.dataset.values || "[]").join("") : "";
+  function shuffle(items) {
+    return [...items].sort(() => Math.random() - 0.5);
   }
 
   function collectAnswer() {
-    if (answerMode === "text") return $("#freeAnswer")?.value.trim() || "";
     if (answerMode === "choice") return document.querySelector('input[name="choiceAnswer"]:checked')?.value || "";
-    if (answerMode === "formula") return formulaValue("mainFormula");
-    return [$("#template1")?.value, $("#template2")?.value, $("#template3")?.value].filter(Boolean).join("。");
+    return $("#clozeAnswer")?.value || "";
   }
 
 
+  function explanationSteps(problem) {
+    return [
+      { prompt: `${problem.concept || problem.unit}について、正しい説明を選びましょう。`, type: "choice", options: shuffle([problem.correctExplanation, ...(problem.distractors || [])]), correct: problem.correctExplanation, support: problem.hint || "正しい説明をもう一度見比べよう。" },
+      { prompt: "説明の大切な言葉を入れましょう。", type: "choice", options: shuffle([problem.blankPhrase, ...(problem.blankDistractors || [])]), correct: problem.blankPhrase, support: `正しい説明は「${problem.correctExplanation}」です。` }
+    ];
+  }
+
   function currentStep() {
-    return (activeProblem.smallSteps || [])[stepIndex];
+    return explanationSteps(activeProblem)[stepIndex];
   }
 
   function renderSmallStep() {
-    const steps = activeProblem.smallSteps || [];
+    const steps = explanationSteps(activeProblem);
     if (!steps.length) {
       $("#stepContent").innerHTML = '<p class="notice">この問題のスモールステップは準備中です。自分で解くに切り替えてください。</p>';
       $("#checkStepBtn").classList.add("hidden");
@@ -398,23 +370,13 @@
       $("#stepContent").innerHTML = `<div class="step-choice-list">${step.options.map((option) =>
         `<label class="choice"><input type="radio" name="stepChoice" value="${option}">${option}</label>`
       ).join("")}</div>`;
-    } else if (step.type === "formula") {
-      $("#stepContent").innerHTML = '<div id="stepFormulaArea"></div>';
-      renderFormulaBuilder("#stepFormulaArea", step.cards || activeProblem.formulaCards || [], "stepFormula");
-    } else {
-      $("#stepContent").innerHTML = `
-        <div class="step-template">
-          ${(step.fields || ["答え"]).map((field, index) => `<label>${field}<input class="step-template-input" data-index="${index}" /></label>`).join("")}
-        </div>`;
     }
   }
 
   function collectStepAnswer() {
     const step = currentStep();
     if (!step) return "";
-    if (step.type === "choice") return document.querySelector('input[name="stepChoice"]:checked')?.value || "";
-    if (step.type === "formula") return formulaValue("stepFormula");
-    return [...document.querySelectorAll(".step-template-input")].map((input) => input.value.trim()).filter(Boolean).join("。");
+    return document.querySelector('input[name="stepChoice"]:checked')?.value || "";
   }
 
   function checkCurrentStep() {
@@ -426,9 +388,7 @@
     }
 
     let correct = false;
-    if (step.type === "choice") correct = answer === step.correct;
-    if (step.type === "formula") correct = answer.replace(/\s/g, "") === (step.target || "").replace(/\s/g, "");
-    if (step.type === "template") correct = (step.expected || []).every((word) => answer.includes(word));
+    correct = answer === step.correct;
 
     stepAnswers[stepIndex] = { answer, correct };
     $("#stepFeedback").className = `step-feedback ${correct ? "good" : "retry"}`;
@@ -450,9 +410,8 @@
     learningRoute = "independent";
     supportUsage.route = "smallStep";
     renderProblem();
-    answerMode = currentStudent().profile.template ? "template" : "text";
+    answerMode = "choice";
     renderAnswerModes();
-    if ($("#freeAnswer")) $("#freeAnswer").value = assembled;
     showToast("一段ずつ考えた内容を、最後の答えにつなげよう");
   }
 
@@ -479,7 +438,7 @@
     }
   });
   $("#nextStepBtn").addEventListener("click", () => {
-    const steps = activeProblem.smallSteps || [];
+    const steps = explanationSteps(activeProblem);
     if (stepIndex < steps.length - 1) {
       stepIndex += 1;
       renderSmallStep();
@@ -549,44 +508,124 @@
   $("#submitAnswerBtn").addEventListener("click", () => {
     const answer = collectAnswer();
     if (!answer) {
-      showToast("答えを入力または選択してください");
+      showToast("説明を選んでください");
       return;
     }
-    const keywords = activeProblem.keywords || [];
-    const hits = keywords.filter((keyword) => answer.includes(keyword)).length;
-    let score = Math.min(100, Math.round((hits / Math.max(2, keywords.length)) * 90) + (answer.length >= 10 ? 10 : 0));
-    if (answerMode === "choice" && answer === activeProblem.choices?.[0]) score = 100;
-
+    const correct = answerMode === "choice"
+      ? answer === activeProblem.correctExplanation
+      : answer === activeProblem.blankPhrase;
+    const score = correct ? 100 : 0;
     const student = currentStudent();
-    const gain = score >= 80 ? 30 : score >= 60 ? 20 : 10;
     const elapsedSeconds = Math.max(1, Math.round((Date.now() - problemStartedAt) / 1000));
-    student.history.push({
-      problemId: activeProblem.id, score, answer, answerMode,
-      route: supportUsage.route || learningRoute,
-      supports: { ...supportUsage, answerMode },
-      hintCount,
-      stepAnswers: clone(stepAnswers),
-      elapsedSeconds,
-      date: new Date().toISOString()
-    });
-    student.xp += gain;
-    student.points += Math.ceil(gain / 2);
-    saveData();
 
-    $("#feedbackBox").className = "feedback " + (score >= 60 ? "good" : "");
+    $("#feedbackBox").className = "feedback " + (correct ? "good" : "");
     const professor = professorForProblem(activeProblem);
     $("#feedbackBox").innerHTML = `
       <div class="professor-feedback">
         <img src="${professor.image}" alt="${professor.name}">
         <div>
-          <div class="feedback-score">${score}点</div>
-          <strong>${professor.name}：${score >= 60 ? professor.success : professor.retry}</strong>
+          <div class="feedback-score">${correct ? "説明できた！" : "もう一度確認"}</div>
+          <strong>${professor.name}：${correct ? professor.success : professor.retry}</strong>
         </div>
       </div>
-      <p>模範例：${activeProblem.modelAnswer || "設定されていません"}</p>
-      <button id="feedbackHomeBtn" class="btn soft" type="button">キャンパスへ戻る</button>`;
-    $("#feedbackHomeBtn").addEventListener("click", renderStudentHome);
+      <div class="explanation-confirmation"><small>正しい説明</small><strong>${activeProblem.correctExplanation}</strong></div>
+      ${correct ? '<button id="startPracticeBtn" class="btn gold large full" type="button">確認問題を3問やってみる</button>' : '<button id="retryExplanationBtn" class="btn soft large full" type="button">説明を選び直す</button>'}`;
+
+    if (correct) {
+      $("#startPracticeBtn").addEventListener("click", () => startPracticeSession(elapsedSeconds, answer));
+    } else {
+      $("#retryExplanationBtn").addEventListener("click", () => {
+        $("#feedbackBox").classList.add("hidden");
+        renderAnswerModes();
+      });
+    }
   });
+
+  function buildPracticeItems(problem) {
+    if (problem.practiceKind === "averageCalculation") {
+      const sets = [[4,6,8],[3,6,9],[5,10,15]];
+      return sets.map((nums, index) => {
+        const answer = nums.reduce((a,b)=>a+b,0) / nums.length;
+        const distractors = [answer + 1, nums.reduce((a,b)=>a+b,0), nums.length].filter((v,i,a)=>v !== answer && a.indexOf(v)===i);
+        return { type: index === 1 ? "cloze" : "choice", prompt: `${nums.join("、")}の平均を求めるとき、説明に合う答えを選びましょう。`, choices: shuffle([String(answer), ...distractors.slice(0,2).map(String)]), correct: String(answer), clozeText: `全部を足した合計を［　］で割ると、平均は${answer}です。`, blankChoices: shuffle([String(nums.length), String(nums.reduce((a,b)=>a+b,0)), String(Math.max(...nums))]), blankCorrect: String(nums.length) };
+      });
+    }
+    if (problem.practiceKind === "ratioMeaning") {
+      return [
+        {type:"choice",prompt:"50人をもとにして20人を比べます。割合を求める式はどれですか。",choices:["20÷50","50÷20","50－20"],correct:"20÷50"},
+        {type:"cloze",prompt:"割合の説明を完成させましょう。",clozeText:"割合は、比べる量が［　］の何倍かを表します。",blankChoices:["もとにする量","答え","差"],blankCorrect:"もとにする量"},
+        {type:"choice",prompt:"割合を求めるとき、基準になる量はどれですか。",choices:["もとにする量","比べる量だけ","二つの量の合計"],correct:"もとにする量"}
+      ];
+    }
+    const distractors = problem.distractors || [];
+    return [
+      {type:"choice",prompt:`${problem.concept}を正しく説明している文を選びましょう。`,choices:shuffle([problem.correctExplanation,...distractors]),correct:problem.correctExplanation},
+      {type:"cloze",prompt:"説明の大切な言葉を入れましょう。",clozeText:problem.clozeText,blankChoices:shuffle([problem.blankPhrase,...(problem.blankDistractors||[])]),blankCorrect:problem.blankPhrase},
+      {type:"choice",prompt:`教授に${problem.concept}を説明するなら、どの文がよいですか。`,choices:shuffle([problem.correctExplanation,...distractors]),correct:problem.correctExplanation}
+    ];
+  }
+
+  function startPracticeSession(explanationSeconds, explanationAnswer) {
+    practiceItems = buildPracticeItems(activeProblem).slice(0,3);
+    practiceIndex = 0;
+    practiceResults = [];
+    supportUsage.explanationSeconds = explanationSeconds;
+    supportUsage.explanationAnswer = explanationAnswer;
+    showPage("practiceView");
+    renderPracticeItem();
+  }
+
+  function renderPracticeItem() {
+    const item = practiceItems[practiceIndex];
+    const professor = professorForProblem(activeProblem);
+    $("#practiceCounter").textContent = `${practiceIndex + 1} / ${practiceItems.length}`;
+    $("#practiceProgressFill").style.width = `${((practiceIndex + 1) / practiceItems.length) * 100}%`;
+    $("#practiceProfessor").innerHTML = `<img src="${professor.image}" alt="${professor.name}"><div><small>${professor.name}</small><strong>説明を使って確かめよう。</strong></div>`;
+    $("#practiceQuestion").innerHTML = `<h2>${item.prompt}</h2>`;
+    $("#practiceExplanationKey").textContent = activeProblem.correctExplanation;
+    $("#practiceFeedback").classList.add("hidden");
+    $("#checkPracticeBtn").classList.remove("hidden");
+    $("#practiceDots").innerHTML = practiceItems.map((_,i)=>`<span class="practice-dot ${practiceResults[i]===true?'good':practiceResults[i]===false?'bad':i===practiceIndex?'current':''}">${i+1}</span>`).join("");
+    if (item.type === "choice") {
+      $("#practiceAnswerArea").innerHTML = item.choices.map(choice=>`<label class="choice explanation-choice"><input type="radio" name="practiceChoice" value="${choice}"><span>${choice}</span></label>`).join("");
+    } else {
+      $("#practiceAnswerArea").innerHTML = `<div class="cloze-card"><p>${item.clozeText.replace("［　］",'<span id="practiceBlank" class="cloze-blank">ここを選ぶ</span>')}</p><div class="cloze-options">${item.blankChoices.map(v=>`<button class="practice-cloze-option cloze-option" data-value="${v}" type="button">${v}</button>`).join("")}</div><input id="practiceClozeAnswer" type="hidden"></div>`;
+      $$(".practice-cloze-option").forEach(button=>button.addEventListener("click",()=>{
+        $$(".practice-cloze-option").forEach(x=>x.classList.toggle("selected",x===button));
+        $("#practiceClozeAnswer").value=button.dataset.value; $("#practiceBlank").textContent=button.dataset.value;
+      }));
+    }
+  }
+
+  $("#checkPracticeBtn").addEventListener("click", () => {
+    const item = practiceItems[practiceIndex];
+    const answer = item.type === "choice" ? document.querySelector('input[name="practiceChoice"]:checked')?.value : $("#practiceClozeAnswer")?.value;
+    if (!answer) { showToast("答えを選んでください"); return; }
+    const correct = answer === (item.type === "choice" ? item.correct : item.blankCorrect);
+    practiceResults[practiceIndex] = correct;
+    $("#practiceFeedback").className = `feedback ${correct?'good':''}`;
+    $("#practiceFeedback").innerHTML = `<strong>${correct?'説明を使えている！':'説明をもう一度見てみよう'}</strong><p>${correct?'考え方と答えがつながりました。':activeProblem.correctExplanation}</p><button id="nextPracticeBtn" class="btn ${correct?'gold':'soft'}" type="button">${practiceIndex===practiceItems.length-1?'結果を見る':'次の問題へ'}</button>`;
+    $("#checkPracticeBtn").classList.add("hidden");
+    $("#nextPracticeBtn").addEventListener("click",()=>{
+      if (practiceIndex < practiceItems.length-1) { practiceIndex++; renderPracticeItem(); } else finishPracticeSession();
+    });
+  });
+
+  function finishPracticeSession() {
+    const correctCount = practiceResults.filter(Boolean).length;
+    const score = Math.round(correctCount / practiceItems.length * 100);
+    const student = currentStudent();
+    const gain = correctCount * 10 + 10;
+    student.history.push({problemId:activeProblem.id,score,answerMode,supports:{...supportUsage,answerMode},practiceCorrect:correctCount,practiceTotal:practiceItems.length,route:supportUsage.route||learningRoute,hintCount,elapsedSeconds:Math.round((Date.now()-problemStartedAt)/1000),date:new Date().toISOString()});
+    student.xp += gain; student.points += Math.ceil(gain/2); saveData();
+    const professor=professorForProblem(activeProblem);
+    $("#practiceQuestion").innerHTML=`<div class="practice-result"><img src="${professor.image}" alt="${professor.name}"><h2>確認問題 ${correctCount} / ${practiceItems.length} 問正解</h2><p>${correctCount===3?'説明を理解し、使うことができました！':'正しい説明を見ながら、もう一度挑戦できます。'}</p></div>`;
+    $("#practiceAnswerArea").innerHTML=`<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
+    $("#checkPracticeBtn").classList.add("hidden"); $("#practiceFeedback").classList.add("hidden");
+    $("#practiceHomeBtn").addEventListener("click",renderStudentHome);
+  }
+
+  $("#leavePracticeBtn").addEventListener("click",renderStudentHome);
 
   function renderProfile() {
     showPage("profileView");
@@ -672,8 +711,8 @@
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.3</h2>
-        <p>児童が学び方と回答方法を選び、一文表示・読む場所の強調・式カード・スモールステップを利用できます。</p>
+        <h2>Version 11.4</h2>
+        <p>説明問題に特化し、選択式・穴埋め式で答えた後、理解確認の練習問題を3問出題します。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
   }
@@ -696,10 +735,10 @@
   function renderTeacherProblems() {
     $("#teacherContent").innerHTML = `
       <section class="panel">
-        <div class="section-head"><div><h2>問題管理</h2><p class="muted">通常文・簡略文・図・選択肢・採点基準を登録できます。</p></div><button id="addProblemBtn" class="btn primary" type="button">＋問題登録</button></div>
-        <div class="table-wrap"><table><thead><tr><th>単元</th><th>問題</th><th>教授</th><th>操作</th></tr></thead>
+        <div class="section-head"><div><h2>問題管理</h2><p class="muted">正しい説明と誤った説明を入力するだけで、選択式・穴埋め式・確認問題3問を作ります。</p></div><button id="addProblemBtn" class="btn primary" type="button">＋問題登録</button></div>
+        <div class="table-wrap"><table><thead><tr><th>単元</th><th>説明する内容</th><th>回答形式</th><th>教授</th><th>操作</th></tr></thead>
         <tbody>${appData.problems.map((problem) => `<tr>
-          <td>${problem.unit}</td><td>${problem.title}</td><td>${problem.professor}</td>
+          <td>${problem.unit}</td><td>${problem.title}</td><td>選択・穴埋め</td><td>${problem.professor}</td>
           <td><button class="btn soft edit-problem-btn" data-id="${problem.id}" type="button">編集</button></td>
         </tr>`).join("")}</tbody></table></div>
       </section>`;
@@ -815,15 +854,14 @@
     const problem = appData.problems.find((item) => item.id === problemId);
     $("#editingProblemId").value = problem?.id || "";
     $("#problemUnitField").value = problem?.unit || "";
+    $("#problemConceptField").value = problem?.concept || problem?.unit || "";
     $("#problemTitleField").value = problem?.title || "";
-    $("#problemProfessorField").value = problem?.professor || "たっくん教授";
-    $("#problemDifficultyField").value = problem?.difficulty || 2;
-    $("#problemQuestionField").value = problem?.question || "";
-    $("#problemSimpleField").value = problem?.simpleQuestion || "";
+    $("#problemProfessorField").innerHTML = (appData.professors || []).map(professor => `<option value="${professor.name}" ${professor.name === (problem?.professor || "たっくん教授") ? "selected" : ""}>${professor.name}</option>`).join("");
+    $("#problemCorrectExplanationField").value = problem?.correctExplanation || "";
+    $("#problemDistractorsField").value = (problem?.distractors || []).join("\n");
+    $("#problemBlankPhraseField").value = problem?.blankPhrase || "";
+    $("#problemBlankDistractorsField").value = (problem?.blankDistractors || []).join("\n");
     $("#problemVisualField").value = problem?.visual?.replaceAll("<br>", "\n") || "";
-    $("#problemChoicesField").value = (problem?.choices || []).join("\n");
-    $("#problemKeywordsField").value = (problem?.keywords || []).join("、");
-    $("#problemModelField").value = problem?.modelAnswer || "";
     $("#problemHintField").value = problem?.hint || "";
     $("#problemDialog").showModal();
   }
@@ -833,27 +871,27 @@
     event.preventDefault();
     const id = $("#editingProblemId").value || "p" + Date.now();
     const existing = appData.problems.find((problem) => problem.id === id);
-    const question = $("#problemQuestionField").value.trim();
+    const concept = $("#problemConceptField").value.trim();
+    const correctExplanation = $("#problemCorrectExplanationField").value.trim();
+    const distractors = $("#problemDistractorsField").value.split("\n").map(x=>x.trim()).filter(Boolean);
+    const blankPhrase = $("#problemBlankPhraseField").value.trim();
+    const blankDistractors = $("#problemBlankDistractorsField").value.split("\n").map(x=>x.trim()).filter(Boolean);
+    if (distractors.length < 2) { showToast("まちがった説明を2つ以上入力してください"); return; }
+    if (!correctExplanation.includes(blankPhrase)) { showToast("正しい説明の中に、穴埋めにする言葉を含めてください"); return; }
     const problem = {
-      id,
-      unit: $("#problemUnitField").value.trim(),
-      title: $("#problemTitleField").value.trim(),
-      professor: $("#problemProfessorField").value.trim(),
-      difficulty: Number($("#problemDifficultyField").value),
-      question,
-      rubyText: question,
-      simpleQuestion: $("#problemSimpleField").value.trim() || question,
-      visual: $("#problemVisualField").value.trim().replaceAll("\n", "<br>"),
-      choices: $("#problemChoicesField").value.split("\n").map((item) => item.trim()).filter(Boolean),
-      keywords: $("#problemKeywordsField").value.split(/[、,]/).map((item) => item.trim()).filter(Boolean),
-      modelAnswer: $("#problemModelField").value.trim(),
+      id, unit: $("#problemUnitField").value.trim(), concept,
+      title: $("#problemTitleField").value.trim(), professor: $("#problemProfessorField").value,
+      difficulty: 2,
+      question: `${concept}について、正しく説明している文を選びましょう。`,
+      rubyText: `${concept}について、正しく説明している文を選びましょう。`,
+      simpleQuestion: `${concept}の正しい説明を選びましょう。`,
+      visual: $("#problemVisualField").value.trim().replaceAll("\n","<br>"),
+      correctExplanation, distractors, choices: [correctExplanation,...distractors],
+      blankPhrase, blankDistractors,
+      clozeText: correctExplanation.replace(blankPhrase,"［　］"),
       hint: $("#problemHintField").value.trim()
     };
-    if (existing) Object.assign(existing, problem);
-    else appData.problems.push(problem);
-    saveData();
-    $("#problemDialog").close();
-    renderTeacherProblems();
-    showToast("問題を保存しました");
+    if (existing) Object.assign(existing,problem); else appData.problems.push(problem);
+    saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と確認問題3問を作成しました");
   });
 })();
