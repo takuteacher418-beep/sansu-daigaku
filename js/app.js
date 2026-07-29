@@ -1,18 +1,18 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "13.0";
+  const APP_VERSION = "14.0";
   const APP_BUILD_DATE = "2026.07.30";
   const DATA_SCHEMA_VERSION = 13;
   const RUNTIME_ERROR_KEY = "sansuDaigakuRuntimeErrors";
   const APP_RELEASE_NOTES = [
-    "LDに配慮した児童ホーム画面へ全面刷新",
-    "5段階で成長する魔法大学キャンパスを実装",
-    "レベルアップ・キャンパス解放・実績演出を追加",
-    "既存データを保護する自動修復処理を追加",
-    "児童編集時にキャンパス・実績情報が消える不具合を修正",
-    "教師画面にシステム確認とデータ整合性チェックを追加",
-    "PC・タブレット・スマートフォン表示を最終調整"
+    "ゲーム内の主要画像をオリジナルの魔法大学RPG風アートへ刷新",
+    "キャンパス5段階を高精細なゲーム背景へ置換",
+    "教授7人の立ち絵を統一したオリジナルデザインへ置換",
+    "児童アバター4色を統一したゲーム風画像へ置換",
+    "学習・キャンパス・プロフィール・コレクション・ヘルプ用の画像素材を追加",
+    "画像形式をPNG・WebPへ整理し、Chromebookでの読み込みを軽量化",
+    "Version 13.0の学習・提出・分析・キャンパス機能を維持"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
@@ -766,7 +766,7 @@
   function professorByName(name) {
     return appData.professors?.find((professor) => professor.name === name)
       || appData.professors?.[0]
-      || { name: name || "たっくん教授", image: "images/professors/takkun.png", greeting: "今日も挑戦しよう！", success: "よくできました。", retry: "もう一度考えてみよう。" };
+      || { name: name || "たっくん教授", image: "images/professors-v14/takkun.png", greeting: "今日も挑戦しよう！", success: "よくできました。", retry: "もう一度考えてみよう。" };
   }
   function professorForProblem(problem) {
     return professorByName(problem?.professor);
@@ -775,7 +775,7 @@
   const CAMPUS_STAGES = [
     {
       minClears: 0,
-      image: "images/campus-v13/stage-1-hut.svg",
+      image: "images/campus-v14/stage-1-hut.webp",
       title: "はじまりの小屋",
       shortTitle: "小さな学び舎",
       description: "森の中に建った、小さな算数の学び舎です。",
@@ -783,7 +783,7 @@
     },
     {
       minClears: 3,
-      image: "images/campus-v13/stage-2-school.svg",
+      image: "images/campus-v14/stage-2-school.webp",
       title: "見習いの校舎",
       shortTitle: "石造りの校舎",
       description: "問題を解いた力で、石造りの校舎と時計塔が建ちました。",
@@ -791,7 +791,7 @@
     },
     {
       minClears: 8,
-      image: "images/campus-v13/stage-3-academy.svg",
+      image: "images/campus-v14/stage-3-academy.webp",
       title: "魔法学院の本館",
       shortTitle: "魔法学院",
       description: "塔や中庭が増え、たくさんの学びが集まる学院になりました。",
@@ -799,7 +799,7 @@
     },
     {
       minClears: 15,
-      image: "images/campus-v13/stage-4-university.svg",
+      image: "images/campus-v14/stage-4-university.webp",
       title: "名門・算数大学",
       shortTitle: "名門大学",
       description: "夜の校舎に明かりが灯り、名門大学へ成長しました。",
@@ -807,7 +807,7 @@
     },
     {
       minClears: 25,
-      image: "images/campus-v13/stage-5-grand.svg",
+      image: "images/campus-v14/stage-5-grand.webp",
       title: "星明かりの大魔法大学",
       shortTitle: "大魔法大学",
       description: "努力の光が集まり、夜空に輝く最高のキャンパスが完成しました。",
@@ -827,10 +827,10 @@
   ];
 
   const AVATAR_IMAGES = [
-    "images/avatars/avatar-blue.svg",
-    "images/avatars/avatar-green.svg",
-    "images/avatars/avatar-orange.svg",
-    "images/avatars/avatar-purple.svg"
+    "images/avatars-v14/avatar-blue.png",
+    "images/avatars-v14/avatar-green.png",
+    "images/avatars-v14/avatar-orange.png",
+    "images/avatars-v14/avatar-purple.png"
   ];
 
   function avatarVariantFromId(id) {

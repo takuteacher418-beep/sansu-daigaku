@@ -1,49 +1,49 @@
 const DEFAULT_APP_DATA = {
   professors: [
     {
-      id: "takkun", name: "たっくん教授", image: "images/professors/takkun.png",
+      id: "takkun", name: "たっくん教授", image: "images/professors-v14/takkun.png",
       specialty: "学び方と挑戦", personality: "明るく、失敗を次の研究につなげる学長",
       greeting: "今日も自分に合った方法で進めよう！",
       success: "素晴らしい！考え方がしっかり伝わったよ。",
       retry: "考えの種は見えているよ。ヒントを使ってもう一度研究しよう。"
     },
     {
-      id: "albert", name: "アルベルト教授", image: "images/professors/albert.png",
+      id: "albert", name: "アルベルト教授", image: "images/professors-v14/albert.png",
       specialty: "平均・数量関係", personality: "穏やかで、言葉を整理するのが得意",
       greeting: "数をならして見ると、隠れた関係が見えてきます。",
       success: "よく整理できています。説明にも筋道がありますね。",
       retry: "まず、全部の量と個数を分けて考えてみましょう。"
     },
     {
-      id: "median", name: "メディアン教授", image: "images/professors/median.png",
+      id: "median", name: "メディアン教授", image: "images/professors-v14/median.png",
       specialty: "データ・代表値", personality: "観察力が高く、複数の見方を教える",
       greeting: "数字を順に並べると、データの顔が見えてきます。",
       success: "データの特徴を正しくつかめています。",
       retry: "数字の並び方をもう一度観察してみましょう。"
     },
     {
-      id: "ratio", name: "レシオ教授", image: "images/professors/ratio.png",
+      id: "ratio", name: "レシオ教授", image: "images/professors-v14/ratio.png",
       specialty: "割合・比", personality: "論理的で、比べる基準を大切にする",
       greeting: "何をもとにして比べるのか、それが割合の鍵です。",
       success: "もとにする量との関係が正しく説明できています。",
       retry: "比べる量と、もとにする量を確かめましょう。"
     },
     {
-      id: "geomet", name: "ジオメト教授", image: "images/professors/geomet.png",
+      id: "geomet", name: "ジオメト教授", image: "images/professors-v14/geomet.png",
       specialty: "図形・面積・体積", personality: "図を使い、形の秘密を見つける",
       greeting: "図にかき込むと、形の秘密が見えてきますよ。",
       success: "図と式がきれいにつながっています。",
       retry: "分かっている長さを図に書き込んでみましょう。"
     },
     {
-      id: "vero", name: "ヴェロ教授", image: "images/professors/vero.png",
+      id: "vero", name: "ヴェロ教授", image: "images/professors-v14/vero.png",
       specialty: "速さ・単位量", personality: "テンポよく、手順を小分けにして導く",
       greeting: "道のり・時間・速さを一つずつ整理しましょう。",
       success: "三つの量の関係を正しく使えています。",
       retry: "求めたいものを一つ決めて、関係図にしてみましょう。"
     },
     {
-      id: "numero", name: "ニュメロ教授", image: "images/professors/numero.png",
+      id: "numero", name: "ニュメロ教授", image: "images/professors-v14/numero.png",
       specialty: "数と計算", personality: "計算の仕組みを丁寧に研究する",
       greeting: "答えだけでなく、計算の仕組みも研究しましょう。",
       success: "計算と説明の両方が正確です。",

@@ -1045,3 +1045,66 @@ dialog{max-height:calc(100vh - 24px);overflow:auto}img{max-width:100%}
 @media(max-width:1100px) and (orientation:landscape){.v13-magic-hero{min-height:760px}.v13-professor-portrait{height:320px}.v13-start-button{min-height:145px}}
 @media(max-width:760px){.system-check-grid{grid-template-columns:1fr}.runtime-error-notice{grid-template-columns:1fr}.runtime-error-notice button{grid-column:1;grid-row:auto;width:100%;margin-top:6px}}
 @media(max-width:420px){.v13-main-nav{grid-template-columns:1fr}.v13-help-tile{grid-column:1}.v13-start-button strong{font-size:24px}.v13-profile-copy strong{max-width:135px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+
+
+/* =========================================================
+   Version 14.0: original fantasy game art integration
+   ========================================================= */
+:root{
+  --v14-navy:#061735;
+  --v14-indigo:#171b58;
+  --v14-gold:#e7b84e;
+  --v14-cream:#fff5d8;
+}
+.v13-campus-background{
+  filter:saturate(1.08) brightness(.62) contrast(1.12);
+  image-rendering:auto;
+}
+.v13-professor-portrait img,
+.professor-avatar img,
+.avatar-button img{
+  object-fit:contain;
+  image-rendering:auto;
+}
+.v13-professor-portrait img{
+  filter:drop-shadow(0 18px 18px rgba(0,0,0,.42));
+}
+.v14-icon-image{
+  width:58px;height:58px;object-fit:contain;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.22));
+}
+.v13-nav-tile span:first-child{font-size:0}
+.v13-nav-tile.learning span:first-child::after{
+  content:"";display:block;width:64px;height:64px;background:url("../images/ui-v14/learning.png") center/contain no-repeat;
+}
+.v13-nav-tile.campus span:first-child::after{
+  content:"";display:block;width:64px;height:64px;background:url("../images/ui-v14/campus.png") center/contain no-repeat;
+}
+.v13-nav-tile.profile span:first-child::after{
+  content:"";display:block;width:64px;height:64px;background:url("../images/ui-v14/profile.png") center/contain no-repeat;
+}
+.v13-nav-tile.collection span:first-child::after{
+  content:"";display:block;width:64px;height:64px;background:url("../images/ui-v14/collection.png") center/contain no-repeat;
+}
+.v13-help-tile>span:first-child{font-size:0}
+.v13-help-tile>span:first-child::after{
+  content:"";display:block;width:68px;height:68px;background:url("../images/ui-v14/help.png") center/contain no-repeat;
+}
+.v13-magic-hero{
+  border-color:rgba(231,184,78,.9);
+  box-shadow:0 25px 80px rgba(3,12,35,.45),0 0 0 1px rgba(255,235,164,.2) inset;
+}
+.v13-dark-card,.v13-main-action-card,.v13-campus-status{
+  border-color:rgba(231,184,78,.72);
+  background:linear-gradient(145deg,rgba(5,22,55,.95),rgba(25,24,80,.92));
+}
+.v13-start-button{
+  background:
+    linear-gradient(180deg,rgba(255,241,139,.45),transparent 32%),
+    linear-gradient(180deg,#ffd842,#efa900);
+  border:2px solid #fff1a4;
+}
+.professor-card img,.professor-avatar img{
+  background:radial-gradient(circle at 50% 25%,#f8f2d7,#28305f);
+  border-radius:18px;
+}

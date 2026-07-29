@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 14.0</title>
-  <link rel="stylesheet" href="css/style.css?v=14.0" />
+  <title>算数大学 Version 13.0</title>
+  <link rel="stylesheet" href="css/style.css?v=13.0" />
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -66,7 +66,7 @@
     <main id="studentHomeView" class="page hidden v13-home-page">
       <section class="v13-home-shell">
         <section class="v13-magic-hero" aria-label="算数大学ホーム">
-          <img id="campusGrowthImage" class="v13-campus-background" src="images/campus-v14/stage-1-hut.webp" alt="成長していく算数大学キャンパス">
+          <img id="campusGrowthImage" class="v13-campus-background" src="images/campus/campus-1.svg" alt="成長していく算数大学キャンパス">
           <div class="v13-night-overlay"></div>
           <div class="v13-stars" aria-hidden="true"></div>
           <div id="campusCelebrationLayer" class="campus-celebration-layer" aria-hidden="true"></div>
@@ -75,7 +75,7 @@
           <header class="v13-hero-header">
             <button id="studentAvatarBtn" class="v13-student-profile avatar-button" type="button" aria-label="自分のアバターを見る">
               <span class="v13-profile-avatar">
-                <img id="studentAvatarImage" src="images/avatars-v14/avatar-blue.png" alt="自分のアバター">
+                <img id="studentAvatarImage" src="images/avatars/avatar-blue.svg" alt="自分のアバター">
                 <span class="avatar-edit-badge">+</span>
               </span>
               <span class="v13-profile-copy">
@@ -110,7 +110,7 @@
                 <div id="recommendationBox" class="recommendation"></div>
               </article>
               <div class="v13-professor-portrait">
-                <img id="homeProfessorImage" src="images/professors-v14/takkun.png" alt="担当教授">
+                <img id="homeProfessorImage" src="images/professors/takkun.png" alt="担当教授">
               </div>
             </aside>
 
@@ -229,7 +229,7 @@
       <section class="battle-grid">
         <article class="panel">
           <div class="professor-message">
-            <div class="professor-avatar large-avatar"><img id="battleProfessorImage" src="images/professors-v14/takkun.png" alt=""></div>
+            <div class="professor-avatar large-avatar"><img id="battleProfessorImage" src="images/professors/takkun.png" alt=""></div>
             <div><p class="eyebrow">PROFESSOR BATTLE</p><h2 id="problemProfessor"></h2></div>
           </div>
 
@@ -450,7 +450,7 @@
     <div class="avatar-room">
       <div class="avatar-stage">
         <div class="avatar-stage-glow"></div>
-        <img id="avatarDialogImage" src="images/avatars-v14/avatar-blue.png" alt="自分のアバター">
+        <img id="avatarDialogImage" src="images/avatars/avatar-blue.svg" alt="自分のアバター">
         <strong id="avatarDialogName"></strong>
         <span id="avatarDialogLevel" class="tag"></span>
       </div>
@@ -560,7 +560,24 @@
     </form>
   </dialog>
 
-  <script src="js/data.js?v=14.0"></script>
-  <script src="js/app.js?v=14.0"></script>
+  <script src="js/data.js?v=13.0"></script>
+  <script src="js/app.js?v=13.0"></script>
+
+<script>
+window.addEventListener("load",()=>setTimeout(()=>{
+  document.querySelector("#teacherTabBtn").click();
+  document.querySelector("#teacherPasscodeInput").value="4180";
+  document.querySelector("#teacherLoginForm").dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+  setTimeout(()=>{
+    document.body.dataset.smokeTeacherHome =
+      !document.querySelector("#teacherView").classList.contains("hidden") ? "ok" : "fail";
+    document.querySelector("#runSystemCheckBtn")?.click();
+    setTimeout(()=>{
+      document.body.dataset.smokeSystemCheck =
+        document.querySelectorAll(".system-check-item").length>=5 ? "ok" : "fail";
+    },400);
+  },900);
+},300));
+</script>
 </body>
 </html>
