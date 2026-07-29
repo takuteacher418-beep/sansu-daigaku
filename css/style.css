@@ -668,3 +668,48 @@ ruby[data-auto-ruby="true"] rt{
 #practiceQuestion .math-fraction{
   font-size:1.3em;
 }
+
+
+/* Version 12.5: fraction expression alignment */
+.fraction-expression{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.34em;
+  vertical-align:middle;
+  white-space:nowrap;
+  line-height:1;
+}
+.fraction-expression .math-fraction{
+  display:inline-grid;
+  vertical-align:middle;
+  margin:0;
+  transform:none;
+}
+.math-operator{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  align-self:center;
+  min-width:1em;
+  height:1em;
+  margin:0 .02em;
+  font-size:1.05em;
+  font-weight:900;
+  line-height:1;
+  transform:translateY(-.01em);
+}
+#practiceQuestion .fraction-expression,
+#questionText .fraction-expression,
+.final-test-heading .fraction-expression{
+  font-size:1.05em;
+}
+.choice .fraction-expression,
+.cloze-option .fraction-expression,
+.final-test-option .fraction-expression{
+  min-height:2.2em;
+}
+@media(max-width:600px){
+  .fraction-expression{gap:.25em}
+  .math-operator{font-size:1em}
+}

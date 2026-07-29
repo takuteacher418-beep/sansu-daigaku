@@ -1,13 +1,14 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "12.4";
+  const APP_VERSION = "12.5";
   const APP_BUILD_DATE = "2026.07.29";
   const APP_RELEASE_NOTES = [
     "日本語表記の分数を教科書型の分数記号へ変換",
     "半角・全角スラッシュの分数表示を改善",
     "バージョン番号を1か所で管理",
-    "教師画面にビルド情報と更新内容を表示"
+    "教師画面にビルド情報と更新内容を表示",
+    "分数同士の演算記号を分数線の中央に配置"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
@@ -113,6 +114,19 @@
       /(^|[^\d\/／])(\d+)\s*[\/／]\s*(\d+)(?![\d\/／])/g,
       (match, prefix, numerator, denominator) =>
         `${prefix}${token(fractionMarkup(numerator, denominator, "slash-fraction"))}`
+    );
+
+    // 分数と分数の間にある演算子を、数式全体としてまとめる。
+    // これにより「÷」「×」「＋」「－」が分数線の中央に揃う。
+    protectedText = protectedText.replace(
+      /@@MATH_(\d+)@@\s*([+＋\-−－×÷])\s*@@MATH_(\d+)@@/g,
+      (match, leftIndex, operator, rightIndex) => token(
+        `<span class="fraction-expression" role="group" aria-label="分数の計算">`
+        + `${tokens[Number(leftIndex)]}`
+        + `<span class="math-operator" aria-hidden="true">${escapeHtml(operator)}</span>`
+        + `${tokens[Number(rightIndex)]}`
+        + `</span>`
+      )
     );
 
     let text = escapeHtml(protectedText);
