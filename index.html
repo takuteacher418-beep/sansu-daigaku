@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.1</title>
+  <title>算数大学 Version 11.2</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.1</span>
+        <span class="version">Version 11.2</span>
       </section>
 
       <section class="login-panel">
@@ -48,65 +48,71 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.1</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.2</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
     </header>
 
     <main id="studentHomeView" class="page hidden">
-      <section class="hero-grid">
-        <article class="panel campus-panel">
-          <div class="section-head">
-            <div><p class="eyebrow">MY CAMPUS</p><h2>キャンパス</h2></div>
-            <span id="campusLevel" class="pill">Lv.1</span>
-          </div>
-          <div class="campus-art">
-            <div class="sun"></div><div class="building left">📚</div><div class="building main">🏛️</div><div class="building right">🔭</div><div class="fountain">⛲</div>
-          </div>
-          <div class="metric-row">
-            <div class="metric"><span>研究ポイント</span><strong id="studentPoints">0 pt</strong></div>
-            <div class="metric"><span>クリア</span><strong id="studentClears">0 問</strong></div>
-          </div>
-        </article>
+      <section class="student-dashboard">
+        <aside class="student-sidebar">
+          <article class="panel student-card">
+            <div class="student-card-top">
+              <div class="student-mini-avatar">🎓</div>
+              <div><p class="eyebrow">STUDENT</p><h2 id="studentDisplayName"></h2><p id="studentStyleText" class="muted"></p></div>
+            </div>
+            <div class="level-line"><span>レベル</span><strong id="studentLevel">1</strong></div>
+            <div class="xp-track"><div id="xpFill"></div></div>
+            <small id="xpText"></small>
+            <div class="metric-row compact-metrics">
+              <div class="metric"><span>研究ポイント</span><strong id="studentPoints">0 pt</strong></div>
+              <div class="metric"><span>クリア</span><strong id="studentClears">0 問</strong></div>
+            </div>
+          </article>
 
-        <article class="panel welcome-panel">
-          <div class="professor-message">
-            <div class="professor-avatar"><img id="homeProfessorImage" src="images/professors/takkun.png" alt="たっくん教授"></div>
-            <div class="speech"><small>たっくん教授</small><strong>今日も自分に合った方法で進めよう！</strong></div>
-          </div>
-          <div class="student-summary">
-            <div><p class="eyebrow">STUDENT</p><h2 id="studentDisplayName"></h2><p id="studentStyleText" class="muted"></p></div>
-            <div id="studentLevel" class="level-badge">1</div>
-          </div>
-          <div class="xp-track"><div id="xpFill"></div></div>
-          <small id="xpText"></small>
-          <div id="supportChips" class="chips"></div>
-        </article>
+          <article class="panel sidebar-actions">
+            <button id="openProfessorListBtn" class="btn professor-list-btn" type="button">🎓 教授一覧を見る</button>
+            <button id="openProfileBtn" class="btn soft" type="button">📘 ぼくの学び方</button>
+            <div id="supportChips" class="chips"></div>
+          </article>
+        </aside>
 
-        <article class="panel recommendation-panel">
-          <p class="eyebrow">TODAY'S LEARNING</p>
-          <h2>今日のおすすめ</h2>
-          <div id="recommendationBox" class="recommendation"></div>
-          <button id="startRecommendationBtn" class="btn gold large" type="button">おすすめに挑戦</button>
-          <button id="openProfessorListBtn" class="btn soft" type="button">教授一覧を見る</button>
-          <button id="openProfileBtn" class="btn soft" type="button">ぼくの学び方を見る</button>
-        </article>
-      </section>
+        <section class="learning-main">
+          <article class="panel campus-banner">
+            <div class="campus-banner-copy">
+              <p class="eyebrow light">MY CAMPUS</p>
+              <h1>算数大学キャンパス</h1>
+              <p>問題を選んで、今日の研究を始めよう。</p>
+            </div>
+            <div class="campus-scenery"><span>📚</span><span>🏛️</span><span>🔭</span></div>
+            <span id="campusLevel" class="campus-level-pill">キャンパス Lv.1</span>
+          </article>
 
-      <section class="content-grid">
-        <article class="panel">
-          <div class="section-head">
-            <div><p class="eyebrow">CHALLENGE</p><h2>問題に挑戦する</h2></div>
-            <select id="unitFilter"></select>
-          </div>
-          <div id="problemList" class="problem-list"></div>
-        </article>
-        <aside class="panel">
-          <p class="eyebrow">LEARNING RECORD</p>
-          <h2>成長の記録</h2>
-          <div id="studentMetrics" class="metric-row"></div>
-          <h3>最近の挑戦</h3>
-          <div id="recentHistory" class="history-list"></div>
+          <article class="panel featured-problem">
+            <div class="featured-heading"><div><p class="eyebrow">TODAY'S LEARNING</p><h2>今日のおすすめ問題</h2></div><span class="featured-badge">おすすめ</span></div>
+            <div class="featured-content">
+              <div id="recommendationBox" class="recommendation"></div>
+              <button id="startRecommendationBtn" class="btn gold large" type="button">挑戦する！</button>
+            </div>
+          </article>
+
+          <article class="panel problem-selector-panel">
+            <div class="section-head problem-selector-head">
+              <div><p class="eyebrow">CHALLENGE</p><h1>問題を選んで挑戦しよう</h1></div>
+              <label class="unit-filter-label">単元<select id="unitFilter"></select></label>
+            </div>
+            <div id="problemList" class="problem-list problem-list-main"></div>
+          </article>
+        </section>
+
+        <aside class="record-sidebar">
+          <article class="panel record-panel">
+            <p class="eyebrow">LEARNING RECORD</p>
+            <h2>成長の記録</h2>
+            <div id="studentMetrics" class="metric-row"></div>
+            <h3>最近の挑戦</h3>
+            <div id="recentHistory" class="history-list"></div>
+          </article>
         </aside>
       </section>
     </main>
@@ -177,6 +183,11 @@
     </div>
     <p class="muted">教授ごとに得意な単元と話し方が異なります。問題に応じて担当教授が登場します。</p>
     <div id="professorGallery" class="professor-gallery"></div>
+  </dialog>
+
+  <dialog id="professorDetailDialog" class="modal professor-detail-modal">
+    <button id="closeProfessorDetailBtn" class="modal-close btn ghost" type="button">×</button>
+    <div id="professorDetailContent"></div>
   </dialog>
 
   <dialog id="studentDialog" class="modal">

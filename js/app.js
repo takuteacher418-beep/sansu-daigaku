@@ -153,11 +153,7 @@
     $("#xpFill").style.width = (student.xp % 100) + "%";
     $("#xpText").textContent = `${student.xp % 100} / 100 EXP`;
     const homeProfessor = professorForProblem(recommendation);
-    $("#homeProfessorImage").src = homeProfessor.image;
-    $("#homeProfessorImage").alt = homeProfessor.name;
-    $(".speech small").textContent = homeProfessor.name;
-    $(".speech strong").textContent = homeProfessor.greeting;
-    $("#recommendationBox").innerHTML = `<strong>${recommendation.unit}｜${recommendation.title}</strong><p>${homeProfessor.name}と、${student.profile.visual ? "図を使って" : "自分の言葉で"}考えられます。</p>`;
+    $("#recommendationBox").innerHTML = `<div class="recommendation-professor"><img src="${homeProfessor.image}" alt="${homeProfessor.name}"><div><strong>${recommendation.unit}｜${recommendation.title}</strong><p>担当：${homeProfessor.name}　${student.profile.visual ? "図を使って" : "自分の言葉で"}考えよう。</p></div></div>`;
     $("#startRecommendationBtn").onclick = () => openProblem(recommendation.id);
 
     const units = ["すべて", ...new Set(appData.problems.map((problem) => problem.unit))];
@@ -330,16 +326,39 @@
   function renderProfessorGallery() {
     const professors = appData.professors || [];
     $("#professorGallery").innerHTML = professors.map((professor) => `
-      <article class="professor-card">
+      <article class="professor-card" data-professor-id="${professor.id}" tabindex="0" role="button" aria-label="${professor.name}のプロフィールを見る">
         <img src="${professor.image}" alt="${professor.name}">
         <div class="professor-card-body">
-          <span class="tag">${professor.specialty}</span>
           <h3>${professor.name}</h3>
-          <p>${professor.personality}</p>
-          <blockquote>「${professor.greeting}」</blockquote>
+          <p>得意：${professor.specialty}</p>
         </div>
       </article>
     `).join("");
+    $$(".professor-card").forEach((card) => {
+      const open = () => openProfessorDetail(card.dataset.professorId);
+      card.addEventListener("click", open);
+      card.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") open(); });
+    });
+  }
+
+  function openProfessorDetail(professorId) {
+    const professor = (appData.professors || []).find((item) => item.id === professorId);
+    if (!professor) return;
+    const assignedProblems = appData.problems.filter((problem) => problem.professor === professor.name);
+    $("#professorDetailContent").innerHTML = `
+      <div class="professor-detail">
+        <div class="professor-detail-image"><img src="${professor.image}" alt="${professor.name}"></div>
+        <div class="professor-detail-copy">
+          <p class="eyebrow">PROFESSOR PROFILE</p>
+          <span class="professor-specialty">${professor.specialty}</span>
+          <h1>${professor.name}</h1>
+          <p>${professor.personality}</p>
+          <div class="professor-quote">「${professor.greeting}」</div>
+          <h3>担当している問題</h3>
+          <div class="professor-problem-list">${assignedProblems.length ? assignedProblems.map((problem) => `<span>${problem.title}</span>`).join("") : "<span>今後追加予定</span>"}</div>
+        </div>
+      </div>`;
+    $("#professorDetailDialog").showModal();
   }
 
   $("#openProfessorListBtn").addEventListener("click", () => {
@@ -347,6 +366,7 @@
     $("#professorDialog").showModal();
   });
   $("#closeProfessorDialogBtn").addEventListener("click", () => $("#professorDialog").close());
+  $("#closeProfessorDetailBtn").addEventListener("click", () => $("#professorDetailDialog").close());
 
   $$(".teacher-tab").forEach((button) => button.addEventListener("click", () => {
     $$(".teacher-tab").forEach((item) => item.classList.toggle("active", item === button));
