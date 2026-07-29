@@ -1,14 +1,15 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "12.5";
+  const APP_VERSION = "12.5.1";
   const APP_BUILD_DATE = "2026.07.29";
   const APP_RELEASE_NOTES = [
     "日本語表記の分数を教科書型の分数記号へ変換",
     "半角・全角スラッシュの分数表示を改善",
     "バージョン番号を1か所で管理",
     "教師画面にビルド情報と更新内容を表示",
-    "分数同士の演算記号を分数線の中央に配置"
+    "分数同士の演算記号を分数線の中央に配置",
+    "CSS・JavaScriptが読み込まれない表示崩れを修正"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
