@@ -1,77 +1,226 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>算数大学 Version 11.0</title>
-<style>
-:root{--blue:#2468bd;--navy:#173b69;--gold:#e6a52c;--ink:#19334e;--muted:#687c90;--line:#d8e4ef;--bg:#f4f9fd}
-*{box-sizing:border-box}body{margin:0;font-family:"BIZ UDPGothic","Yu Gothic UI","Yu Gothic",sans-serif;color:var(--ink);background:linear-gradient(#eaf6ff,#fff9ee)}
-button,input,select,textarea{font:inherit}.hidden{display:none!important}button{cursor:pointer}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:900}.primary{background:linear-gradient(135deg,#3177d1,#2059a6);color:#fff}.soft{background:#eaf3ff;color:#245eaa}.gold{background:linear-gradient(135deg,#efb43a,#d98422);color:#fff}.ghost{background:#eef3f7;color:#52697f}
-.login{min-height:100vh;display:grid;place-items:center;padding:20px}.loginbox{width:min(900px,100%);display:grid;grid-template-columns:1.1fr .9fr;background:#fff;border-radius:30px;overflow:hidden;box-shadow:0 30px 80px #244d762b}.brand{padding:48px;background:linear-gradient(145deg,#163d71,#2e72c6);color:#fff}.crest{width:80px;height:80px;display:grid;place-items:center;border-radius:25px;background:linear-gradient(#fff5b8,#e4a32b);color:#173c6c;font-size:43px;font-weight:900;border:4px solid #ffffffaa}.brand h1{font-size:50px;margin:14px 0 5px}.brand p{line-height:1.8}.form{padding:38px;align-self:center}.tabs{display:flex;gap:7px;background:#edf4fa;padding:5px;border-radius:14px}.tabs button{flex:1;border:0;border-radius:10px;padding:10px;background:transparent;font-weight:900;color:#60778d}.tabs button.active{background:#fff;color:var(--blue);box-shadow:0 4px 12px #2866a322}.loginform{display:grid;gap:14px;margin-top:22px}label{display:grid;gap:6px;font-weight:800;font-size:14px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff}textarea{min-height:130px}
-header{position:sticky;top:0;z-index:10;background:#ffffffed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:9px max(15px,calc((100vw - 1350px)/2))}.mini{width:44px;height:44px;border-radius:14px;font-size:25px}.session{margin-left:auto;text-align:right}.session span{display:block;font-size:11px;color:var(--muted)}
-main{width:min(1350px,calc(100% - 24px));margin:18px auto 40px}.panel{background:#fffffff2;border:1px solid var(--line);border-radius:20px;padding:17px;box-shadow:0 12px 30px #234d7714}.hero{display:grid;grid-template-columns:.9fr 1.4fr .8fr;gap:14px}.eyebrow{font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:900;margin:0 0 5px}h2{margin:0}.campus{height:210px;position:relative;overflow:hidden;border-radius:17px;margin-top:12px;background:linear-gradient(#8ed8ff 0 57%,#78cf86 57%);border:3px solid #fff}.sun{position:absolute;right:22px;top:18px;width:55px;height:55px;border-radius:50%;background:#ffe47b;box-shadow:0 0 35px #fff0a0}.building{position:absolute;bottom:35px;width:70px;height:84px;background:#fff0cb;border:4px solid #c98d42;border-radius:10px;display:grid;place-items:center;font-size:34px}.building.main{left:50%;transform:translateX(-50%);width:112px;height:120px;font-size:50px}.b1{left:20px}.b2{right:20px}.fountain{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:32px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.stats div,.metric{background:#f3f8fc;border-radius:12px;padding:10px;text-align:center}.stats span,.metric span{display:block;font-size:11px;color:var(--muted)}.stats strong,.metric strong{font-size:22px}
-.welcome{background:linear-gradient(145deg,#fffdf0,#eef7ff);border:2px solid #efcc72}.prof{display:grid;grid-template-columns:82px 1fr;gap:10px;align-items:center}.avatar{font-size:58px;text-align:center}.speech{background:#fff;border:2px solid #edbc5e;border-radius:15px;padding:12px}.speech small{color:#9b6914}.speech strong{display:block;margin-top:4px}.status{display:flex;justify-content:space-between;align-items:center;margin-top:13px}.level{width:75px;height:75px;border-radius:19px;background:linear-gradient(145deg,#7d62d3,#5030a6);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:900}.xp{height:15px;background:#dce8f1;border-radius:999px;overflow:hidden;margin-top:10px}.xp div{height:100%;background:linear-gradient(90deg,#36ad72,#98e076)}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.chip,.tag{padding:6px 9px;border-radius:999px;background:#e8f3ff;color:#215fa8;font-size:11px;font-weight:900}.today{display:flex;flex-direction:column}.recommend{flex:1;background:linear-gradient(145deg,#f0f7ff,#fff8e8);padding:13px;border-radius:14px;margin:11px 0}.today .btn{margin-top:7px}
-.content{display:grid;grid-template-columns:1.55fr .65fr;gap:14px;margin-top:14px}.heading{display:flex;justify-content:space-between;align-items:center;gap:10px}.problemList{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.problem{border:1px solid var(--line);border-radius:15px;padding:13px}.problem.done{border-color:#85cfa4;background:#f5fff8}.problem h3{margin:9px 0 5px}.problem p{font-size:12px;color:var(--muted);min-height:36px}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.history{display:grid;gap:6px}.history div{border-left:4px solid #78a9db;background:#f6f9fc;padding:8px;border-radius:8px;font-size:12px}
-.battle{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:12px}.tools{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0}.tool{border:1px solid #bfd4e8;background:#fff;border-radius:999px;padding:8px 10px;font-weight:800;color:#315d86}.tool.active{background:var(--blue);color:#fff}.question{background:#fff;border:2px solid #cfe0ed;border-radius:18px;padding:20px}.questionText{font-size:20px;line-height:2;font-weight:700}.questionText.large{font-size:27px}.questionText ruby rt{visibility:hidden}.questionText.ruby-on ruby rt{visibility:visible}.visual,.hint,.feedback{margin-top:12px;padding:14px;border-radius:13px}.visual{background:#eefaf4;text-align:center;font-size:20px;line-height:1.7}.hint{background:#fff6d8}.answerTabs{display:flex;gap:6px;background:#eef4f8;padding:5px;border-radius:12px;margin:12px 0}.answerTabs button{flex:1;border:0;border-radius:9px;padding:9px;background:transparent;font-weight:900}.answerTabs button.active{background:#fff;color:var(--blue)}.choice{display:flex;gap:8px;padding:11px;border:1px solid var(--line);border-radius:11px;margin:7px 0}.choice input{width:auto}.feedback{background:#eef7ff;border-left:6px solid #3978c5}.feedback.good{background:#effbf4;border-color:#39a269}.score{font-size:30px;font-weight:900}
-.profileCards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:17px}.profileCard{padding:17px;background:linear-gradient(145deg,#f0f7ff,#fff);border:1px solid var(--line);border-radius:16px}.profileCard .icon{font-size:38px}
-.teacherTabs{display:flex;gap:6px;background:#edf4f8;padding:5px;border-radius:14px;max-width:720px;margin-bottom:13px}.teacherTabs button{flex:1;border:0;background:transparent;padding:10px;border-radius:10px;font-weight:900}.teacherTabs button.active{background:#fff;color:var(--blue)}.teacherMetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.tableWrap{overflow:auto}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{background:#f3f7fa;font-size:12px}.notice{background:#fff7d8;color:#735e1b;border-radius:11px;padding:10px;font-size:12px;line-height:1.6}
-dialog{width:min(820px,calc(100% - 20px));border:0;border-radius:20px;padding:20px;box-shadow:0 25px 80px #173b6955}dialog::backdrop{background:#173b6977}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.assess{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.assess fieldset{border:1px solid var(--line);border-radius:12px}.assess label{display:flex;gap:7px;margin:8px 0;font-weight:600}.assess input{width:auto}.toast{position:fixed;z-index:99;top:16px;left:50%;transform:translate(-50%,-150%);background:#173d70;color:#fff;padding:11px 16px;border-radius:12px;font-weight:900;transition:.3s}.toast.show{transform:translate(-50%,0)}
-@media(max-width:950px){.hero{grid-template-columns:1fr 1fr}.today{grid-column:1/-1}.content,.battle{grid-template-columns:1fr}}@media(max-width:650px){.loginbox,.hero,.content,.profileCards,.formgrid,.assess{grid-template-columns:1fr}.brand{padding:28px}.brand h1{font-size:40px}.form{padding:25px}.problemList{grid-template-columns:1fr}.teacherMetrics{grid-template-columns:1fr 1fr}.session{order:3;width:100%;text-align:left}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>算数大学 Version 11.0</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id="toast" class="toast"></div>
-<section id="login" class="login"><div class="loginbox">
-<div class="brand"><div class="crest">Σ</div><p>ADAPTIVE LEARNING RPG</p><h1>算数大学</h1><p>自分に合った学び方で、算数をもっと好きになる。</p><b>Version 11.0</b></div>
-<div class="form"><div class="tabs"><button class="active" data-login="student">児童</button><button data-login="teacher">教師</button></div>
-<form id="studentLogin" class="loginform"><label>ログインID<input id="loginId" value="aoi01"></label><label>パスワード<input id="loginPw" type="password" value="1234"></label><button class="btn primary">算数大学へ入る</button><small>デモ：aoi01 / 1234</small></form>
-<form id="teacherLogin" class="loginform hidden"><label>教師用パスコード<input id="teacherPw" type="password" value="4180"></label><button class="btn primary">教師画面を開く</button></form></div>
-</div></section>
-<div id="app" class="hidden"><header><div class="crest mini">Σ</div><b>算数大学 Ver.11.0</b><div id="session" class="session"></div><button id="logout" class="btn ghost">ログアウト</button></header>
-<main id="studentHome" class="hidden">
-<section class="hero">
-<article class="panel"><p class="eyebrow">MY CAMPUS</p><div class="heading"><h2>キャンパス</h2><b id="campusLv">Lv.1</b></div><div class="campus"><div class="sun"></div><div class="building b1">📚</div><div class="building main">🏛️</div><div class="building b2">🔭</div><div class="fountain">⛲</div></div><div class="stats"><div><span>研究ポイント</span><strong id="points">0</strong></div><div><span>クリア</span><strong id="clears">0</strong></div></div></article>
-<article class="panel welcome"><div class="prof"><div class="avatar">👨‍🏫</div><div class="speech"><small>たっくん教授</small><strong>今日も自分に合った方法で進めよう！</strong></div></div><div class="status"><div><p class="eyebrow">STUDENT</p><h2 id="studentName"></h2><p id="styleText"></p></div><div id="level" class="level">1</div></div><div class="xp"><div id="xpbar"></div></div><small id="xptext"></small><div id="chips" class="chips"></div></article>
-<article class="panel today"><p class="eyebrow">TODAY'S LEARNING</p><h2>今日のおすすめ</h2><div id="recommend" class="recommend"></div><button id="startRec" class="btn gold">おすすめに挑戦</button><button id="showProfile" class="btn soft">ぼくの学び方</button></article>
-</section>
-<section class="content"><article class="panel"><div class="heading"><div><p class="eyebrow">CHALLENGE</p><h2>問題に挑戦する</h2></div><select id="unit"></select></div><div id="problemList" class="problemList"></div></article><aside class="panel"><p class="eyebrow">RECORD</p><h2>成長の記録</h2><div id="metrics" class="stats"></div><h3>最近の挑戦</h3><div id="history" class="history"></div></aside></section>
-</main>
-<main id="problemScreen" class="hidden"><button id="backHome" class="btn ghost">← キャンパスへ</button><section class="battle"><article class="panel"><div class="prof"><div class="avatar">🧙‍♂️</div><div><p class="eyebrow">PROFESSOR BATTLE</p><h2 id="professor"></h2></div></div><div class="tools"><button id="speak" class="tool">🔊 読み上げ</button><button id="rubyBtn" class="tool">ふりがな</button><button id="largeBtn" class="tool">文字を大きく</button></div><div class="question"><small id="meta"></small><h2 id="qtitle"></h2><div id="qtext" class="questionText"></div><div id="visual" class="visual"></div></div><div id="hint" class="hint hidden"></div><button id="hintBtn" class="btn soft">ヒントを見る</button></article><article class="panel"><p class="eyebrow">YOUR ANSWER</p><h2>自分の考えを伝えよう</h2><div id="answerTabs" class="answerTabs"></div><div id="answerArea"></div><button id="submit" class="btn primary" style="width:100%;margin-top:12px">教授に答える</button><div id="feedback" class="feedback hidden"></div></article></section></main>
-<main id="profileScreen" class="hidden"><button id="profileBack" class="btn ghost">← キャンパスへ</button><section class="panel" style="margin-top:12px"><p class="eyebrow">MY LEARNING STYLE</p><h1>ぼくの学び方</h1><p>苦手の名前ではなく、学びやすくする方法を表示します。</p><div id="profileCards" class="profileCards"></div></section></main>
-<main id="teacherScreen" class="hidden"><nav class="teacherTabs"><button class="active" data-tv="dash">概要</button><button data-tv="students">児童・アセスメント</button><button data-tv="problems">問題</button><button data-tv="results">結果</button></nav><section id="teacherContent"></section></main>
-</div>
-<dialog id="studentDialog"><form id="studentForm"><div class="heading"><h2>児童・学習プロフィール</h2><button type="button" id="closeDialog" class="btn ghost">×</button></div><input type="hidden" id="editId"><div class="formgrid"><label>名前<input id="fName" required></label><label>学年<select id="fGrade"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label><label>ログインID<input id="fLogin" required></label><label>パスワード<input id="fPw" required value="1234"></label></div><p class="notice">以下は表示支援を決めるための試作チェックです。正式なLDIRの実施・採点や診断を代替しません。</p><div class="assess">
-<fieldset><legend>読む</legend><label><input id="rAudio" type="checkbox">読み上げ</label><label><input id="rRuby" type="checkbox">ふりがな</label></fieldset>
-<fieldset><legend>答える</legend><label><input id="wLarge" type="checkbox">大きな文字</label><label><input id="wChoice" type="checkbox">選択式</label><label><input id="wTemplate" type="checkbox">文の型</label></fieldset>
-<fieldset><legend>考える</legend><label><input id="mVisual" type="checkbox">図を使う</label><label><input id="mSteps" type="checkbox">手順を小分け</label><label><input id="mEasy" type="checkbox">やさしい問題から</label></fieldset></div><button class="btn primary" style="margin-top:12px">保存</button></form></dialog>
-<script>
-const KEY="sansuDaigakuV11";
-const seed={students:[{id:"s1",name:"あおい",grade:5,login:"aoi01",pw:"1234",xp:160,points:240,profile:{rAudio:true,rRuby:true,wLarge:false,wChoice:true,wTemplate:true,mVisual:true,mSteps:true,mEasy:false},history:[]}],problems:[
-{id:"p1",unit:"平均",title:"平均とはどんな数？",difficulty:2,question:"平均とは、どのような数ですか。自分の言葉で説明しましょう。",ruby:"<ruby>平均<rt>へいきん</rt></ruby>とは、どのような<ruby>数<rt>かず</rt></ruby>ですか。<ruby>自分<rt>じぶん</rt></ruby>の<ruby>言葉<rt>ことば</rt></ruby>で<ruby>説明<rt>せつめい</rt></ruby>しましょう。",simple:"いくつかの数を同じくらいにならした数を何といいますか。",visual:"8、4、6を同じ数にならすと<br>6、6、6になります。",choices:["いくつかの数を同じくらいにならした数","いちばん大きい数","全部を足した数"],keys:["ならした","同じくらい","合計","個数","割る"],model:"いくつかの数を同じくらいにならした数です。",hint:"全部の量を同じになるように分ける場面を思い出そう。",prof:"アルベルト教授"},
-{id:"p2",unit:"平均",title:"平均の求め方",difficulty:3,question:"5、7、9の平均を求める方法を、式と言葉で説明しましょう。",ruby:"5、7、9の<ruby>平均<rt>へいきん</rt></ruby>を<ruby>求<rt>もと</rt></ruby>める<ruby>方法<rt>ほうほう</rt></ruby>を、<ruby>式<rt>しき</rt></ruby>と<ruby>言葉<rt>ことば</rt></ruby>で<ruby>説明<rt>せつめい</rt></ruby>しましょう。",simple:"5、7、9を足して3で割ります。答えはいくつですか。",visual:"5＋7＋9＝21<br>21÷3＝？",choices:["7","21","3"],keys:["21","3","割","7"],model:"5＋7＋9＝21、数は3個なので21÷3＝7です。",hint:"まず全部を足し、次に個数で割ります。",prof:"メディアン教授"},
-{id:"p3",unit:"割合",title:"割合の意味",difficulty:2,question:"割合とは、どのような関係を表す数ですか。",ruby:"<ruby>割合<rt>わりあい</rt></ruby>とは、どのような<ruby>関係<rt>かんけい</rt></ruby>を<ruby>表<rt>あらわ</rt></ruby>す<ruby>数<rt>かず</rt></ruby>ですか。",simple:"比べる量が、もとにする量の何倍かを表す数を何といいますか。",visual:"比べる量 50 ÷ もとにする量 100 ＝ 0.5",choices:["何倍にあたるか","全部でいくつか","差がいくつか"],keys:["何倍","比べる量","もとにする量","割"],model:"比べる量がもとにする量の何倍にあたるかを表す数です。",hint:"比べる量÷もとにする量で考えます。",prof:"レシオ教授"},
-{id:"p4",unit:"図形",title:"合同の意味",difficulty:2,question:"2つの図形が合同であるとは、どのようなことですか。",ruby:"2つの<ruby>図形<rt>ずけい</rt></ruby>が<ruby>合同<rt>ごうどう</rt></ruby>であるとは、どのようなことですか。",simple:"重ねると形も大きさもぴったり合う図形を何といいますか。",visual:"形も大きさもぴったり重なります。",choices:["形も大きさも同じ","形だけが同じ","大きさだけが同じ"],keys:["形","大きさ","重","ぴったり","同じ"],model:"重ねたときに形も大きさもぴったり重なることです。",hint:"形だけでなく、大きさにも注目します。",prof:"ジオメト教授"}]};
-let data=JSON.parse(localStorage.getItem(KEY)||"null")||structuredClone(seed),session=null,current=null,mode="text";
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],save=()=>localStorage.setItem(KEY,JSON.stringify(data));
-function toast(x){$("#toast").textContent=x;$("#toast").classList.add("show");setTimeout(()=>$("#toast").classList.remove("show"),1800)}
-function only(id){["studentHome","problemScreen","profileScreen","teacherScreen"].forEach(x=>$("#"+x).classList.toggle("hidden",x!==id))}
-function student(){return data.students.find(x=>x.id===session?.sid)}function lv(x){return Math.floor(x/100)+1}
-function support(p){return [[p.rAudio,"音声で聞く"],[p.rRuby,"ふりがな"],[p.wLarge,"大きな文字"],[p.wChoice,"選んで答える"],[p.wTemplate,"文の型"],[p.mVisual,"図で考える"],[p.mSteps,"手順を小分け"],[p.mEasy,"やさしい問題から"]].filter(x=>x[0]).map(x=>x[1])}
-$$("[data-login]").forEach(b=>b.onclick=()=>{$$("[data-login]").forEach(x=>x.classList.toggle("active",x===b));$("#studentLogin").classList.toggle("hidden",b.dataset.login!=="student");$("#teacherLogin").classList.toggle("hidden",b.dataset.login!=="teacher")});
-$("#studentLogin").onsubmit=e=>{e.preventDefault();let s=data.students.find(x=>x.login===$("#loginId").value&&x.pw===$("#loginPw").value);if(!s)return toast("IDかパスワードが違います");session={role:"student",sid:s.id};enter();home()}
-$("#teacherLogin").onsubmit=e=>{e.preventDefault();if($("#teacherPw").value!=="4180")return toast("パスコードが違います");session={role:"teacher"};enter();teacher("dash")}
-function enter(){$("#login").classList.add("hidden");$("#app").classList.remove("hidden");$("#session").innerHTML=session.role==="teacher"?"<b>教師モード</b><span>学習環境を設定</span>":`<b>${student().name} さん</b><span>${student().grade}年生</span>`}
-$("#logout").onclick=()=>location.reload();
-function home(){only("studentHome");let s=student(),p=s.profile,L=lv(s.xp),rec=data.problems.find(q=>!s.history.some(h=>h.pid===q.id&&h.score>=80))||data.problems[0];$("#studentName").textContent=s.name+" さん";$("#level").textContent=L;$("#campusLv").textContent="Lv."+Math.max(1,Math.floor(L/2));$("#points").textContent=s.points+" pt";$("#clears").textContent=new Set(s.history.filter(h=>h.score>=60).map(h=>h.pid)).size+" 問";$("#xpbar").style.width=(s.xp%100)+"%";$("#xptext").textContent=`${s.xp%100}/100 EXP`;let sup=support(p);$("#styleText").textContent=sup.slice(0,3).join("・")||"スタンダード";$("#chips").innerHTML=(sup.length?sup:["自分の言葉で説明"]).map(x=>`<span class="chip">${x}</span>`).join("");$("#recommend").innerHTML=`<b>${rec.unit}｜${rec.title}</b><p>${p.mVisual?"図を使って":"自分の言葉で"}考えられます。</p>`;$("#startRec").onclick=()=>openProblem(rec.id);let units=["すべて",...new Set(data.problems.map(x=>x.unit))];$("#unit").innerHTML=units.map(x=>`<option>${x}</option>`).join("");$("#unit").onchange=problemList;problemList();let avg=s.history.length?Math.round(s.history.reduce((a,h)=>a+h.score,0)/s.history.length):0;$("#metrics").innerHTML=`<div><span>挑戦</span><strong>${s.history.length}</strong></div><div><span>平均</span><strong>${avg}</strong></div>`;$("#history").innerHTML=s.history.slice(-5).reverse().map(h=>`<div>${data.problems.find(p=>p.id===h.pid)?.title}：${h.score}点</div>`).join("")||"<p>まだ記録がありません。</p>"}
-function problemList(){let s=student(),u=$("#unit").value;$("#problemList").innerHTML=data.problems.filter(p=>u==="すべて"||p.unit===u).map(p=>{let best=Math.max(0,...s.history.filter(h=>h.pid===p.id).map(h=>h.score));return `<article class="problem ${best>=60?"done":""}"><div class="row"><span class="tag">${p.unit}</span><span>${"★".repeat(p.difficulty)}</span></div><h3>${p.title}</h3><p>${p.question}</p><div class="row"><small>${best?best+"点":"未挑戦"}</small><button class="btn soft" onclick="openProblem('${p.id}')">挑戦</button></div></article>`}).join("")}
-window.openProblem=id=>{current=data.problems.find(x=>x.id===id);mode=student().profile.wChoice?"choice":"text";only("problemScreen");renderProblem()}
-function renderProblem(){let p=student().profile;$("#professor").textContent=current.prof;$("#meta").textContent=current.unit+"｜難易度"+"★".repeat(current.difficulty);$("#qtitle").textContent=current.title;$("#qtext").innerHTML=p.mEasy?current.simple:current.ruby;$("#qtext").classList.toggle("ruby-on",p.rRuby);$("#qtext").classList.toggle("large",p.wLarge);$("#visual").innerHTML=current.visual;$("#visual").classList.toggle("hidden",!p.mVisual);$("#speak").classList.toggle("hidden",!p.rAudio);$("#rubyBtn").classList.toggle("hidden",!p.rRuby);answerModes();$("#feedback").classList.add("hidden");$("#hint").classList.add("hidden")}
-function answerModes(){let p=student().profile,m=[["text","文章"],["choice","選択"]];if(p.wTemplate)m.push(["template","文の型"]);$("#answerTabs").innerHTML=m.map(x=>`<button class="${mode===x[0]?"active":""}" data-mode="${x[0]}">${x[1]}</button>`).join("");$$("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;answerModes()});if(mode==="text")$("#answerArea").innerHTML='<textarea id="answer" placeholder="自分の考えを書こう"></textarea>';if(mode==="choice")$("#answerArea").innerHTML=current.choices.map(c=>`<label class="choice"><input type="radio" name="choice" value="${c}">${c}</label>`).join("");if(mode==="template")$("#answerArea").innerHTML='<label>まず<input id="t1"></label><label>次に<input id="t2"></label><label>だから<input id="t3"></label>'}
-$("#backHome").onclick=home;$("#rubyBtn").onclick=()=>$("#qtext").classList.toggle("ruby-on");$("#largeBtn").onclick=()=>$("#qtext").classList.toggle("large");$("#hintBtn").onclick=()=>{$("#hint").textContent=current.hint;$("#hint").classList.remove("hidden")};$("#speak").onclick=()=>{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(student().profile.mEasy?current.simple:current.question);u.lang="ja-JP";u.rate=.85;speechSynthesis.speak(u)}
-$("#submit").onclick=()=>{let a=mode==="text"?$("#answer")?.value.trim():mode==="choice"?$('input[name="choice"]:checked')?.value:[$("#t1")?.value,$("#t2")?.value,$("#t3")?.value].filter(Boolean).join("。");if(!a)return toast("答えを入力してください");let hits=current.keys.filter(k=>a.includes(k)).length,score=Math.min(100,Math.round(hits/Math.max(2,current.keys.length)*90)+(a.length>=10?10:0));if(mode==="choice"&&a===current.choices[0])score=100;let s=student(),gain=score>=80?30:score>=60?20:10;s.history.push({pid:current.id,score,answer:a,mode,date:new Date().toISOString()});s.xp+=gain;s.points+=Math.ceil(gain/2);save();$("#feedback").className="feedback "+(score>=60?"good":"");$("#feedback").innerHTML=`<div class="score">${score}点</div><b>${score>=60?"教授は納得した！":"もう少しで伝わりそう！"}</b><p>例：${current.model}</p><button class="btn soft" onclick="home()">キャンパスへ</button>`}
-$("#showProfile").onclick=()=>{only("profileScreen");let p=student().profile,c=[["📖","読む",[[p.rAudio,"音声で聞く"],[p.rRuby,"ふりがなを使う"]]],["✍️","答える",[[p.wLarge,"大きな文字"],[p.wChoice,"選択肢"],[p.wTemplate,"文の型"]]],["📊","考える",[[p.mVisual,"図を使う"],[p.mSteps,"手順を小分け"],[p.mEasy,"やさしい問題から"]]];$("#profileCards").innerHTML=c.map(x=>`<article class="profileCard"><div class="icon">${x[0]}</div><h2>${x[1]}</h2><ul>${x[2].filter(y=>y[0]).map(y=>`<li>${y[1]}</li>`).join("")||"<li>スタンダード</li>"}</ul></article>`).join("")};$("#profileBack").onclick=home;
-$$("[data-tv]").forEach(b=>b.onclick=()=>{$$("[data-tv]").forEach(x=>x.classList.toggle("active",x===b));teacher(b.dataset.tv)});
-function teacher(v){only("teacherScreen");let hs=data.students.flatMap(s=>s.history),avg=hs.length?Math.round(hs.reduce((a,h)=>a+h.score,0)/hs.length):0;if(v==="dash")$("#teacherContent").innerHTML=`<section class="teacherMetrics"><div class="metric"><span>児童</span><strong>${data.students.length}</strong></div><div class="metric"><span>挑戦</span><strong>${hs.length}</strong></div><div class="metric"><span>平均点</span><strong>${avg}</strong></div><div class="metric"><span>問題</span><strong>${data.problems.length}</strong></div></section><section class="panel" style="margin-top:12px"><h2>Version 11.0</h2><p>児童ごとのプロフィールに応じ、読み上げ・ふりがな・文字サイズ・回答形式・図・簡略問題を切り替えます。</p><p class="notice">このチェックは正式なLDIRではなく、画面支援設定の試作です。</p></section>`;if(v==="students")$("#teacherContent").innerHTML=`<section class="panel"><div class="heading"><h2>児童・学習プロフィール</h2><button class="btn primary" onclick="editStudent()">＋登録</button></div><div class="tableWrap"><table><tr><th>名前</th><th>学年</th><th>ID</th><th>支援</th><th></th></tr>${data.students.map(s=>`<tr><td>${s.name}</td><td>${s.grade}</td><td>${s.login}</td><td>${support(s.profile).map(x=>`<span class="tag">${x}</span>`).join("")}</td><td><button class="btn soft" onclick="editStudent('${s.id}')">編集</button></td></tr>`).join("")}</table></div></section>`;if(v==="problems")$("#teacherContent").innerHTML=`<section class="panel"><h2>問題管理</h2><table><tr><th>単元</th><th>問題</th><th>教授</th></tr>${data.problems.map(p=>`<tr><td>${p.unit}</td><td>${p.title}</td><td>${p.prof}</td></tr>`).join("")}</table></section>`;if(v==="results")$("#teacherContent").innerHTML=`<section class="panel"><h2>学習結果</h2><table><tr><th>児童</th><th>問題</th><th>形式</th><th>点</th></tr>${data.students.flatMap(s=>s.history.map(h=>`<tr><td>${s.name}</td><td>${data.problems.find(p=>p.id===h.pid)?.title}</td><td>${h.mode}</td><td>${h.score}</td></tr>`)).join("")||'<tr><td colspan="4">記録なし</td></tr>'}</table></section>`}
-window.editStudent=id=>{let s=data.students.find(x=>x.id===id);$("#editId").value=s?.id||"";$("#fName").value=s?.name||"";$("#fGrade").value=s?.grade||5;$("#fLogin").value=s?.login||"";$("#fPw").value=s?.pw||"1234";let p=s?.profile||{};["rAudio","rRuby","wLarge","wChoice","wTemplate","mVisual","mSteps","mEasy"].forEach(k=>$("#"+k).checked=!!p[k]);$("#studentDialog").showModal()};$("#closeDialog").onclick=()=>$("#studentDialog").close();
-$("#studentForm").onsubmit=e=>{e.preventDefault();let id=$("#editId").value||"s"+Date.now(),old=data.students.find(x=>x.id===id),obj={id,name:$("#fName").value,grade:+$("#fGrade").value,login:$("#fLogin").value,pw:$("#fPw").value,xp:old?.xp||0,points:old?.points||0,history:old?.history||[],profile:{rAudio:$("#rAudio").checked,rRuby:$("#rRuby").checked,wLarge:$("#wLarge").checked,wChoice:$("#wChoice").checked,wTemplate:$("#wTemplate").checked,mVisual:$("#mVisual").checked,mSteps:$("#mSteps").checked,mEasy:$("#mEasy").checked}};old?Object.assign(old,obj):data.students.push(obj);save();$("#studentDialog").close();teacher("students");toast("保存しました")}
-</script></body></html>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <section id="loginView" class="login-view">
+    <div class="login-shell">
+      <section class="brand-panel">
+        <div class="logo-mark">Σ</div>
+        <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
+        <h1>算数大学</h1>
+        <p>自分に合った学び方で、算数をもっと好きになる。</p>
+        <span class="version">Version 11.0</span>
+      </section>
+
+      <section class="login-panel">
+        <div class="switcher">
+          <button id="studentTabBtn" class="switch active" type="button">児童</button>
+          <button id="teacherTabBtn" class="switch" type="button">教師</button>
+        </div>
+
+        <form id="studentLoginForm" class="login-form">
+          <label>ログインID
+            <input id="studentIdInput" value="aoi01" autocomplete="username" />
+          </label>
+          <label>パスワード
+            <input id="studentPasswordInput" type="password" value="1234" autocomplete="current-password" />
+          </label>
+          <button class="btn primary large" type="submit">算数大学へ入る</button>
+          <small>デモ：aoi01 / 1234</small>
+        </form>
+
+        <form id="teacherLoginForm" class="login-form hidden">
+          <label>教師用パスコード
+            <input id="teacherPasscodeInput" type="password" value="4180" />
+          </label>
+          <button class="btn primary large" type="submit">教師画面を開く</button>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.0</small></div></div>
+      <div id="sessionInfo" class="session-info"></div>
+      <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
+    </header>
+
+    <main id="studentHomeView" class="page hidden">
+      <section class="hero-grid">
+        <article class="panel campus-panel">
+          <div class="section-head">
+            <div><p class="eyebrow">MY CAMPUS</p><h2>キャンパス</h2></div>
+            <span id="campusLevel" class="pill">Lv.1</span>
+          </div>
+          <div class="campus-art">
+            <div class="sun"></div><div class="building left">📚</div><div class="building main">🏛️</div><div class="building right">🔭</div><div class="fountain">⛲</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric"><span>研究ポイント</span><strong id="studentPoints">0 pt</strong></div>
+            <div class="metric"><span>クリア</span><strong id="studentClears">0 問</strong></div>
+          </div>
+        </article>
+
+        <article class="panel welcome-panel">
+          <div class="professor-message">
+            <div class="professor-avatar">👨‍🏫</div>
+            <div class="speech"><small>たっくん教授</small><strong>今日も自分に合った方法で進めよう！</strong></div>
+          </div>
+          <div class="student-summary">
+            <div><p class="eyebrow">STUDENT</p><h2 id="studentDisplayName"></h2><p id="studentStyleText" class="muted"></p></div>
+            <div id="studentLevel" class="level-badge">1</div>
+          </div>
+          <div class="xp-track"><div id="xpFill"></div></div>
+          <small id="xpText"></small>
+          <div id="supportChips" class="chips"></div>
+        </article>
+
+        <article class="panel recommendation-panel">
+          <p class="eyebrow">TODAY'S LEARNING</p>
+          <h2>今日のおすすめ</h2>
+          <div id="recommendationBox" class="recommendation"></div>
+          <button id="startRecommendationBtn" class="btn gold large" type="button">おすすめに挑戦</button>
+          <button id="openProfileBtn" class="btn soft" type="button">ぼくの学び方を見る</button>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="section-head">
+            <div><p class="eyebrow">CHALLENGE</p><h2>問題に挑戦する</h2></div>
+            <select id="unitFilter"></select>
+          </div>
+          <div id="problemList" class="problem-list"></div>
+        </article>
+        <aside class="panel">
+          <p class="eyebrow">LEARNING RECORD</p>
+          <h2>成長の記録</h2>
+          <div id="studentMetrics" class="metric-row"></div>
+          <h3>最近の挑戦</h3>
+          <div id="recentHistory" class="history-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <main id="problemView" class="page hidden">
+      <button id="backToHomeBtn" class="btn ghost" type="button">← キャンパスへ戻る</button>
+      <section class="battle-grid">
+        <article class="panel">
+          <div class="professor-message">
+            <div class="professor-avatar large-avatar">🧙‍♂️</div>
+            <div><p class="eyebrow">PROFESSOR BATTLE</p><h2 id="problemProfessor"></h2></div>
+          </div>
+
+          <div class="toolbar">
+            <button id="readAloudBtn" class="tool-btn" type="button">🔊 読み上げ</button>
+            <button id="furiganaBtn" class="tool-btn" type="button">ふりがな</button>
+            <button id="largeTextBtn" class="tool-btn" type="button">文字を大きく</button>
+          </div>
+
+          <div class="question-card">
+            <small id="problemMeta"></small>
+            <h1 id="problemTitle"></h1>
+            <div id="questionText" class="question-text"></div>
+            <div id="visualAid" class="visual-aid hidden"></div>
+          </div>
+
+          <div id="hintBox" class="hint-box hidden"></div>
+          <button id="showHintBtn" class="btn soft" type="button">ヒントを見る</button>
+        </article>
+
+        <article class="panel">
+          <p class="eyebrow">YOUR ANSWER</p>
+          <h2>自分の考えを伝えよう</h2>
+          <div id="answerModeTabs" class="answer-tabs"></div>
+          <div id="answerArea"></div>
+          <button id="submitAnswerBtn" class="btn primary large full" type="button">教授に答える</button>
+          <div id="feedbackBox" class="feedback hidden"></div>
+        </article>
+      </section>
+    </main>
+
+    <main id="profileView" class="page hidden">
+      <button id="backFromProfileBtn" class="btn ghost" type="button">← キャンパスへ戻る</button>
+      <section class="panel profile-panel">
+        <p class="eyebrow">MY LEARNING STYLE</p>
+        <h1>ぼくの学び方</h1>
+        <p class="muted">苦手の名前ではなく、学びやすくする方法を表示します。</p>
+        <div id="profileCards" class="profile-cards"></div>
+      </section>
+    </main>
+
+    <main id="teacherView" class="page hidden">
+      <nav class="teacher-tabs">
+        <button class="teacher-tab active" data-view="dashboard" type="button">概要</button>
+        <button class="teacher-tab" data-view="students" type="button">児童・LDIR</button>
+        <button class="teacher-tab" data-view="problems" type="button">問題管理</button>
+        <button class="teacher-tab" data-view="results" type="button">結果</button>
+      </nav>
+      <section id="teacherContent"></section>
+    </main>
+  </div>
+
+  <dialog id="studentDialog" class="modal">
+    <form id="studentForm">
+      <div class="section-head"><h2>児童・学習プロフィール</h2><button id="closeStudentDialogBtn" class="btn ghost" type="button">×</button></div>
+      <input id="editingStudentId" type="hidden" />
+      <div class="form-grid">
+        <label>名前<input id="studentNameField" required /></label>
+        <label>学年<select id="studentGradeField"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
+        <label>ログインID<input id="studentLoginField" required /></label>
+        <label>パスワード<input id="studentPasswordField" value="1234" required /></label>
+      </div>
+      <p class="notice">以下は、現時点では表示支援を設定するための試作項目です。正式なLDIR項目を入力いただいた後、項目・採点・判定ロジックを差し替えられます。</p>
+      <div class="assessment-grid">
+        <fieldset><legend>読む支援</legend>
+          <label class="check"><input id="supportAudio" type="checkbox" />読み上げ</label>
+          <label class="check"><input id="supportRuby" type="checkbox" />ふりがな</label>
+        </fieldset>
+        <fieldset><legend>書く支援</legend>
+          <label class="check"><input id="supportLarge" type="checkbox" />大きな文字</label>
+          <label class="check"><input id="supportChoice" type="checkbox" />選択式</label>
+          <label class="check"><input id="supportTemplate" type="checkbox" />文の型</label>
+        </fieldset>
+        <fieldset><legend>算数支援</legend>
+          <label class="check"><input id="supportVisual" type="checkbox" />図を表示</label>
+          <label class="check"><input id="supportSteps" type="checkbox" />手順を小分け</label>
+          <label class="check"><input id="supportEasy" type="checkbox" />簡略問題</label>
+        </fieldset>
+      </div>
+      <button class="btn primary large" type="submit">保存する</button>
+    </form>
+  </dialog>
+
+  <dialog id="problemDialog" class="modal">
+    <form id="problemForm">
+      <div class="section-head"><h2>問題を登録</h2><button id="closeProblemDialogBtn" class="btn ghost" type="button">×</button></div>
+      <input id="editingProblemId" type="hidden" />
+      <div class="form-grid">
+        <label>単元<input id="problemUnitField" required /></label>
+        <label>題名<input id="problemTitleField" required /></label>
+        <label>教授名<input id="problemProfessorField" required /></label>
+        <label>難易度<select id="problemDifficultyField"><option value="1">★</option><option value="2" selected>★★</option><option value="3">★★★</option></select></label>
+      </div>
+      <label>通常の問題文<textarea id="problemQuestionField" required></textarea></label>
+      <label>簡略問題文<textarea id="problemSimpleField"></textarea></label>
+      <label>図・補足<textarea id="problemVisualField"></textarea></label>
+      <label>選択肢（1行に1つ。1行目を正解にする）<textarea id="problemChoicesField"></textarea></label>
+      <label>採点キーワード（読点区切り）<input id="problemKeywordsField" /></label>
+      <label>模範回答<textarea id="problemModelField"></textarea></label>
+      <label>ヒント<textarea id="problemHintField"></textarea></label>
+      <button class="btn primary large" type="submit">保存する</button>
+    </form>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
