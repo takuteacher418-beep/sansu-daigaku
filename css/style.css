@@ -205,3 +205,44 @@ ruby[data-auto-ruby="true"] rt{font-size:.52em;line-height:1;color:#4d6577;font-
 .cloze-full-text{display:block;min-height:2.8em;margin:0 0 16px;padding:15px;border:2px solid #c8dbea;border-radius:13px;background:#fff;font-size:1.18em;line-height:1.9}
 .cloze-full-text .cloze-blank{display:inline-block;min-width:7em;text-align:center}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.global-accessibility-tools{order:3;width:100%;justify-content:flex-end}.global-large-text #studentHomeView,.global-large-text #problemView,.global-large-text #practiceView,.global-large-text #profileView{font-size:1.12rem}}
+
+
+/* Version 11.8.1: clickable ruby and complete large-text coverage */
+ruby[data-auto-ruby="true"],
+ruby[data-auto-ruby="true"] rt{
+  pointer-events:none;
+}
+
+/* Fixed pixel sizes in the home problem cards need explicit enlargement. */
+.global-large-text .problem-list-main .problem-card h3{
+  font-size:1.65rem !important;
+  line-height:1.55;
+}
+.global-large-text .problem-list-main .problem-card p{
+  font-size:1.12rem !important;
+  line-height:1.75;
+}
+.global-large-text .problem-list-main .problem-card .tag,
+.global-large-text .problem-list-main .problem-card small{
+  font-size:.95rem !important;
+}
+.global-large-text .problem-list-main .challenge-btn{
+  font-size:1.12rem !important;
+  padding:15px 20px;
+}
+.global-large-text .recommendation-professor strong{
+  font-size:1.35rem !important;
+  line-height:1.6;
+}
+.global-large-text .recommendation-professor p{
+  font-size:1.08rem !important;
+}
+.global-large-text .problem-selector-head h1{
+  font-size:2rem !important;
+}
+.global-large-text .unit-filter-label{
+  font-size:1.05rem !important;
+}
+.global-large-text .unit-filter-label select{
+  font-size:1.05rem !important;
+}

@@ -157,8 +157,10 @@
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
      $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
-      unwrapGeneratedRuby(root);
-      if (!rubyEnabled) return;
+      if (!rubyEnabled) {
+        unwrapGeneratedRuby(root);
+        return;
+      }
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const nodes = [];
       while (walker.nextNode()) {
@@ -427,6 +429,7 @@
     const popupTarget = unread.find((assignment) => !dismissedAssignmentIds.has(assignment.id));
     if (popupTarget) showAssignmentMailPopup(popupTarget);
     else hideAssignmentMailPopup();
+    scheduleAccessibility();
   }
 
   function showAssignmentMailPopup(assignment) {
@@ -437,6 +440,7 @@
     $("#assignmentMailMessage").textContent = assignment.message || "この問題をやってみてください。";
     $("#assignmentMailMeta").innerHTML = `<span>${problem.grade}年生</span><span>${problem.unit}</span><span>${new Date(assignment.assignedAt).toLocaleDateString("ja-JP")}</span>`;
     $("#assignmentMailPopup").classList.remove("hidden");
+    scheduleAccessibility();
   }
 
   function hideAssignmentMailPopup() {
@@ -478,6 +482,7 @@
     $$(".open-inbox-assignment-btn").forEach((button) =>
       button.addEventListener("click", () => openAssignedProblem(button.dataset.id))
     );
+    scheduleAccessibility();
   }
 
   $("#assignmentInboxBtn").addEventListener("click", () => {
@@ -522,8 +527,16 @@
         <div class="row"><small>${best ? best + "点" : "未挑戦"}</small><button class="btn soft challenge-btn" data-id="${problem.id}" type="button">挑戦する</button></div>
       </article>`;
     }).join("") || '<p class="notice">この条件の問題はありません。</p>';
-    $$(".challenge-btn").forEach((button) => button.addEventListener("click", () => { activeAssignmentId = null; openProblem(button.dataset.id); }));
+    scheduleAccessibility();
   }
+
+  $("#problemList").addEventListener("click", (event) => {
+    const button = event.target.closest(".challenge-btn");
+    if (!button) return;
+    event.preventDefault();
+    activeAssignmentId = null;
+    openProblem(button.dataset.id);
+  });
 
   function openProblem(problemId) {
     activeProblem = appData.problems.find((problem) => problem.id === problemId);
@@ -1111,7 +1124,7 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.8</h2>
+        <h2>Version 11.8.1</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1448,7 +1461,5 @@
     if (existing) Object.assign(existing,problem); else appData.problems.push(problem);
     saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と実際に解く確認問題を作成しました");
   });
-  const accessibilityObserver = new MutationObserver(() => scheduleAccessibility());
-  accessibilityObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
 
 })();
