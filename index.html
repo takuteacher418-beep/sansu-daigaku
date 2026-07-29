@@ -255,7 +255,7 @@
         <button class="teacher-tab teacher-submission-tab" data-view="submissions" type="button">
           提出箱 <span id="submissionTabBadge" class="teacher-tab-badge hidden">0</span>
         </button>
-        <button class="teacher-tab" data-view="results" type="button">結果・支援分析</button>
+        <button class="teacher-tab teacher-results-tab" data-view="results" type="button">結果・支援分析</button>
       </nav>
       <section id="teacherContent"></section>
     </main>
@@ -302,6 +302,15 @@
     <button id="closeReturnedMarkPopupBtn" class="returned-popup-close" type="button" aria-label="あとで見る">×</button>
   </section>
 
+
+
+  <dialog id="researchDetailDialog" class="modal research-detail-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">LEARNING RESEARCH</p><h2 id="researchDetailTitle">学習分析の詳細</h2></div>
+      <button id="closeResearchDetailDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div id="researchDetailContent"></div>
+  </dialog>
 
   <dialog id="markingImageDialog" class="modal marking-image-dialog">
     <div class="section-head">

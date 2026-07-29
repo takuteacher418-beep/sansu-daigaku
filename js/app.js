@@ -30,6 +30,11 @@
   let markPenSize = 7;
   let markPenMode = "pen";
   let markCanvasDirty = false;
+  let audioRecorder = null;
+  let audioChunks = [];
+  let recordedAudioDataUrl = "";
+  let audioRecordingStartedAt = 0;
+  let audioTimerId = null;
   const dismissedAssignmentIds = new Set();
   const dismissedReturnedSubmissionIds = new Set();
 
@@ -144,6 +149,101 @@
 
   function markCanvasDataUrl() {
     return activeMarkCanvas ? activeMarkCanvas.toDataURL("image/png") : "";
+  }
+
+
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function stopAudioTimer() {
+    clearInterval(audioTimerId);
+    audioTimerId = null;
+  }
+
+  function updateAudioTimer() {
+    const timer = $("#audioRecordingTimer");
+    if (!timer || !audioRecordingStartedAt) return;
+    const seconds = Math.floor((Date.now() - audioRecordingStartedAt) / 1000);
+    timer.textContent = `${seconds}秒`;
+  }
+
+  async function startTeacherAudioRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      showToast("このブラウザでは録音機能を使えません");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      const mimeOptions = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4"
+      ];
+      const mimeType = mimeOptions.find((type) => MediaRecorder.isTypeSupported?.(type)) || "";
+      audioRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      audioRecorder.addEventListener("dataavailable", (event) => {
+        if (event.data?.size) audioChunks.push(event.data);
+      });
+      audioRecorder.addEventListener("stop", async () => {
+        stopAudioTimer();
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(audioChunks, { type: audioRecorder.mimeType || "audio/webm" });
+        if (blob.size > 1_500_000) {
+          recordedAudioDataUrl = "";
+          showToast("録音が長すぎます。30秒以内で録音してください");
+        } else {
+          recordedAudioDataUrl = await blobToDataUrl(blob);
+          const preview = $("#teacherAudioPreview");
+          if (preview) {
+            preview.src = recordedAudioDataUrl;
+            preview.classList.remove("hidden");
+          }
+          const status = $("#audioRecordingStatus");
+          if (status) status.textContent = "録音できました。再生して確認できます。";
+        }
+        const startButton = $("#startAudioRecordBtn");
+        const stopButton = $("#stopAudioRecordBtn");
+        if (startButton) startButton.classList.remove("hidden");
+        if (stopButton) stopButton.classList.add("hidden");
+      });
+      audioRecorder.start();
+      audioRecordingStartedAt = Date.now();
+      updateAudioTimer();
+      audioTimerId = setInterval(updateAudioTimer, 500);
+      $("#startAudioRecordBtn")?.classList.add("hidden");
+      $("#stopAudioRecordBtn")?.classList.remove("hidden");
+      $("#audioRecordingStatus").textContent = "録音しています。30秒以内がおすすめです。";
+    } catch (error) {
+      showToast("マイクの使用が許可されませんでした");
+    }
+  }
+
+  function stopTeacherAudioRecording() {
+    if (audioRecorder && audioRecorder.state !== "inactive") audioRecorder.stop();
+  }
+
+  function clearTeacherAudioRecording() {
+    recordedAudioDataUrl = "";
+    const preview = $("#teacherAudioPreview");
+    if (preview) {
+      preview.pause();
+      preview.removeAttribute("src");
+      preview.load();
+      preview.classList.add("hidden");
+    }
+    const status = $("#audioRecordingStatus");
+    if (status) status.textContent = "録音はまだありません。";
+  }
+
+  function dataUrlIsAudio(value) {
+    return typeof value === "string" && value.startsWith("data:audio/");
   }
 
   function normalizeClozeText(problem) {
@@ -312,7 +412,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#researchDetailDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -750,6 +850,14 @@
             <img src="${submission.markingImage}" alt="先生の手書き丸つけ">
             <span>先生の手書き丸つけを見る</span>
           </button>` : ""}
+        ${dataUrlIsAudio(submission.audioMessage) ? `
+          <div class="returned-audio-card">
+            <div class="returned-audio-icon">🔊</div>
+            <div>
+              <strong>先生の声を聞く</strong>
+              <audio controls src="${submission.audioMessage}"></audio>
+            </div>
+          </div>` : ""}
         <div class="returned-teacher-comment">
           <div class="teacher-comment-avatar">👩‍🏫</div>
           <div><small>先生から</small><p>${escapeHtml(submission.comment).replace(/\n/g, "<br>")}</p></div>
@@ -777,6 +885,7 @@
   });
   $("#closeReturnedMarkDialogBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
   $("#closeMarkingImageDialogBtn").addEventListener("click", () => $("#markingImageDialog").close());
+  $("#closeResearchDetailDialogBtn").addEventListener("click", () => $("#researchDetailDialog").close());
 
   function renderUnitFilter() {
     const gradeValue = $("#gradeFilter").value;
@@ -1675,7 +1784,7 @@
         <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 12.1</h2>
+        <h2>Version 12.2</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1984,6 +2093,23 @@
             </div>
           </section>
 
+          <section class="teacher-audio-section">
+            <div class="section-head compact">
+              <div>
+                <h3>声でほめる</h3>
+                <p class="muted">短い音声メッセージを録音して返却できます。</p>
+              </div>
+              <span id="audioRecordingTimer" class="tag">0秒</span>
+            </div>
+            <div class="teacher-audio-controls">
+              <button id="startAudioRecordBtn" class="btn primary" type="button">🎤 録音を始める</button>
+              <button id="stopAudioRecordBtn" class="btn danger hidden" type="button">■ 録音を止める</button>
+              <button id="clearAudioRecordBtn" class="btn ghost" type="button">録音を消す</button>
+            </div>
+            <p id="audioRecordingStatus" class="notice">${submission.audioMessage ? "前回の録音があります。" : "録音はまだありません。"}</p>
+            <audio id="teacherAudioPreview" class="${submission.audioMessage ? "" : "hidden"}" controls ${submission.audioMessage ? `src="${submission.audioMessage}"` : ""}></audio>
+          </section>
+
           <label class="teacher-comment-field">
             先生からのコメント
             <textarea id="teacherSubmissionComment" rows="4" maxlength="300" placeholder="できたことを具体的にほめましょう。">${escapeHtml(submission.comment || "")}</textarea>
@@ -2007,7 +2133,11 @@
       $("#markPreview").className = `mark-preview ${selectedMark}`;
     }));
 
+    recordedAudioDataUrl = submission.audioMessage || "";
     initMarkCanvas(submission.markingImage || "");
+    $("#startAudioRecordBtn").addEventListener("click", startTeacherAudioRecording);
+    $("#stopAudioRecordBtn").addEventListener("click", stopTeacherAudioRecording);
+    $("#clearAudioRecordBtn").addEventListener("click", clearTeacherAudioRecording);
     $("#markPenBtn").addEventListener("click", () => {
       markPenMode = "pen";
       $("#markPenBtn").classList.add("active");
@@ -2069,6 +2199,7 @@
       submission.mark = selectedMark;
       submission.comment = comment;
       submission.markingImage = markCanvasDataUrl();
+      submission.audioMessage = recordedAudioDataUrl;
       submission.status = "returned";
       submission.reviewedAt = new Date().toISOString();
       submission.returnedAt = new Date().toISOString();
@@ -2081,49 +2212,69 @@
   }
 
   function renderTeacherResults() {
-    const students = appData.students;
-    const firstStudentId = students[0]?.id || "";
+    const grades = [...new Set(appData.students.map((student) => Number(student.grade)))].sort((a,b) => a-b);
+    const defaultGrade = grades[0] || 1;
     $("#teacherContent").innerHTML = `
       <section class="panel student-analysis-panel">
         <div class="section-head">
           <div>
             <p class="eyebrow">STUDENT ANALYSIS</p>
-            <h2>結果・支援分析</h2>
-            <p class="muted">児童のタブを選ぶと、その児童の結果だけを確認できます。</p>
+            <h2 class="results-single-line-title">結果・支援分析</h2>
+            <p class="muted">学年を選び、そのあと児童名を選んでください。</p>
           </div>
         </div>
-        <div id="analysisStudentTabs" class="analysis-student-tabs">
-          ${students.map((student, index) => `
-            <button class="analysis-student-tab ${index === 0 ? "active" : ""}" data-student="${student.id}" type="button">
-              <span class="analysis-tab-avatar">${escapeHtml(student.name.slice(0,1))}</span>
-              <span><strong>${escapeHtml(student.name)}</strong><small>${student.grade}年</small></span>
-            </button>`).join("")}
+        <div class="analysis-grade-selector">
+          <label>学年
+            <select id="analysisGradeField">
+              ${grades.map((grade) => `<option value="${grade}">${grade}年</option>`).join("")}
+            </select>
+          </label>
         </div>
+        <div id="analysisStudentTabs" class="analysis-student-tabs"></div>
         <div id="studentAnalysisContent"></div>
       </section>`;
 
-    function renderSelectedStudentAnalysis(studentId) {
-      const student = appData.students.find((item) => item.id === studentId);
-      if (!student) {
-        $("#studentAnalysisContent").innerHTML = '<p class="notice">児童が登録されていません。</p>';
-        return;
-      }
-      const history = [...(student.history || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
-      const average = history.length
-        ? Math.round(history.reduce((sum,item) => sum + Number(item.score || 0), 0) / history.length)
-        : 0;
-      const completedProblems = new Set(history.map((item) => item.problemId)).size;
-      const selfMarked = history.filter((item) => item.finalTestMarking === "self").length;
-      const teacherMarked = history.filter((item) => item.finalTestMarking === "teacher").length;
-      const submissions = allSubmissionRows().filter((item) => item.studentId === student.id);
-      const returned = submissions.filter((item) => item.status === "returned").length;
+    function studentsInGrade(grade) {
+      return appData.students.filter((student) => Number(student.grade) === Number(grade));
+    }
 
-      const routeCounts = history.reduce((counts, item) => {
-        const route = item.route || "direct";
-        counts[route] = (counts[route] || 0) + 1;
+    function renderStudentTabs(grade) {
+      const students = studentsInGrade(grade);
+      $("#analysisStudentTabs").innerHTML = students.length ? students.map((student, index) => `
+        <button class="analysis-student-tab ${index === 0 ? "active" : ""}" data-student="${student.id}" type="button">
+          <span class="analysis-tab-avatar">${escapeHtml(student.name.slice(0,1))}</span>
+          <span><strong>${escapeHtml(student.name)}</strong><small>${student.grade}年</small></span>
+        </button>`).join("") : '<p class="notice">この学年には児童がいません。</p>';
+
+      $$(".analysis-student-tab").forEach((button) => button.addEventListener("click", () => {
+        $$(".analysis-student-tab").forEach((item) => item.classList.toggle("active", item === button));
+        renderSelectedStudentAnalysis(button.dataset.student);
+      }));
+      if (students[0]) renderSelectedStudentAnalysis(students[0].id);
+      else $("#studentAnalysisContent").innerHTML = "";
+    }
+
+    function getStudentAnalysis(student) {
+      const history = [...(student.history || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+      const scores = history.map((item) => Number(item.score || 0));
+      const average = scores.length ? Math.round(scores.reduce((sum,score) => sum + score, 0) / scores.length) : 0;
+      const firstHalf = scores.slice(Math.ceil(scores.length / 2));
+      const recentHalf = scores.slice(0, Math.floor(scores.length / 2));
+      const firstAverage = firstHalf.length ? firstHalf.reduce((a,b)=>a+b,0)/firstHalf.length : average;
+      const recentAverage = recentHalf.length ? recentHalf.reduce((a,b)=>a+b,0)/recentHalf.length : average;
+      const trend = Math.round(recentAverage - firstAverage);
+      const uniqueProblems = new Set(history.map((item) => item.problemId)).size;
+      const teacherMarked = history.filter((item) => item.finalTestMarking === "teacher").length;
+      const selfMarked = history.filter((item) => item.finalTestMarking === "self").length;
+      const submissions = allSubmissionRows().filter((item) => item.studentId === student.id);
+      const returned = submissions.filter((item) => item.status === "returned");
+      const markCounts = returned.reduce((counts,item) => {
+        counts[item.mark || "未評価"] = (counts[item.mark || "未評価"] || 0) + 1;
         return counts;
       }, {});
       const hintTotal = history.reduce((sum,item) => sum + Number(item.hintCount || 0), 0);
+      const elapsedValues = history.map((item) => Number(item.elapsedSeconds || 0)).filter(Boolean);
+      const averageSeconds = elapsedValues.length ? Math.round(elapsedValues.reduce((a,b)=>a+b,0)/elapsedValues.length) : 0;
       const supportCounts = history.reduce((counts,item) => {
         const supports = item.supports || {};
         ["ruby","large","easy","readAloud","lineFocus"].forEach((key) => {
@@ -2131,12 +2282,37 @@
         });
         return counts;
       }, {});
-
-      const recentRows = history.slice(0, 12).map((item) => {
+      const routeCounts = history.reduce((counts,item) => {
+        const route = item.route || "direct";
+        counts[route] = (counts[route] || 0) + 1;
+        return counts;
+      }, {});
+      const unitScores = {};
+      history.forEach((item) => {
         const problem = appData.problems.find((entry) => entry.id === item.problemId);
-        const submission = item.submissionId
-          ? appData.submissions.find((entry) => entry.id === item.submissionId)
-          : null;
+        const unit = problem?.unit || "その他";
+        if (!unitScores[unit]) unitScores[unit] = [];
+        unitScores[unit].push(Number(item.score || 0));
+      });
+      const unitAverages = Object.entries(unitScores).map(([unit,values]) => ({
+        unit,
+        average: Math.round(values.reduce((a,b)=>a+b,0)/values.length),
+        count: values.length
+      })).sort((a,b) => a.average - b.average);
+      return {
+        history, scores, average, trend, uniqueProblems, teacherMarked, selfMarked,
+        submissions, returned, markCounts, hintTotal, averageSeconds,
+        supportCounts, routeCounts, unitAverages
+      };
+    }
+
+    function renderSelectedStudentAnalysis(studentId) {
+      const student = appData.students.find((item) => item.id === studentId);
+      if (!student) return;
+      const analysis = getStudentAnalysis(student);
+      const recentRows = analysis.history.slice(0, 12).map((item) => {
+        const problem = appData.problems.find((entry) => entry.id === item.problemId);
+        const submission = item.submissionId ? appData.submissions.find((entry) => entry.id === item.submissionId) : null;
         return `<tr>
           <td>${new Date(item.date).toLocaleDateString("ja-JP")}</td>
           <td>${escapeHtml(problem?.title || "問題")}</td>
@@ -2147,21 +2323,21 @@
         </tr>`;
       }).join("");
 
-      const recentScores = history.slice(0, 8).reverse();
+      const recentScores = analysis.history.slice(0,8).reverse();
       $("#studentAnalysisContent").innerHTML = `
         <div class="selected-student-head">
           <div>
             <h3>${escapeHtml(student.name)}さんの学習結果</h3>
             <p>${student.grade}年｜レベル ${levelFromXp(student.xp)}｜${student.points} pt</p>
           </div>
-          <span class="analysis-average ${average >= 80 ? "good" : average >= 60 ? "middle" : "needs-support"}">${average}<small>平均点</small></span>
+          <span class="analysis-average ${analysis.average >= 80 ? "good" : analysis.average >= 60 ? "middle" : "needs-support"}">${analysis.average}<small>平均点</small></span>
         </div>
 
         <div class="analysis-metric-grid">
-          <div class="analysis-metric"><span>取り組んだ問題</span><strong>${completedProblems}</strong><small>種類</small></div>
-          <div class="analysis-metric"><span>学習回数</span><strong>${history.length}</strong><small>回</small></div>
-          <div class="analysis-metric"><span>先生へ提出</span><strong>${teacherMarked}</strong><small>回</small></div>
-          <div class="analysis-metric"><span>返却済み</span><strong>${returned}</strong><small>件</small></div>
+          <div class="analysis-metric"><span>取り組んだ問題</span><strong>${analysis.uniqueProblems}</strong><small>種類</small></div>
+          <div class="analysis-metric"><span>学習回数</span><strong>${analysis.history.length}</strong><small>回</small></div>
+          <div class="analysis-metric"><span>先生へ提出</span><strong>${analysis.teacherMarked}</strong><small>回</small></div>
+          <div class="analysis-metric"><span>返却済み</span><strong>${analysis.returned.length}</strong><small>件</small></div>
         </div>
 
         <div class="analysis-two-column">
@@ -2182,19 +2358,27 @@
           <article class="analysis-card">
             <h3>使った支援</h3>
             <div class="support-chip-list">
-              <span>ふりがな <strong>${supportCounts.ruby || 0}</strong></span>
-              <span>文字拡大 <strong>${supportCounts.large || 0}</strong></span>
-              <span>やさしい文 <strong>${supportCounts.easy || 0}</strong></span>
-              <span>読み上げ <strong>${supportCounts.readAloud || 0}</strong></span>
-              <span>行の強調 <strong>${supportCounts.lineFocus || 0}</strong></span>
-              <span>ヒント <strong>${hintTotal}</strong></span>
+              <span>ふりがな <strong>${analysis.supportCounts.ruby || 0}</strong></span>
+              <span>文字拡大 <strong>${analysis.supportCounts.large || 0}</strong></span>
+              <span>やさしい文 <strong>${analysis.supportCounts.easy || 0}</strong></span>
+              <span>読み上げ <strong>${analysis.supportCounts.readAloud || 0}</strong></span>
+              <span>行の強調 <strong>${analysis.supportCounts.lineFocus || 0}</strong></span>
+              <span>ヒント <strong>${analysis.hintTotal}</strong></span>
             </div>
             <div class="support-summary">
-              <p><strong>自分で丸つけ：</strong>${selfMarked}回</p>
-              <p><strong>先生に依頼：</strong>${teacherMarked}回</p>
-              <p><strong>少しずつ考える：</strong>${routeCounts.smallStep || 0}回</p>
+              <p><strong>自分で丸つけ：</strong>${analysis.selfMarked}回</p>
+              <p><strong>先生に依頼：</strong>${analysis.teacherMarked}回</p>
+              <p><strong>少しずつ考える：</strong>${analysis.routeCounts.smallStep || 0}回</p>
             </div>
           </article>
+        </div>
+
+        <div class="analysis-detail-launch">
+          <div>
+            <h3>研究用の詳細分析</h3>
+            <p>得点の変化、単元別傾向、支援利用、提出行動などを詳しく見ます。</p>
+          </div>
+          <button id="openResearchDetailBtn" class="btn primary" type="button">詳細を見る →</button>
         </div>
 
         <article class="analysis-card analysis-history-card">
@@ -2208,13 +2392,94 @@
             </table>
           </div>
         </article>`;
+
+      $("#openResearchDetailBtn").addEventListener("click", () => renderResearchDetail(student, analysis));
     }
 
-    $$(".analysis-student-tab").forEach((button) => button.addEventListener("click", () => {
-      $$(".analysis-student-tab").forEach((item) => item.classList.toggle("active", item === button));
-      renderSelectedStudentAnalysis(button.dataset.student);
-    }));
-    if (firstStudentId) renderSelectedStudentAnalysis(firstStudentId);
+    function renderResearchDetail(student, analysis) {
+      const strongest = [...analysis.unitAverages].sort((a,b)=>b.average-a.average)[0];
+      const weakest = analysis.unitAverages[0];
+      const supportTotal = Object.values(analysis.supportCounts).reduce((a,b)=>a+b,0);
+      const teacherRequestRate = analysis.history.length
+        ? Math.round(analysis.teacherMarked / analysis.history.length * 100) : 0;
+      const selfMarkRate = analysis.history.length
+        ? Math.round(analysis.selfMarked / analysis.history.length * 100) : 0;
+      const returnedMarks = analysis.returned.length;
+      const positiveMarks = (analysis.markCounts["○"] || 0);
+      const positiveRate = returnedMarks ? Math.round(positiveMarks / returnedMarks * 100) : 0;
+
+      const interpretation = [];
+      if (analysis.trend >= 10) interpretation.push("最近の得点は、前半より上がっています。学習の定着が進んでいる可能性があります。");
+      else if (analysis.trend <= -10) interpretation.push("最近の得点は、前半より下がっています。疲労、問題の難しさ、支援の合い方を確認する必要があります。");
+      else interpretation.push("得点の大きな変化は見られません。継続的な観察が必要です。");
+      if (supportTotal > analysis.history.length) interpretation.push("一つの学習で複数の支援を使うことがあります。どの支援が得点や自立度に結び付いたかを個別に見るとよいです。");
+      if (teacherRequestRate >= 50) interpretation.push("先生への丸つけ依頼が多めです。安心して提出できている一方、自分で確かめる力とのバランスも観察できます。");
+      if (weakest && weakest.average < 60) interpretation.push(`${weakest.unit}は平均${weakest.average}点で、重点的に支援する候補です。`);
+
+      $("#researchDetailTitle").textContent = `${student.name}さんの詳細分析`;
+      $("#researchDetailContent").innerHTML = `
+        <div class="research-warning">
+          この分析は学習支援の手がかりです。診断や能力の断定には使わず、授業中の様子や本人の話と合わせて判断してください。
+        </div>
+
+        <div class="research-metric-grid">
+          <div><span>得点の変化</span><strong>${analysis.trend >= 0 ? "+" : ""}${analysis.trend}</strong><small>前半との差</small></div>
+          <div><span>平均時間</span><strong>${analysis.averageSeconds}</strong><small>秒／回</small></div>
+          <div><span>先生依頼率</span><strong>${teacherRequestRate}</strong><small>％</small></div>
+          <div><span>自分で丸つけ</span><strong>${selfMarkRate}</strong><small>％</small></div>
+          <div><span>○の割合</span><strong>${positiveRate}</strong><small>％</small></div>
+          <div><span>ヒント使用</span><strong>${analysis.hintTotal}</strong><small>回</small></div>
+        </div>
+
+        <section class="research-section">
+          <h3>単元別の傾向</h3>
+          <div class="unit-analysis-list">
+            ${analysis.unitAverages.length ? analysis.unitAverages.map((item) => `
+              <div class="unit-analysis-row">
+                <span>${escapeHtml(item.unit)}</span>
+                <div><i style="width:${item.average}%"></i></div>
+                <strong>${item.average}点</strong>
+                <small>${item.count}回</small>
+              </div>`).join("") : '<p class="notice">まだ単元別に分析できる結果がありません。</p>'}
+          </div>
+          ${strongest ? `<p class="research-note">比較的得意：<strong>${escapeHtml(strongest.unit)}</strong>（${strongest.average}点）</p>` : ""}
+          ${weakest ? `<p class="research-note">支援候補：<strong>${escapeHtml(weakest.unit)}</strong>（${weakest.average}点）</p>` : ""}
+        </section>
+
+        <section class="research-section">
+          <h3>支援の利用状況</h3>
+          <div class="research-support-table">
+            <div><span>ふりがな</span><strong>${analysis.supportCounts.ruby || 0}</strong></div>
+            <div><span>文字拡大</span><strong>${analysis.supportCounts.large || 0}</strong></div>
+            <div><span>やさしい文</span><strong>${analysis.supportCounts.easy || 0}</strong></div>
+            <div><span>読み上げ</span><strong>${analysis.supportCounts.readAloud || 0}</strong></div>
+            <div><span>行の強調</span><strong>${analysis.supportCounts.lineFocus || 0}</strong></div>
+            <div><span>少しずつ考える</span><strong>${analysis.routeCounts.smallStep || 0}</strong></div>
+          </div>
+        </section>
+
+        <section class="research-section">
+          <h3>読み取れる可能性</h3>
+          <div class="interpretation-list">
+            ${interpretation.map((text) => `<p>${escapeHtml(text)}</p>`).join("")}
+          </div>
+        </section>
+
+        <section class="research-section">
+          <h3>次に確認したいこと</h3>
+          <ul class="research-question-list">
+            <li>支援を使った回と使わなかった回で、得点や時間はどう変わるか。</li>
+            <li>先生に丸つけを頼んだ理由は、安心感・難しさ・ほめられたい気持ちのどれに近いか。</li>
+            <li>得点が低い単元で、問題文理解と計算技能のどちらにつまずいているか。</li>
+            <li>支援を減らしても同じ水準で解けるようになっているか。</li>
+          </ul>
+        </section>`;
+      $("#researchDetailDialog").showModal();
+    }
+
+    $("#analysisGradeField").value = String(defaultGrade);
+    $("#analysisGradeField").addEventListener("change", (event) => renderStudentTabs(event.target.value));
+    renderStudentTabs(defaultGrade);
   }
 
   function openStudentDialog(studentId = "") {
