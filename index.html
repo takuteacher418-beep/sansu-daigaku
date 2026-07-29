@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.6</title>
+  <title>算数大学 Version 11.7</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.6</span>
+        <span class="version">Version 11.7</span>
       </section>
 
       <section class="login-panel">
@@ -48,7 +48,7 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.6</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.7</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
     </header>
@@ -71,6 +71,11 @@
           </article>
 
           <article class="panel sidebar-actions">
+            <button id="assignmentInboxBtn" class="assignment-inbox-btn hidden" type="button">
+              <span class="mail-icon">✉️</span>
+              <span><strong>先生からの課題</strong><small id="assignmentInboxText">新しい課題があります</small></span>
+              <span id="assignmentInboxCount" class="mail-count">0</span>
+            </button>
             <button id="openProfessorListBtn" class="btn professor-list-btn" type="button">🎓 教授一覧を見る</button>
             <button id="openProfileBtn" class="btn soft" type="button">📘 ぼくの学び方</button>
             <div id="supportChips" class="chips"></div>
@@ -233,12 +238,40 @@
         <button class="teacher-tab active" data-view="dashboard" type="button">概要</button>
         <button class="teacher-tab" data-view="students" type="button">児童・LDIR</button>
         <button class="teacher-tab" data-view="problems" type="button">問題管理</button>
+        <button class="teacher-tab" data-view="assignments" type="button">個別課題</button>
         <button class="teacher-tab" data-view="results" type="button">結果・支援分析</button>
       </nav>
       <section id="teacherContent"></section>
     </main>
   </div>
 
+
+
+  <section id="assignmentMailPopup" class="assignment-mail-popup hidden" aria-live="polite">
+    <div class="mail-popup-top">
+      <span class="mail-stamp">NEW</span>
+      <button id="closeAssignmentMailBtn" class="mail-close" type="button" aria-label="あとで見る">×</button>
+    </div>
+    <div class="mail-envelope">✉️</div>
+    <div class="mail-popup-copy">
+      <small>先生からメールが届きました</small>
+      <h2 id="assignmentMailTitle">新しい課題</h2>
+      <p id="assignmentMailMessage"></p>
+      <div id="assignmentMailMeta" class="mail-meta"></div>
+    </div>
+    <div class="mail-popup-actions">
+      <button id="laterAssignmentBtn" class="btn ghost" type="button">あとで見る</button>
+      <button id="openAssignmentBtn" class="btn primary" type="button">課題を開く</button>
+    </div>
+  </section>
+
+  <dialog id="assignmentInboxDialog" class="modal assignment-inbox-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">ASSIGNMENT MAIL</p><h2>先生からの課題</h2></div>
+      <button id="closeAssignmentInboxBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div id="assignmentInboxList" class="assignment-inbox-list"></div>
+  </dialog>
 
   <dialog id="professorDialog" class="modal professor-modal">
     <div class="section-head">

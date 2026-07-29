@@ -18,6 +18,9 @@
   let practiceItems = [];
   let practiceIndex = 0;
   let practiceResults = [];
+  let activeAssignmentId = null;
+  let popupAssignmentId = null;
+  const dismissedAssignmentIds = new Set();
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -51,6 +54,7 @@
       merged.students = merged.students.map((student) => ({
         ...student,
         history: Array.isArray(student.history) ? student.history : [],
+        assignments: Array.isArray(student.assignments) ? student.assignments : [],
         profile: {
           audio: false, ruby: false, large: false, choice: false,
           template: false, visual: false, steps: false, easy: false,
@@ -200,7 +204,7 @@
     $("#xpText").textContent = `${student.xp % 100} / 100 EXP`;
     const homeProfessor = professorForProblem(recommendation);
     $("#recommendationBox").innerHTML = `<div class="recommendation-professor"><img src="${homeProfessor.image}" alt="${homeProfessor.name}"><div><strong>${recommendation.unit}｜${recommendation.title}</strong><p>担当：${homeProfessor.name}　${student.profile.visual ? "図を使って" : "自分の言葉で"}考えよう。</p></div></div>`;
-    $("#startRecommendationBtn").onclick = () => openProblem(recommendation.id);
+    $("#startRecommendationBtn").onclick = () => { activeAssignmentId = null; openProblem(recommendation.id); };
 
     const gradeOptions = [
       { value: String(student.grade), label: `${student.grade}年生（おすすめ）` },
@@ -227,7 +231,107 @@
       const problem = appData.problems.find((entry) => entry.id === item.problemId);
       return `<div class="history-item">${problem?.title || "問題"}：${item.score}点</div>`;
     }).join("") || '<p class="muted">まだ記録がありません。</p>';
+
+    renderStudentAssignments();
   }
+
+
+  function assignmentsForCurrentStudent() {
+    const student = currentStudent();
+    if (!Array.isArray(student.assignments)) student.assignments = [];
+    return student.assignments
+      .filter((assignment) => appData.problems.some((problem) => problem.id === assignment.problemId))
+      .sort((a, b) => new Date(b.assignedAt) - new Date(a.assignedAt));
+  }
+
+  function assignmentStatusLabel(status) {
+    if (status === "completed") return "完了";
+    if (status === "opened") return "取り組み中";
+    return "未読";
+  }
+
+  function renderStudentAssignments() {
+    const assignments = assignmentsForCurrentStudent();
+    const pending = assignments.filter((assignment) => assignment.status !== "completed");
+    const unread = assignments.filter((assignment) => assignment.status === "unread");
+
+    $("#assignmentInboxBtn").classList.toggle("hidden", assignments.length === 0);
+    $("#assignmentInboxCount").textContent = pending.length;
+    $("#assignmentInboxCount").classList.toggle("hidden", pending.length === 0);
+    $("#assignmentInboxText").textContent = pending.length
+      ? `取り組む課題が ${pending.length} 件あります`
+      : "すべての課題が終わりました";
+
+    const popupTarget = unread.find((assignment) => !dismissedAssignmentIds.has(assignment.id));
+    if (popupTarget) showAssignmentMailPopup(popupTarget);
+    else hideAssignmentMailPopup();
+  }
+
+  function showAssignmentMailPopup(assignment) {
+    const problem = appData.problems.find((item) => item.id === assignment.problemId);
+    if (!problem) return;
+    popupAssignmentId = assignment.id;
+    $("#assignmentMailTitle").textContent = problem.title;
+    $("#assignmentMailMessage").textContent = assignment.message || "この問題をやってみてください。";
+    $("#assignmentMailMeta").innerHTML = `<span>${problem.grade}年生</span><span>${problem.unit}</span><span>${new Date(assignment.assignedAt).toLocaleDateString("ja-JP")}</span>`;
+    $("#assignmentMailPopup").classList.remove("hidden");
+  }
+
+  function hideAssignmentMailPopup() {
+    $("#assignmentMailPopup").classList.add("hidden");
+    popupAssignmentId = null;
+  }
+
+  function openAssignedProblem(assignmentId) {
+    const assignment = assignmentsForCurrentStudent().find((item) => item.id === assignmentId);
+    if (!assignment) return;
+    assignment.status = assignment.status === "completed" ? "completed" : "opened";
+    assignment.openedAt = assignment.openedAt || new Date().toISOString();
+    activeAssignmentId = assignment.id;
+    saveData();
+    hideAssignmentMailPopup();
+    $("#assignmentInboxDialog").close();
+    openProblem(assignment.problemId);
+  }
+
+  function renderAssignmentInbox() {
+    const assignments = assignmentsForCurrentStudent();
+    $("#assignmentInboxList").innerHTML = assignments.length ? assignments.map((assignment) => {
+      const problem = appData.problems.find((item) => item.id === assignment.problemId);
+      const status = assignmentStatusLabel(assignment.status);
+      return `<article class="assignment-mail-item ${assignment.status}">
+        <div class="assignment-mail-symbol">✉️</div>
+        <div class="assignment-mail-body">
+          <div class="row"><span class="tag">${status}</span><small>${new Date(assignment.assignedAt).toLocaleDateString("ja-JP")}</small></div>
+          <h3>${problem?.title || "削除された問題"}</h3>
+          <p>${assignment.message || "この問題をやってみてください。"}</p>
+          <small>${problem ? `${problem.grade}年｜${problem.unit}` : ""}${assignment.score != null ? `｜結果 ${assignment.score}点` : ""}</small>
+        </div>
+        ${problem && assignment.status !== "completed"
+          ? `<button class="btn soft open-inbox-assignment-btn" data-id="${assignment.id}" type="button">取り組む</button>`
+          : ""}
+      </article>`;
+    }).join("") : '<p class="notice">先生から届いた課題はまだありません。</p>';
+
+    $$(".open-inbox-assignment-btn").forEach((button) =>
+      button.addEventListener("click", () => openAssignedProblem(button.dataset.id))
+    );
+  }
+
+  $("#assignmentInboxBtn").addEventListener("click", () => {
+    renderAssignmentInbox();
+    $("#assignmentInboxDialog").showModal();
+  });
+  $("#closeAssignmentInboxBtn").addEventListener("click", () => $("#assignmentInboxDialog").close());
+  $("#openAssignmentBtn").addEventListener("click", () => {
+    if (popupAssignmentId) openAssignedProblem(popupAssignmentId);
+  });
+  function dismissCurrentAssignmentPopup() {
+    if (popupAssignmentId) dismissedAssignmentIds.add(popupAssignmentId);
+    hideAssignmentMailPopup();
+  }
+  $("#laterAssignmentBtn").addEventListener("click", dismissCurrentAssignmentPopup);
+  $("#closeAssignmentMailBtn").addEventListener("click", dismissCurrentAssignmentPopup);
 
   function renderUnitFilter() {
     const gradeValue = $("#gradeFilter").value;
@@ -256,7 +360,7 @@
         <div class="row"><small>${best ? best + "点" : "未挑戦"}</small><button class="btn soft challenge-btn" data-id="${problem.id}" type="button">挑戦する</button></div>
       </article>`;
     }).join("") || '<p class="notice">この条件の問題はありません。</p>';
-    $$(".challenge-btn").forEach((button) => button.addEventListener("click", () => openProblem(button.dataset.id)));
+    $$(".challenge-btn").forEach((button) => button.addEventListener("click", () => { activeAssignmentId = null; openProblem(button.dataset.id); }));
   }
 
   function openProblem(problemId) {
@@ -721,7 +825,15 @@
     const score = Math.round(correctCount / practiceItems.length * 100);
     const student = currentStudent();
     const gain = correctCount * 10 + 10;
-    student.history.push({problemId:activeProblem.id,score,answerMode,supports:{...supportUsage,answerMode},practiceCorrect:correctCount,practiceTotal:practiceItems.length,route:supportUsage.route||learningRoute,hintCount,elapsedSeconds:Math.round((Date.now()-problemStartedAt)/1000),date:new Date().toISOString()});
+    student.history.push({problemId:activeProblem.id,score,answerMode,supports:{...supportUsage,answerMode},practiceCorrect:correctCount,practiceTotal:practiceItems.length,route:supportUsage.route||learningRoute,hintCount,elapsedSeconds:Math.round((Date.now()-problemStartedAt)/1000),assignmentId:activeAssignmentId,date:new Date().toISOString()});
+    if (activeAssignmentId) {
+      const assignment = (student.assignments || []).find((item) => item.id === activeAssignmentId);
+      if (assignment) {
+        assignment.status = "completed";
+        assignment.completedAt = new Date().toISOString();
+        assignment.score = score;
+      }
+    }
     student.xp += gain; student.points += Math.ceil(gain/2); saveData();
     const professor=professorForProblem(activeProblem);
     $("#practiceQuestion").innerHTML=`<div class="practice-result"><img src="${professor.image}" alt="${professor.name}"><h2>確認問題 ${correctCount} / ${practiceItems.length} 問正解</h2><p>${correctCount===3?'説明を理解し、使うことができました！':'正しい説明を見ながら、もう一度挑戦できます。'}</p></div>`;
@@ -802,22 +914,26 @@
     if (viewName === "dashboard") renderTeacherDashboard();
     if (viewName === "students") renderTeacherStudents();
     if (viewName === "problems") renderTeacherProblems();
+    if (viewName === "assignments") renderTeacherAssignments();
     if (viewName === "results") renderTeacherResults();
   }
 
   function renderTeacherDashboard() {
     const results = appData.students.flatMap((student) => student.history);
     const average = results.length ? Math.round(results.reduce((sum, item) => sum + item.score, 0) / results.length) : 0;
+    const assignments = allAssignmentRows();
+    const pendingAssignments = assignments.filter((assignment) => assignment.status !== "completed").length;
     $("#teacherContent").innerHTML = `
       <section class="teacher-metrics">
         <div class="metric"><span>登録児童</span><strong>${appData.students.length}</strong></div>
         <div class="metric"><span>総挑戦数</span><strong>${results.length}</strong></div>
         <div class="metric"><span>平均点</span><strong>${average}</strong></div>
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
+        <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.6</h2>
-        <p>1年生から6年生まで各10問、合計60問の説明問題を搭載しました。児童の学年を最初に表示し、他学年にも切り替えられます。</p>
+        <h2>Version 11.7</h2>
+        <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
   }
@@ -849,6 +965,126 @@
       </section>`;
     $("#addProblemBtn").addEventListener("click", () => openProblemDialog());
     $$(".edit-problem-btn").forEach((button) => button.addEventListener("click", () => openProblemDialog(button.dataset.id)));
+  }
+
+
+  function allAssignmentRows() {
+    return appData.students.flatMap((student) =>
+      (student.assignments || []).map((assignment) => ({
+        ...assignment,
+        studentId: student.id,
+        studentName: student.name
+      }))
+    ).sort((a, b) => new Date(b.assignedAt) - new Date(a.assignedAt));
+  }
+
+  function renderTeacherAssignments() {
+    const rows = allAssignmentRows();
+    const gradeOptions = [1,2,3,4,5,6].map((grade) => `<option value="${grade}">${grade}年生</option>`).join("");
+    $("#teacherContent").innerHTML = `
+      <section class="panel assignment-send-panel">
+        <div class="section-head">
+          <div><p class="eyebrow">SEND ASSIGNMENT</p><h2>個別に課題を配信する</h2><p class="muted">児童を一人選び、取り組んでほしい問題を送ります。</p></div>
+          <div class="assignment-send-icon">✉️</div>
+        </div>
+        <div class="assignment-form-grid">
+          <label>配信する児童
+            <select id="assignmentStudentField">
+              ${appData.students.map((student) => `<option value="${student.id}">${student.name}（${student.grade}年）</option>`).join("")}
+            </select>
+          </label>
+          <label>問題の学年
+            <select id="assignmentGradeField">${gradeOptions}</select>
+          </label>
+          <label class="assignment-problem-field">配信する問題
+            <select id="assignmentProblemField"></select>
+          </label>
+          <label class="assignment-message-field">先生からのメッセージ
+            <input id="assignmentMessageField" value="この問題をやってみてください。" maxlength="80">
+          </label>
+        </div>
+        <div id="assignmentProblemPreview" class="assignment-problem-preview"></div>
+        <button id="sendAssignmentBtn" class="btn primary large" type="button">この児童に配信する</button>
+        <p class="notice">この試作版では、同じブラウザの保存データ内に課題を登録します。</p>
+      </section>
+
+      <section class="panel" style="margin-top:12px">
+        <div class="section-head"><div><h2>配信した課題</h2><p class="muted">未読・取り組み中・完了を確認できます。</p></div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>児童</th><th>問題</th><th>配信日</th><th>状態</th><th>結果</th><th>操作</th></tr></thead>
+          <tbody>${rows.length ? rows.map((assignment) => {
+            const problem = appData.problems.find((item) => item.id === assignment.problemId);
+            return `<tr>
+              <td>${assignment.studentName}</td>
+              <td>${problem ? `${problem.grade}年｜${problem.title}` : "削除済み"}</td>
+              <td>${new Date(assignment.assignedAt).toLocaleString("ja-JP")}</td>
+              <td><span class="assignment-status ${assignment.status}">${assignmentStatusLabel(assignment.status)}</span></td>
+              <td>${assignment.score != null ? assignment.score + "点" : "—"}</td>
+              <td><button class="btn ghost delete-assignment-btn" data-student="${assignment.studentId}" data-id="${assignment.id}" type="button">取り消す</button></td>
+            </tr>`;
+          }).join("") : '<tr><td colspan="6">まだ課題を配信していません。</td></tr>'}</tbody>
+        </table></div>
+      </section>`;
+
+    const selectedStudent = appData.students.find((student) => student.id === $("#assignmentStudentField").value);
+    $("#assignmentGradeField").value = String(selectedStudent?.grade || 5);
+
+    function refreshAssignmentProblemOptions() {
+      const grade = Number($("#assignmentGradeField").value);
+      const problems = appData.problems.filter((problem) => Number(problem.grade) === grade);
+      $("#assignmentProblemField").innerHTML = problems.map((problem) =>
+        `<option value="${problem.id}">${problem.unit}｜${problem.title}</option>`
+      ).join("");
+      refreshAssignmentPreview();
+    }
+
+    function refreshAssignmentPreview() {
+      const problem = appData.problems.find((item) => item.id === $("#assignmentProblemField").value);
+      $("#assignmentProblemPreview").innerHTML = problem
+        ? `<span class="tag">${problem.grade}年｜${problem.unit}</span><strong>${problem.title}</strong><p>${problem.correctExplanation}</p>`
+        : '<p class="notice">この学年には問題がありません。</p>';
+    }
+
+    $("#assignmentStudentField").addEventListener("change", () => {
+      const student = appData.students.find((item) => item.id === $("#assignmentStudentField").value);
+      if (student) $("#assignmentGradeField").value = String(student.grade);
+      refreshAssignmentProblemOptions();
+    });
+    $("#assignmentGradeField").addEventListener("change", refreshAssignmentProblemOptions);
+    $("#assignmentProblemField").addEventListener("change", refreshAssignmentPreview);
+    refreshAssignmentProblemOptions();
+
+    $("#sendAssignmentBtn").addEventListener("click", () => {
+      const student = appData.students.find((item) => item.id === $("#assignmentStudentField").value);
+      const problem = appData.problems.find((item) => item.id === $("#assignmentProblemField").value);
+      if (!student || !problem) {
+        showToast("児童と問題を選んでください");
+        return;
+      }
+      if (!Array.isArray(student.assignments)) student.assignments = [];
+      student.assignments.push({
+        id: `assignment_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+        problemId: problem.id,
+        message: $("#assignmentMessageField").value.trim() || "この問題をやってみてください。",
+        status: "unread",
+        assignedAt: new Date().toISOString(),
+        openedAt: null,
+        completedAt: null,
+        score: null
+      });
+      saveData();
+      renderTeacherAssignments();
+      showToast(`${student.name}さんに課題を配信しました`);
+    });
+
+    $$(".delete-assignment-btn").forEach((button) => button.addEventListener("click", () => {
+      const student = appData.students.find((item) => item.id === button.dataset.student);
+      if (!student) return;
+      student.assignments = (student.assignments || []).filter((assignment) => assignment.id !== button.dataset.id);
+      saveData();
+      renderTeacherAssignments();
+      showToast("課題を取り消しました");
+    }));
   }
 
   function renderTeacherResults() {

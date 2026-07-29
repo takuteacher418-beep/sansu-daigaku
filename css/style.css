@@ -127,3 +127,64 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}button{
   .problem-filter-group{width:100%;display:grid;grid-template-columns:1fr 1fr}
   .problem-filter-group .unit-filter-label{min-width:0}
 }
+
+
+/* Version 11.7: individual assignment mail */
+.assignment-inbox-btn{
+  width:100%;display:grid;grid-template-columns:38px 1fr auto;gap:9px;align-items:center;
+  padding:10px 11px;border:1px solid #c9d8e6;border-radius:13px;background:#f7fbff;
+  color:var(--ink);text-align:left;cursor:pointer;
+}
+.assignment-inbox-btn:hover{background:#edf6ff}
+.assignment-inbox-btn .mail-icon{font-size:24px}
+.assignment-inbox-btn strong,.assignment-inbox-btn small{display:block}
+.assignment-inbox-btn small{margin-top:2px;color:var(--muted);font-size:11px}
+.mail-count{
+  display:grid;place-items:center;min-width:25px;height:25px;padding:0 7px;border-radius:999px;
+  background:#d84949;color:#fff;font-size:12px;font-weight:900;
+}
+.assignment-mail-popup{
+  position:fixed;right:22px;bottom:22px;z-index:1200;width:min(370px,calc(100vw - 28px));
+  display:grid;grid-template-columns:55px 1fr;gap:12px;padding:15px;
+  border:1px solid #c9d8e4;border-radius:17px;background:#fff;
+  box-shadow:0 18px 45px rgba(34,59,83,.25);
+  animation:mail-arrive .3s ease-out;
+}
+@keyframes mail-arrive{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.mail-popup-top{position:absolute;top:8px;right:9px;display:flex;align-items:center;gap:8px}
+.mail-stamp{padding:3px 7px;border-radius:999px;background:#d94a4a;color:#fff;font-size:10px;font-weight:900}
+.mail-close{border:0;background:transparent;color:#71808e;font-size:19px;cursor:pointer}
+.mail-envelope{display:grid;place-items:center;width:50px;height:50px;border-radius:14px;background:#e9f4ff;font-size:28px}
+.mail-popup-copy{padding-right:42px}
+.mail-popup-copy small{color:#71808e}.mail-popup-copy h2{margin:3px 0 5px;font-size:19px}
+.mail-popup-copy p{margin:0;color:#455764;font-size:14px}
+.mail-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.mail-meta span{padding:3px 7px;border-radius:999px;background:#f0f4f7;color:#60717e;font-size:10px}
+.mail-popup-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}
+.assignment-inbox-dialog{width:min(720px,calc(100vw - 28px))}
+.assignment-inbox-list{display:grid;gap:10px}
+.assignment-mail-item{
+  display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center;
+  padding:13px;border:1px solid #d7e1e9;border-radius:14px;background:#fff;
+}
+.assignment-mail-item.unread{border-left:5px solid #d84949;background:#fffdf8}
+.assignment-mail-item.opened{border-left:5px solid #e3a72d}
+.assignment-mail-item.completed{border-left:5px solid #39a56a;background:#f6fcf8}
+.assignment-mail-symbol{font-size:25px}.assignment-mail-body h3{margin:5px 0}.assignment-mail-body p{margin:0 0 5px;color:#50616d}
+.assignment-send-panel{border-top:5px solid #4b91ca}
+.assignment-send-icon{font-size:42px}
+.assignment-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.assignment-problem-field,.assignment-message-field{grid-column:1/-1}
+.assignment-problem-preview{display:grid;gap:6px;margin:13px 0;padding:13px;border-radius:13px;background:#f2f8fd;border:1px solid #d0e0eb}
+.assignment-problem-preview strong{font-size:18px}.assignment-problem-preview p{margin:0;color:#50616d}
+.assignment-status{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900}
+.assignment-status.unread{background:#ffe8e8;color:#a73535}
+.assignment-status.opened{background:#fff2d2;color:#8c6414}
+.assignment-status.completed{background:#e5f8eb;color:#277a4d}
+@media(max-width:620px){
+  .assignment-mail-popup{right:14px;bottom:14px}
+  .assignment-form-grid{grid-template-columns:1fr}
+  .assignment-problem-field,.assignment-message-field{grid-column:auto}
+  .assignment-mail-item{grid-template-columns:36px 1fr}
+  .assignment-mail-item>button{grid-column:2}
+}
