@@ -1,6 +1,15 @@
 (() => {
   "use strict";
 
+  const APP_VERSION = "12.4";
+  const APP_BUILD_DATE = "2026.07.29";
+  const APP_RELEASE_NOTES = [
+    "日本語表記の分数を教科書型の分数記号へ変換",
+    "半角・全角スラッシュの分数表示を改善",
+    "バージョン番号を1か所で管理",
+    "教師画面にビルド情報と更新内容を表示"
+  ];
+
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
   let appData = loadData();
   let session = null;
@@ -68,8 +77,28 @@
       return key;
     };
 
-    // 帯分数。半角・全角スペース、半角・全角スラッシュに対応。
-    let protectedText = source.replace(
+    let protectedText = source;
+
+    // 日本語の帯分数。「1と2分の1」→ 1 1/2 の教科書型表示。
+    protectedText = protectedText.replace(
+      /(^|[^\d])(\d+)\s*と\s*(\d+)\s*分の\s*(\d+)(?!\d)/g,
+      (match, prefix, whole, denominator, numerator) =>
+        `${prefix}${token(
+          `<span class="mixed-number" role="img" aria-label="${escapeHtml(whole)}と${escapeHtml(denominator)}分の${escapeHtml(numerator)}">`
+          + `<span class="mixed-whole">${escapeHtml(whole)}</span>`
+          + `${fractionMarkup(numerator, denominator, "mixed-fraction")}</span>`
+        )}`
+    );
+
+    // 日本語の分数。「4分の1」では 1 が分子、4 が分母。
+    protectedText = protectedText.replace(
+      /(^|[^\d])(\d+)\s*分の\s*(\d+)(?!\d)/g,
+      (match, prefix, denominator, numerator) =>
+        `${prefix}${token(fractionMarkup(numerator, denominator, "japanese-fraction"))}`
+    );
+
+    // スラッシュ表記の帯分数。半角・全角スペース、半角・全角スラッシュに対応。
+    protectedText = protectedText.replace(
       /(^|[^\d])(\d+)[ \u3000]+(\d+)\s*[\/／]\s*(\d+)(?![\d\/／])/g,
       (match, prefix, whole, numerator, denominator) =>
         `${prefix}${token(
@@ -79,11 +108,11 @@
         )}`
     );
 
-    // 真分数・仮分数。日付やURLの連続スラッシュは対象外。
+    // スラッシュ表記の真分数・仮分数。
     protectedText = protectedText.replace(
       /(^|[^\d\/／])(\d+)\s*[\/／]\s*(\d+)(?![\d\/／])/g,
       (match, prefix, numerator, denominator) =>
-        `${prefix}${token(fractionMarkup(numerator, denominator))}`
+        `${prefix}${token(fractionMarkup(numerator, denominator, "slash-fraction"))}`
     );
 
     let text = escapeHtml(protectedText);
@@ -100,7 +129,8 @@
     const targets = [];
     while (walker.nextNode()) {
       const node = walker.currentNode;
-      if (!/[\/／]/.test(node.nodeValue || "")) continue;
+      const text = node.nodeValue || "";
+      if (!(/[\/／]/.test(text) || /\d+\s*分の\s*\d+/.test(text))) continue;
       if (node.parentElement?.closest(".math-fraction, .mixed-number, input, textarea, option, script, style, code, pre")) continue;
       targets.push(node);
     }
@@ -115,10 +145,20 @@
 
   function formatAllVisibleMath() {
     [
-      "#studentHomeView", "#problemView", "#practiceView", "#profileView",
-      "#teacherView", "#assignmentInboxDialog", "#returnedMarkDialog",
-      "#researchDetailDialog", "#markingImageDialog"
+      "#loginView", "#studentHomeView", "#problemView", "#practiceView",
+      "#profileView", "#teacherView", "#assignmentInboxDialog",
+      "#returnedMarkDialog", "#researchDetailDialog", "#markingImageDialog"
     ].forEach((selector) => formatMathInElement($(selector)));
+  }
+
+  function applyAppMetadata() {
+    document.title = `算数大学 Version ${APP_VERSION}`;
+    $$("[data-app-version]").forEach((element) => {
+      element.textContent = `Version ${APP_VERSION}`;
+    });
+    $$("[data-app-build]").forEach((element) => {
+      element.textContent = `Build ${APP_BUILD_DATE}`;
+    });
   }
 
 
@@ -518,6 +558,7 @@
   });
 
   document.addEventListener("DOMContentLoaded", () => {
+    applyAppMetadata();
     mathObserver.observe(document.body, {
       childList: true,
       subtree: true,
@@ -1873,10 +1914,19 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
         <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
-      <section class="panel" style="margin-top:12px">
-        <h2>Version 12.3.1</h2>
-        <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
-        <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
+      <section class="panel app-build-panel" style="margin-top:12px">
+        <div class="section-head compact">
+          <div>
+            <p class="eyebrow">APP INFORMATION</p>
+            <h2 data-app-version>Version ${APP_VERSION}</h2>
+          </div>
+          <span class="tag" data-app-build>Build ${APP_BUILD_DATE}</span>
+        </div>
+        <h3>今回の更新</h3>
+        <ul class="release-note-list">
+          ${APP_RELEASE_NOTES.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
+        </ul>
+        <p class="notice">画面上のバージョン番号は、今後APP_VERSIONの1か所から自動反映されます。</p>
       </section>`;
   }
 

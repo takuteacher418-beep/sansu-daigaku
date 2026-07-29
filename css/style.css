@@ -647,3 +647,24 @@ ruby[data-auto-ruby="true"] rt{
 .returned-answer-row .math-fraction{
   font-size:1.18em;
 }
+
+
+/* Version 12.4: version metadata and Japanese fraction notation */
+.app-build-panel .section-head{align-items:flex-start}
+.release-note-list{margin:8px 0 14px;padding-left:22px}
+.release-note-list li{margin:7px 0;line-height:1.6}
+.japanese-fraction{
+  margin-left:.18em;
+  margin-right:.18em;
+}
+.choice .math-fraction{
+  font-size:1.24em;
+}
+.choice span:has(.math-fraction){
+  display:inline-flex;
+  align-items:center;
+  min-height:2.1em;
+}
+#practiceQuestion .math-fraction{
+  font-size:1.3em;
+}
