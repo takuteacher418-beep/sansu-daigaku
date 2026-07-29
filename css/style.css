@@ -310,3 +310,17 @@ ruby[data-auto-ruby="true"] rt{
   .avatar-room{grid-template-columns:1fr}
   .avatar-stage{min-height:300px}
 }
+
+
+/* Version 11.9.1: easy language and guaranteed explanation display */
+.easy-choice-guide{
+  margin:0 0 12px;padding:12px 14px;border-radius:12px;
+  background:#fff7d6;border:2px solid #ead16b;color:#4d472b;
+  font-weight:900;line-height:1.7;
+}
+.explanation-choice-list{display:grid;gap:11px}
+.explanation-choice-list .choice{
+  min-height:58px;padding:14px 15px;font-size:1.05rem;line-height:1.75;
+}
+.global-large-text .easy-choice-guide{font-size:1.15rem}
+.global-large-text .explanation-choice-list .choice{font-size:1.22rem}

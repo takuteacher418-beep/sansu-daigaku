@@ -194,15 +194,10 @@
         students: Array.isArray(parsed.students) ? parsed.students : clone(DEFAULT_APP_DATA.students),
         problems: (() => {
           const savedProblems = Array.isArray(parsed.problems) ? parsed.problems : [];
-          const savedById = new Map(savedProblems.map((problem) => [problem.id, problem]));
-          const defaultsWithSavedEdits = clone(DEFAULT_APP_DATA.problems).map((defaultProblem) => ({
-            ...defaultProblem,
-            ...(savedById.get(defaultProblem.id) || {})
-          }));
-          const customProblems = savedProblems.filter((problem) =>
-            !DEFAULT_APP_DATA.problems.some((defaultProblem) => defaultProblem.id === problem.id)
-          );
-          return [...defaultsWithSavedEdits, ...customProblems];
+          const defaultIds = new Set(DEFAULT_APP_DATA.problems.map((problem) => problem.id));
+          const customProblems = savedProblems.filter((problem) => !defaultIds.has(problem.id));
+          // 標準問題は最新版を必ず使う。古い保存データの空欄・説明欠落を引き継がない。
+          return [...clone(DEFAULT_APP_DATA.problems), ...customProblems];
         })()
       };
       merged.students = merged.students.map((student) => ({
@@ -218,19 +213,21 @@
       const defaultProblemById = new Map(DEFAULT_APP_DATA.problems.map((problem) => [problem.id, problem]));
       merged.problems = merged.problems.map((problem) => {
         const fallback = defaultProblemById.get(problem.id) || {};
+        const isDefaultProblem = Boolean(defaultProblemById.get(problem.id));
+        const sourceProblem = isDefaultProblem ? clone(fallback) : problem;
         const normalized = {
-          ...clone(fallback), ...problem,
-          grade: Number(problem.grade || fallback.grade || 5),
-          professor: problem.professor || fallback.professor || "たっくん教授",
-          correctExplanation: problem.correctExplanation || problem.modelAnswer || fallback.correctExplanation || "",
-          distractors: problem.distractors || (problem.choices || []).slice(1) || fallback.distractors || [],
-          choices: problem.choices || fallback.choices || [],
-          blankPhrase: problem.blankPhrase || fallback.blankPhrase || "",
-          blankDistractors: problem.blankDistractors || fallback.blankDistractors || [],
-          clozeText: problem.clozeText || fallback.clozeText || "",
-          practiceKind: problem.practiceKind || fallback.practiceKind || "manual",
-          practiceItems: problem.practiceItems || fallback.practiceItems || [],
-          smallSteps: problem.smallSteps || fallback.smallSteps || []
+          ...clone(fallback), ...sourceProblem,
+          grade: Number(sourceProblem.grade || fallback.grade || 5),
+          professor: sourceProblem.professor || fallback.professor || "たっくん教授",
+          correctExplanation: sourceProblem.correctExplanation || sourceProblem.modelAnswer || fallback.correctExplanation || "",
+          distractors: sourceProblem.distractors || (sourceProblem.choices || []).slice(1) || fallback.distractors || [],
+          choices: sourceProblem.choices || fallback.choices || [],
+          blankPhrase: sourceProblem.blankPhrase || fallback.blankPhrase || "",
+          blankDistractors: sourceProblem.blankDistractors || fallback.blankDistractors || [],
+          clozeText: sourceProblem.clozeText || fallback.clozeText || "",
+          practiceKind: sourceProblem.practiceKind || fallback.practiceKind || "manual",
+          practiceItems: sourceProblem.practiceItems || fallback.practiceItems || [],
+          smallSteps: sourceProblem.smallSteps || fallback.smallSteps || []
         };
         normalized.clozeText = normalizeClozeText(normalized);
         normalized.practiceItems = (normalized.practiceItems || []).map((item) => normalizePracticeItem(item, normalized));
@@ -621,7 +618,8 @@
       $("#prevSentenceBtn").disabled = sentenceIndex === 0;
       $("#nextSentenceBtn").disabled = sentenceIndex === sentences.length - 1;
     } else {
-      content = escapeHtml(profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
+      content = escapeHtml((profile.easy ? activeProblem.simpleQuestion : activeProblem.question)
+        || `「${activeProblem.concept || activeProblem.unit}」の正しいせつめいを1つえらびましょう。`);
       $("#sentenceProgress").classList.add("hidden");
       $("#sentenceNavigation").classList.add("hidden");
     }
@@ -675,9 +673,17 @@
     }));
 
     if (answerMode === "choice") {
-      $("#answerArea").innerHTML = (activeProblem.choices || []).map((choice) =>
-        `<label class="choice explanation-choice"><input type="radio" name="choiceAnswer" value="${choice}" /><span>${choice}</span></label>`
-      ).join("");
+      const explanationChoices = (activeProblem.choices || []).filter((choice) => String(choice || "").trim());
+      const safeChoices = explanationChoices.length >= 2
+        ? explanationChoices
+        : [activeProblem.correctExplanation, ...(activeProblem.distractors || [])].filter((choice) => String(choice || "").trim());
+      $("#answerArea").innerHTML = `
+        <div class="easy-choice-guide">三つの文をゆっくり読み、いちばん合う文を1つえらびましょう。</div>
+        <div class="explanation-choice-list">
+          ${safeChoices.map((choice) =>
+            `<label class="choice explanation-choice"><input type="radio" name="choiceAnswer" value="${escapeHtml(choice)}" /><span>${escapeHtml(choice)}</span></label>`
+          ).join("")}
+        </div>`;
     } else {
       const options = shuffle([activeProblem.blankPhrase, ...(activeProblem.blankDistractors || [])].filter(Boolean));
       const fullClozeText = normalizeClozeText(activeProblem);
@@ -1179,7 +1185,7 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.9</h2>
+        <h2>Version 11.9.1</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
