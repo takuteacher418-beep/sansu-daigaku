@@ -1,19 +1,18 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "13.0-phase3";
+  const APP_VERSION = "13.0";
   const APP_BUILD_DATE = "2026.07.30";
+  const DATA_SCHEMA_VERSION = 13;
+  const RUNTIME_ERROR_KEY = "sansuDaigakuRuntimeErrors";
   const APP_RELEASE_NOTES = [
-    "日本語表記の分数を教科書型の分数記号へ変換",
-    "半角・全角スラッシュの分数表示を改善",
-    "バージョン番号を1か所で管理",
-    "教師画面にビルド情報と更新内容を表示",
-    "分数同士の演算記号を分数線の中央に配置",
-    "CSS・JavaScriptが読み込まれない表示崩れを修正",
-    "児童ホーム画面をLDに配慮した大きなカードUIへ全面刷新",
-    "既存の学習・課題・プロフィール機能との接続を維持",
-    "キャンパス成長・レベルアップ・実績解放の演出を追加",
-    "視覚過敏に配慮して演出を自動短縮できる設定へ対応"
+    "LDに配慮した児童ホーム画面へ全面刷新",
+    "5段階で成長する魔法大学キャンパスを実装",
+    "レベルアップ・キャンパス解放・実績演出を追加",
+    "既存データを保護する自動修復処理を追加",
+    "児童編集時にキャンパス・実績情報が消える不具合を修正",
+    "教師画面にシステム確認とデータ整合性チェックを追加",
+    "PC・タブレット・スマートフォン表示を最終調整"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
@@ -180,6 +179,16 @@
     });
   }
 
+
+
+  window.addEventListener("error", (event) => {
+    recordRuntimeError(event.message, event.filename);
+    $("#runtimeErrorNotice")?.classList.remove("hidden");
+  });
+  window.addEventListener("unhandledrejection", (event) => {
+    recordRuntimeError(event.reason?.message || event.reason || "Promise error", "unhandledrejection");
+    $("#runtimeErrorNotice")?.classList.remove("hidden");
+  });
 
   function dataUrlIsImage(value) {
     return typeof value === "string" && value.startsWith("data:image/");
@@ -586,6 +595,84 @@
     formatAllVisibleMath();
   });
 
+
+  function normalizeAppData(rawData) {
+    const source = rawData && typeof rawData === "object" ? rawData : {};
+    const normalized = {
+      ...source,
+      schemaVersion: DATA_SCHEMA_VERSION,
+      students: Array.isArray(source.students) ? source.students : [],
+      problems: Array.isArray(source.problems) ? source.problems : [],
+      professors: Array.isArray(source.professors) ? source.professors : [],
+      submissions: Array.isArray(source.submissions) ? source.submissions : []
+    };
+    normalized.students = normalized.students.map((student, index) => {
+      const safe = student && typeof student === "object" ? student : {};
+      return {
+        ...safe,
+        id: String(safe.id || `student-${index + 1}`),
+        name: String(safe.name || `児童${index + 1}`),
+        grade: Math.min(6, Math.max(1, Number(safe.grade || 5))),
+        loginId: String(safe.loginId || `student${index + 1}`),
+        password: String(safe.password || "1234"),
+        xp: Math.max(0, Number(safe.xp || 0)),
+        points: Math.max(0, Number(safe.points || 0)),
+        history: Array.isArray(safe.history) ? safe.history.filter(Boolean) : [],
+        assignments: Array.isArray(safe.assignments) ? safe.assignments.filter(Boolean) : [],
+        profile: safe.profile && typeof safe.profile === "object" ? { ...safe.profile } : {}
+      };
+    });
+    normalized.problems = normalized.problems.filter(Boolean).map((problem, index) => ({
+      ...problem,
+      id: String(problem.id || `problem-${index + 1}`),
+      grade: Math.min(6, Math.max(1, Number(problem.grade || 5))),
+      title: String(problem.title || "問題"),
+      unit: String(problem.unit || "その他"),
+      choices: Array.isArray(problem.choices) ? problem.choices : [],
+      distractors: Array.isArray(problem.distractors) ? problem.distractors : [],
+      practiceItems: Array.isArray(problem.practiceItems) ? problem.practiceItems : []
+    }));
+    return normalized;
+  }
+
+  function dataIntegrityReport(data = appData) {
+    const checks = [];
+    const add = (label, ok, detail) => checks.push({ label, ok:Boolean(ok), detail:String(detail || "") });
+    add("児童データ", Array.isArray(data.students), `${data.students?.length || 0}人`);
+    add("問題データ", Array.isArray(data.problems) && data.problems.length > 0, `${data.problems?.length || 0}問`);
+    add("教授データ", Array.isArray(data.professors) && data.professors.length > 0, `${data.professors?.length || 0}人`);
+    add("提出データ", Array.isArray(data.submissions), `${data.submissions?.length || 0}件`);
+    const studentIds = (data.students || []).map((student) => student.id);
+    const loginIds = (data.students || []).map((student) => student.loginId);
+    add("児童IDの重複", new Set(studentIds).size === studentIds.length, "重複がないこと");
+    add("ログインIDの重複", new Set(loginIds).size === loginIds.length, "重複がないこと");
+    const problemIds = new Set((data.problems || []).map((problem) => problem.id));
+    const brokenHistory = (data.students || []).flatMap((student) =>
+      (student.history || []).filter((item) => item.problemId && !problemIds.has(item.problemId))
+    ).length;
+    add("学習履歴の問題参照", brokenHistory === 0, brokenHistory ? `${brokenHistory}件の参照切れ` : "正常");
+    add("キャンパス画像設定", CAMPUS_STAGES.every((stage) => Boolean(stage.image)), `${CAMPUS_STAGES.length}段階`);
+    const requiredDomIds = ["studentHomeView","startRecommendationBtn","campusGrowthImage","problemList","teacherView","teacherContent","campusDetailDialog","levelUpDialog","achievementDialog"];
+    const missingDom = requiredDomIds.filter((id) => !document.getElementById(id));
+    add("主要画面部品", missingDom.length === 0, missingDom.length ? `不足: ${missingDom.join(", ")}` : "正常");
+    return checks;
+  }
+
+  function repairAndSaveData() {
+    appData = normalizeAppData(appData);
+    appData.students.forEach(ensureCampusProfile);
+    saveData();
+    return dataIntegrityReport(appData);
+  }
+
+  function recordRuntimeError(message, source = "") {
+    try {
+      const existing = JSON.parse(localStorage.getItem(RUNTIME_ERROR_KEY) || "[]");
+      existing.unshift({ date:new Date().toISOString(), message:String(message || "不明なエラー").slice(0,500), source:String(source || "").slice(0,200) });
+      localStorage.setItem(RUNTIME_ERROR_KEY, JSON.stringify(existing.slice(0,20)));
+    } catch (_) {}
+  }
+
   function loadData() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -642,10 +729,10 @@
         return normalized;
       });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-      return merged;
+      return normalizeAppData(merged);
     } catch (error) {
       console.error(error);
-      return clone(DEFAULT_APP_DATA);
+      return normalizeAppData(clone(DEFAULT_APP_DATA));
     }
   }
   function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
@@ -654,6 +741,16 @@
     toast.textContent = message;
     toast.classList.add("show");
     window.setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+  function safeShowModal(dialog) {
+    if (!dialog || typeof dialog.showModal !== "function") return false;
+    if (!dialog.open) dialog.showModal();
+    return true;
+  }
+  function closeAllDialogs() {
+    $$("dialog[open]").forEach((dialog) => { try { dialog.close(); } catch (_) {} });
+    window.pendingCampusUnlock = null;
+    window.pendingAchievements = null;
   }
   function showPage(pageId) {
     ["studentHomeView", "problemView", "practiceView", "profileView", "teacherView"].forEach((id) => {
@@ -858,7 +955,7 @@
     $("#achievementContent").innerHTML = `
       <div class="achievement-intro">がんばりが新しい実績になりました！</div>
       <div class="achievement-grid">${achievements.map(renderAchievementCard).join("")}</div>`;
-    $("#achievementDialog").showModal();
+    safeShowModal($("#achievementDialog"));
     playCampusCelebration("achievement");
   }
 
@@ -875,7 +972,7 @@
       <p>今日のがんばりが、キャンパスを育てる力になりました。</p>`;
     student.profile.lastSeenLevel = currentLevel;
     saveData();
-    $("#levelUpDialog").showModal();
+    safeShowModal($("#levelUpDialog"));
     playCampusCelebration("level");
     return true;
   }
@@ -917,7 +1014,7 @@
           }).join("")}
         </div>
       </section>`;
-    $("#campusDetailDialog").showModal();
+    safeShowModal($("#campusDetailDialog"));
     $("#reduceMotionField")?.addEventListener("change", (event) => {
       student.profile.reduceMotion = event.target.checked;
       saveData();
@@ -945,7 +1042,7 @@
     saveData();
     $("#campusNewBadge").classList.remove("hidden");
     window.setTimeout(() => $("#campusNewBadge").classList.add("hidden"), 5000);
-    $("#campusUnlockDialog").showModal();
+    safeShowModal($("#campusUnlockDialog"));
     playCampusCelebration("campus");
   }
 
@@ -1016,7 +1113,9 @@
   });
 
   $("#logoutBtn").addEventListener("click", () => {
+    closeAllDialogs();
     session = null;
+    document.body.classList.remove("v13-student-home-active");
     $("#appView").classList.add("hidden");
     $("#loginView").classList.remove("hidden");
   });
@@ -1037,6 +1136,15 @@
     const labels = profileLabels(student.profile);
     const recommendation = chooseRecommendation(student);
 
+    if (!recommendation) {
+      $("#studentDisplayName").textContent = student.name + " さん";
+      $("#recommendationBox").innerHTML = "<p>現在、挑戦できる問題がありません。先生に確認してください。</p>";
+      $("#homeRecommendationTitle").textContent = "問題が登録されていません";
+      $("#startRecommendationBtn").disabled = true;
+      $("#problemList").innerHTML = '<p class="notice">問題が登録されていません。</p>';
+      return;
+    }
+    $("#startRecommendationBtn").disabled = false;
     $("#studentDisplayName").textContent = student.name + " さん";
     $("#studentLevel").textContent = level;
     const campusProgress = campusProgressForStudent(student);
@@ -1198,7 +1306,7 @@
 
   $("#assignmentInboxBtn").addEventListener("click", () => {
     renderAssignmentInbox();
-    $("#assignmentInboxDialog").showModal();
+    safeShowModal($("#assignmentInboxDialog"));
   });
   $("#closeAssignmentInboxBtn").addEventListener("click", () => $("#assignmentInboxDialog").close());
   $("#openAssignmentBtn").addEventListener("click", () => {
@@ -1276,12 +1384,12 @@
         </div>
         <button id="closeReturnedFromContentBtn" class="btn primary large full" type="button">わかりました</button>
       </article>`;
-    $("#returnedMarkDialog").showModal();
+    safeShowModal($("#returnedMarkDialog"));
     $("#closeReturnedFromContentBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
     const handwritingButton = $("#openMarkingImageBtn");
     if (handwritingButton) handwritingButton.addEventListener("click", () => {
       $("#markingImageLarge").src = submission.markingImage;
-      $("#markingImageDialog").showModal();
+      safeShowModal($("#markingImageDialog"));
     });
     popupReturnedSubmissionId = null;
     scheduleAccessibility();
@@ -2185,7 +2293,7 @@
           <div class="professor-problem-list">${assignedProblems.length ? assignedProblems.map((problem) => `<span>${problem.title}</span>`).join("") : "<span>今後追加予定</span>"}</div>
         </div>
       </div>`;
-    $("#professorDetailDialog").showModal();
+    safeShowModal($("#professorDetailDialog"));
   }
 
   function openAvatarDialog() {
@@ -2194,7 +2302,7 @@
     $("#avatarDialogImage").src = avatarImageForStudent(student);
     $("#avatarDialogName").textContent = student.name + " さん";
     $("#avatarDialogLevel").textContent = `学生レベル ${levelFromXp(student.xp)}｜${student.points} pt`;
-    $("#avatarDialog").showModal();
+    safeShowModal($("#avatarDialog"));
     scheduleAccessibility();
   }
   $("#studentAvatarBtn").addEventListener("click", openAvatarDialog);
@@ -2202,7 +2310,7 @@
 
   $("#openProfessorListBtn").addEventListener("click", () => {
     renderProfessorGallery();
-    $("#professorDialog").showModal();
+    safeShowModal($("#professorDialog"));
   });
   $("#closeProfessorDialogBtn").addEventListener("click", () => $("#professorDialog").close());
   $("#closeProfessorDetailBtn").addEventListener("click", () => $("#professorDetailDialog").close());
@@ -2250,8 +2358,34 @@
         <ul class="release-note-list">
           ${APP_RELEASE_NOTES.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
         </ul>
-        <p class="notice">画面上のバージョン番号は、今後APP_VERSIONの1か所から自動反映されます。</p>
+        <p class="notice">画面上のバージョン番号は、APP_VERSIONの1か所から自動反映されます。</p>
+      </section>
+      <section class="panel system-check-panel">
+        <div class="section-head">
+          <div><p class="eyebrow">SYSTEM CHECK</p><h2>システム確認</h2><p class="muted">データや主要画面の状態を確認します。</p></div>
+          <button id="runSystemCheckBtn" class="btn primary" type="button">確認を実行</button>
+        </div>
+        <div id="systemCheckResults" class="system-check-results"><p class="notice">「確認を実行」を押してください。</p></div>
+        <div class="system-check-actions">
+          <button id="repairDataBtn" class="btn soft" type="button">データを安全に整える</button>
+          <button id="clearRuntimeErrorsBtn" class="btn ghost" type="button">エラー記録を消す</button>
+        </div>
       </section>`;
+    const renderChecks = (checks) => {
+      let runtimeErrors = [];
+      try { runtimeErrors = JSON.parse(localStorage.getItem(RUNTIME_ERROR_KEY) || "[]"); } catch (_) {}
+      $("#systemCheckResults").innerHTML = `
+        <div class="system-check-grid">
+          ${checks.map((check) => `<div class="system-check-item ${check.ok ? "ok" : "warning"}">
+            <span>${check.ok ? "✓" : "!"}</span>
+            <div><strong>${escapeHtml(check.label)}</strong><small>${escapeHtml(check.detail)}</small></div>
+          </div>`).join("")}
+        </div>
+        <p class="runtime-error-summary ${runtimeErrors.length ? "has-errors" : ""}">ブラウザのエラー記録：${runtimeErrors.length}件</p>`;
+    };
+    $("#runSystemCheckBtn").addEventListener("click", () => { renderChecks(dataIntegrityReport()); showToast("システム確認が完了しました"); });
+    $("#repairDataBtn").addEventListener("click", () => { renderChecks(repairAndSaveData()); showToast("データを安全な形式に整えました"); });
+    $("#clearRuntimeErrorsBtn").addEventListener("click", () => { localStorage.removeItem(RUNTIME_ERROR_KEY); renderChecks(dataIntegrityReport()); showToast("エラー記録を消しました"); });
   }
 
   function renderTeacherStudents() {
@@ -2938,7 +3072,7 @@
             <li>支援を減らしても同じ水準で解けるようになっているか。</li>
           </ul>
         </section>`;
-      $("#researchDetailDialog").showModal();
+      safeShowModal($("#researchDetailDialog"));
     }
 
     $("#analysisGradeField").value = String(defaultGrade);
@@ -2962,7 +3096,7 @@
     $("#supportVisual").checked = Boolean(profile.visual);
     $("#supportSteps").checked = Boolean(profile.steps);
     $("#supportEasy").checked = Boolean(profile.easy);
-    $("#studentDialog").showModal();
+    safeShowModal($("#studentDialog"));
   }
 
   $("#closeStudentDialogBtn").addEventListener("click", () => $("#studentDialog").close());
@@ -2980,6 +3114,7 @@
       points: existing?.points || 0,
       history: existing?.history || [],
       profile: {
+        ...(existing?.profile || {}),
         audio: $("#supportAudio").checked,
         ruby: $("#supportRuby").checked,
         large: $("#supportLarge").checked,
@@ -3023,7 +3158,7 @@
       $("#practiceChoices" + number).value = ordered.join("\n");
     });
     updatePracticeBuilderVisibility();
-    $("#problemDialog").showModal();
+    safeShowModal($("#problemDialog"));
   }
 
   function updatePracticeBuilderVisibility() {
@@ -3076,5 +3211,7 @@
     if (existing) Object.assign(existing,problem); else appData.problems.push(problem);
     saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と実際に解く確認問題を作成しました");
   });
+
+  $("#dismissRuntimeErrorBtn")?.addEventListener("click", () => $("#runtimeErrorNotice").classList.add("hidden"));
 
 })();

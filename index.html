@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 13.0-phase3</title>
-  <link rel="stylesheet" href="css/style.css?v=13.0-phase3" />
+  <title>算数大学 Version 13.0</title>
+  <link rel="stylesheet" href="css/style.css?v=13.0" />
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
+  <div id="runtimeErrorNotice" class="runtime-error-notice hidden" role="alert">
+    <strong>画面の読み込みで問題が起きました</strong>
+    <span>ページを再読み込みしてください。続く場合は教師画面の「システム確認」を開いてください。</span>
+    <button id="dismissRuntimeErrorBtn" type="button">閉じる</button>
+  </div>
 
   <section id="loginView" class="login-view">
     <div class="login-shell">
@@ -555,7 +560,7 @@
     </form>
   </dialog>
 
-  <script src="js/data.js?v=13.0-phase3"></script>
-  <script src="js/app.js?v=13.0-phase3"></script>
+  <script src="js/data.js?v=13.0"></script>
+  <script src="js/app.js?v=13.0"></script>
 </body>
 </html>
