@@ -26,6 +26,158 @@
   const $$ = (selector) => [...document.querySelectorAll(selector)];
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[character]));
+  }
+
+  function normalizeClozeText(problem) {
+    const existing = String(problem.clozeText || "").trim();
+    if (existing.includes("［　］") && existing.replace("［　］", "").trim().length >= 4) return existing;
+    const explanation = String(problem.correctExplanation || "").trim();
+    const phrase = String(problem.blankPhrase || "").trim();
+    if (explanation && phrase && explanation.includes(phrase)) return explanation.replace(phrase, "［　］");
+    if (explanation) return `${explanation}<br>大切な言葉は［　］です。`;
+    return `${problem.concept || "算数の言葉"}について、［　］に入る言葉を選びましょう。`;
+  }
+
+  function normalizePracticeItem(item, problem) {
+    const normalized = { ...item };
+    normalized.prompt = String(normalized.prompt || `${problem.concept || "この内容"}を使って答えましょう。`).trim();
+    if (normalized.type === "cloze") {
+      const text = String(normalized.clozeText || "").trim();
+      normalized.clozeText = text.includes("［　］") && text.replace("［　］", "").trim().length >= 2
+        ? text : `${normalized.prompt}<br>答えは［　］です。`;
+      normalized.blankChoices = Array.isArray(normalized.blankChoices) ? normalized.blankChoices.filter(Boolean) : [];
+      if (normalized.blankCorrect && !normalized.blankChoices.includes(normalized.blankCorrect)) {
+        normalized.blankChoices.unshift(normalized.blankCorrect);
+      }
+    }
+    return normalized;
+  }
+
+  const FURIGANA_DICTIONARY = [
+    ["先生からの課題","せんせいからのかだい"],["問題を選んで挑戦しよう","もんだいをえらんでちょうせんしよう"],
+    ["文字を大きく","もじをおおきく"],["今日のおすすめ問題","きょうのおすすめもんだい"],
+    ["成長の記録","せいちょうのきろく"],["教授一覧","きょうじゅいちらん"],
+    ["算数大学","さんすうだいがく"],["個別課題","こべつかだい"],["取り組み中","とりくみちゅう"],
+    ["問題管理","もんだいかんり"],["支援分析","しえんぶんせき"],["単位量あたり","たんいりょうあたり"],
+    ["小数のかけ算","しょうすうのかけざん"],["小数のたし算","しょうすうのたしざん"],
+    ["小数のひき算","しょうすうのひきざん"],["分数のかけ算","ぶんすうのかけざん"],
+    ["分数のわり算","ぶんすうのわりざん"],["わり算の筆算","わりざんのひっさん"],
+    ["かけ算の筆算","かけざんのひっさん"],["たし算の筆算","たしざんのひっさん"],
+    ["直方体","ちょくほうたい"],["立方体","りっぽうたい"],["折れ線グラフ","おれせんグラフ"],
+    ["棒グラフ","ぼうグラフ"],["線対称","せんたいしょう"],["点対称","てんたいしょう"],
+    ["四捨五入","ししゃごにゅう"],["単位量","たんいりょう"],["百分率","ひゃくぶんりつ"],
+    ["平均値","へいきんち"],["中央値","ちゅうおうち"],["最頻値","さいひんち"],["代表値","だいひょうち"],
+    ["正方形","せいほうけい"],["長方形","ちょうほうけい"],["三角形","さんかくけい"],["四角形","しかくけい"],
+    ["円周率","えんしゅうりつ"],["底面積","ていめんせき"],["平行","へいこう"],["垂直","すいちょく"],
+    ["一の位","いちのくらい"],["十の位","じゅうのくらい"],["百の位","ひゃくのくらい"],
+    ["学び方","まなびかた"],["進め方","すすめかた"],["自分で解く","じぶんでとく"],
+    ["少しずつ","すこしずつ"],["読み上げ","よみあげ"],["一文ずつ","いちぶんずつ"],
+    ["読む場所","よむばしょ"],["正しい説明","ただしいせつめい"],["穴を埋める","あなをうめる"],
+    ["説明を使って","せつめいをつかって"],["答えを確かめる","こたえをたしかめる"],
+    ["新しい課題","あたらしいかだい"],["あとで見る","あとでみる"],["課題を開く","かだいをひらく"],
+    ["児童","じどう"],["教師","きょうし"],["先生","せんせい"],["課題","かだい"],["問題","もんだい"],
+    ["算数","さんすう"],["大学","だいがく"],["学年","がくねん"],["年生","ねんせい"],["単元","たんげん"],
+    ["挑戦","ちょうせん"],["未挑戦","みちょうせん"],["今日","きょう"],["成長","せいちょう"],["記録","きろく"],
+    ["研究","けんきゅう"],["教授","きょうじゅ"],["一覧","いちらん"],["説明","せつめい"],["正しい","ただしい"],
+    ["選ぶ","えらぶ"],["文字","もじ"],["答え","こたえ"],["確かめる","たしかめる"],["練習","れんしゅう"],
+    ["理解","りかい"],["表示","ひょうじ"],["設定","せってい"],["音声","おんせい"],["大きく","おおきく"],
+    ["全体","ぜんたい"],["前の文","まえのぶん"],["次の文","つぎのぶん"],["強調","きょうちょう"],
+    ["手順","てじゅん"],["考える","かんがえる"],["図形","ずけい"],["計算","けいさん"],["数量","すうりょう"],
+    ["大きさ","おおきさ"],["同じ","おなじ"],["違い","ちがい"],["合わせた","あわせた"],["残り","のこり"],
+    ["分ける","わける"],["全部","ぜんぶ"],["一の位","いちのくらい"],["位","くらい"],["億","おく"],["兆","ちょう"],
+    ["概数","がいすう"],["切り捨て","きりすて"],["切り上げ","きりあげ"],["筆算","ひっさん"],
+    ["繰り上がり","くりあがり"],["くり下がり","くりさがり"],["加える","くわえる"],["引く","ひく"],
+    ["足す","たす"],["割る","わる"],["かけ算","かけざん"],["たし算","たしざん"],["ひき算","ひきざん"],
+    ["わり算","わりざん"],["九九","くく"],["整数","せいすう"],["小数","しょうすう"],["分数","ぶんすう"],
+    ["分母","ぶんぼ"],["分子","ぶんし"],["通分","つうぶん"],["約分","やくぶん"],["平均","へいきん"],
+    ["割合","わりあい"],["比","ひ"],["比例","ひれい"],["反比例","はんぴれい"],["速さ","はやさ"],
+    ["道のり","みちのり"],["時間","じかん"],["時刻","じこく"],["時計","とけい"],["長さ","ながさ"],
+    ["重さ","おもさ"],["面積","めんせき"],["体積","たいせき"],["角度","かくど"],["直角","ちょっかく"],
+    ["合同","ごうどう"],["対称","たいしょう"],["中心","ちゅうしん"],["円周","えんしゅう"],
+    ["半径","はんけい"],["直径","ちょっけい"],["角柱","かくちゅう"],["円柱","えんちゅう"],
+    ["高さ","たかさ"],["頂点","ちょうてん"],["目盛り","めもり"],["変化","へんか"],["等号","とうごう"],
+    ["左側","ひだりがわ"],["右側","みぎがわ"],["合計","ごうけい"],["個数","こすう"],["何倍","なんばい"],
+    ["何番目","なんばんめ"],["順番","じゅんばん"],["大切","たいせつ"],["言葉","ことば"],["意味","いみ"],
+    ["方法","ほうほう"],["使い方","つかいかた"],["配信","はいしん"],["未読","みどく"],["完了","かんりょう"],
+    ["取り組む","とりくむ"],["届きました","とどきました"],["新しい","あたらしい"],["開く","ひらく"],
+    ["戻る","もどる"],["入る","はいる"],["登録","とうろく"],["選択","せんたく"],["確認","かくにん"],
+    ["今回","こんかい"],["正解","せいかい"],["得点","とくてん"],["難易度","なんいど"],["画面","がめん"],
+    ["結果","けっか"],["支援","しえん"],["分析","ぶんせき"],["概要","がいよう"],["管理","かんり"]
+  ].sort((a,b) => b[0].length - a[0].length);
+
+  function furiganaHtml(text) {
+    const source = String(text ?? "");
+    let output = "", index = 0;
+    while (index < source.length) {
+      let found = null;
+      for (const pair of FURIGANA_DICTIONARY) {
+        if (source.startsWith(pair[0], index)) { found = pair; break; }
+      }
+      if (found) {
+        output += `<ruby data-auto-ruby="true" data-base-text="${escapeHtml(found[0])}">${escapeHtml(found[0])}<rt>${escapeHtml(found[1])}</rt></ruby>`;
+        index += found[0].length;
+      } else {
+        output += escapeHtml(source[index]);
+        index += 1;
+      }
+    }
+    return output;
+  }
+
+  function unwrapGeneratedRuby(root) {
+    root.querySelectorAll("ruby[data-auto-ruby='true']").forEach((ruby) => {
+      ruby.replaceWith(document.createTextNode(ruby.dataset.baseText || ruby.firstChild?.textContent || ""));
+    });
+  }
+
+  let accessibilityApplying = false;
+  function applyAccessibility() {
+    if (!session || session.role !== "student") return;
+    const student = currentStudent();
+    if (!student) return;
+    const rubyEnabled = Boolean(student.profile.ruby);
+    const largeEnabled = Boolean(student.profile.large);
+    document.body.classList.toggle("global-large-text", largeEnabled);
+    $("#globalAccessibilityTools").classList.remove("hidden");
+
+    ["globalFuriganaBtn","furiganaBtn"].forEach((id) => {
+      const button = $("#" + id);
+      if (button) { button.classList.toggle("active", rubyEnabled); button.setAttribute("aria-pressed", String(rubyEnabled)); }
+    });
+    ["globalLargeTextBtn","largeTextBtn"].forEach((id) => {
+      const button = $("#" + id);
+      if (button) { button.classList.toggle("active", largeEnabled); button.setAttribute("aria-pressed", String(largeEnabled)); }
+    });
+
+    accessibilityApplying = true;
+    [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+      unwrapGeneratedRuby(root);
+      if (!rubyEnabled) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode, parent = node.parentElement;
+        if (!parent || !node.nodeValue.trim() || !/[一-龯々]/.test(node.nodeValue)) continue;
+        if (parent.closest("ruby,rt,script,style,textarea,input,select,option,[data-no-ruby]")) continue;
+        nodes.push(node);
+      }
+      nodes.forEach((node) => node.replaceWith(document.createRange().createContextualFragment(furiganaHtml(node.nodeValue))));
+    });
+    accessibilityApplying = false;
+  }
+
+  let accessibilityTimer = null;
+  function scheduleAccessibility() {
+    if (accessibilityApplying || !session || session.role !== "student") return;
+    clearTimeout(accessibilityTimer);
+    accessibilityTimer = setTimeout(applyAccessibility, 0);
+  }
   function loadData() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -61,21 +213,27 @@
           ...student.profile
         }
       }));
-      merged.problems = merged.problems.map((problem, index) => ({
-        ...clone(DEFAULT_APP_DATA.problems[index] || {}),
-        ...problem,
-        grade: Number(problem.grade || DEFAULT_APP_DATA.problems[index]?.grade || 5),
-        professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授",
-        correctExplanation: problem.correctExplanation || problem.modelAnswer || DEFAULT_APP_DATA.problems[index]?.correctExplanation || "",
-        distractors: problem.distractors || (problem.choices || []).slice(1) || DEFAULT_APP_DATA.problems[index]?.distractors || [],
-        choices: problem.choices || DEFAULT_APP_DATA.problems[index]?.choices || [],
-        blankPhrase: problem.blankPhrase || DEFAULT_APP_DATA.problems[index]?.blankPhrase || "",
-        blankDistractors: problem.blankDistractors || DEFAULT_APP_DATA.problems[index]?.blankDistractors || [],
-        clozeText: problem.clozeText || DEFAULT_APP_DATA.problems[index]?.clozeText || "",
-        practiceKind: problem.practiceKind || DEFAULT_APP_DATA.problems[index]?.practiceKind || "manual",
-        practiceItems: problem.practiceItems || DEFAULT_APP_DATA.problems[index]?.practiceItems || [],
-        smallSteps: problem.smallSteps || DEFAULT_APP_DATA.problems[index]?.smallSteps || []
-      }));
+      const defaultProblemById = new Map(DEFAULT_APP_DATA.problems.map((problem) => [problem.id, problem]));
+      merged.problems = merged.problems.map((problem) => {
+        const fallback = defaultProblemById.get(problem.id) || {};
+        const normalized = {
+          ...clone(fallback), ...problem,
+          grade: Number(problem.grade || fallback.grade || 5),
+          professor: problem.professor || fallback.professor || "たっくん教授",
+          correctExplanation: problem.correctExplanation || problem.modelAnswer || fallback.correctExplanation || "",
+          distractors: problem.distractors || (problem.choices || []).slice(1) || fallback.distractors || [],
+          choices: problem.choices || fallback.choices || [],
+          blankPhrase: problem.blankPhrase || fallback.blankPhrase || "",
+          blankDistractors: problem.blankDistractors || fallback.blankDistractors || [],
+          clozeText: problem.clozeText || fallback.clozeText || "",
+          practiceKind: problem.practiceKind || fallback.practiceKind || "manual",
+          practiceItems: problem.practiceItems || fallback.practiceItems || [],
+          smallSteps: problem.smallSteps || fallback.smallSteps || []
+        };
+        normalized.clozeText = normalizeClozeText(normalized);
+        normalized.practiceItems = (normalized.practiceItems || []).map((item) => normalizePracticeItem(item, normalized));
+        return normalized;
+      });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       return merged;
     } catch (error) {
@@ -94,6 +252,7 @@
     ["studentHomeView", "problemView", "practiceView", "profileView", "teacherView"].forEach((id) => {
       $("#" + id).classList.toggle("hidden", id !== pageId);
     });
+    scheduleAccessibility();
   }
   function currentStudent() {
     return appData.students.find((student) => student.id === session?.studentId);
@@ -125,8 +284,11 @@
     $("#loginView").classList.add("hidden");
     $("#appView").classList.remove("hidden");
     if (session.role === "teacher") {
+      $("#globalAccessibilityTools").classList.add("hidden");
+      document.body.classList.remove("global-large-text");
       $("#sessionInfo").innerHTML = "<strong>教師モード</strong><small>児童と問題を管理します</small>";
     } else {
+      $("#globalAccessibilityTools").classList.remove("hidden");
       const student = currentStudent();
       $("#sessionInfo").innerHTML = `<strong>${student.name} さん</strong><small>${student.grade}年生</small>`;
     }
@@ -393,18 +555,17 @@
   function renderQuestionText() {
     const profile = currentStudent().profile;
     const sentences = getProblemSentences();
-    const useRuby = profile.ruby && !sentenceMode && activeProblem.rubyText;
     let content;
 
     if (sentenceMode && sentences.length) {
-      content = `<span class="focused-sentence">${sentences[sentenceIndex]}</span>`;
+      content = `<span class="focused-sentence">${escapeHtml(sentences[sentenceIndex])}</span>`;
       $("#sentenceProgress").textContent = `${sentenceIndex + 1} / ${sentences.length} 文`;
       $("#sentenceProgress").classList.remove("hidden");
       $("#sentenceNavigation").classList.remove("hidden");
       $("#prevSentenceBtn").disabled = sentenceIndex === 0;
       $("#nextSentenceBtn").disabled = sentenceIndex === sentences.length - 1;
     } else {
-      content = useRuby ? activeProblem.rubyText : (profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
+      content = escapeHtml(profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
       $("#sentenceProgress").classList.add("hidden");
       $("#sentenceNavigation").classList.add("hidden");
     }
@@ -413,6 +574,7 @@
     $("#questionText").classList.toggle("ruby-on", profile.ruby);
     $("#questionText").classList.toggle("large", profile.large);
     $("#questionText").classList.toggle("line-focus", lineFocusMode);
+    scheduleAccessibility();
   }
 
   function renderProblem() {
@@ -462,10 +624,14 @@
       ).join("");
     } else {
       const options = shuffle([activeProblem.blankPhrase, ...(activeProblem.blankDistractors || [])].filter(Boolean));
+      const fullClozeText = normalizeClozeText(activeProblem);
+      const clozeHtml = fullClozeText.split("<br>").map((part) => escapeHtml(part)).join("<br>")
+        .replace("［　］", '<span id="clozeBlank" class="cloze-blank">ここを選ぶ</span>');
       $("#answerArea").innerHTML = `
         <div class="cloze-card">
-          <p>${(activeProblem.clozeText || activeProblem.correctExplanation || "").replace("［　］", '<span id="clozeBlank" class="cloze-blank">ここを選ぶ</span>')}</p>
-          <div class="cloze-options">${options.map((option) => `<button class="cloze-option" data-value="${option}" type="button">${option}</button>`).join("")}</div>
+          <p class="cloze-instruction"><strong>［　］に入る言葉を選びましょう。</strong></p>
+          <p class="cloze-full-text">${clozeHtml}</p>
+          <div class="cloze-options">${options.map((option) => `<button class="cloze-option" data-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`).join("")}</div>
           <input id="clozeAnswer" type="hidden" />
         </div>`;
       $$(".cloze-option").forEach((button) => button.addEventListener("click", () => {
@@ -599,18 +765,26 @@
     hintCount += 1;
     supportUsage.hint = true;
   });
-  $("#furiganaBtn").addEventListener("click", () => {
-    currentStudent().profile.ruby = !currentStudent().profile.ruby;
-    supportUsage.ruby = currentStudent().profile.ruby;
-    renderQuestionText();
-    $("#furiganaBtn").classList.toggle("active", currentStudent().profile.ruby);
-  });
-  $("#largeTextBtn").addEventListener("click", () => {
-    currentStudent().profile.large = !currentStudent().profile.large;
-    supportUsage.large = currentStudent().profile.large;
-    renderQuestionText();
-    $("#largeTextBtn").classList.toggle("active", currentStudent().profile.large);
-  });
+  function toggleFurigana() {
+    const student = currentStudent();
+    if (!student) return;
+    student.profile.ruby = !student.profile.ruby;
+    supportUsage.ruby = student.profile.ruby;
+    saveData();
+    applyAccessibility();
+  }
+  function toggleLargeText() {
+    const student = currentStudent();
+    if (!student) return;
+    student.profile.large = !student.profile.large;
+    supportUsage.large = student.profile.large;
+    saveData();
+    applyAccessibility();
+  }
+  $("#furiganaBtn").addEventListener("click", toggleFurigana);
+  $("#largeTextBtn").addEventListener("click", toggleLargeText);
+  $("#globalFuriganaBtn").addEventListener("click", toggleFurigana);
+  $("#globalLargeTextBtn").addEventListener("click", toggleLargeText);
   $("#sentenceModeBtn").addEventListener("click", () => {
     sentenceMode = !sentenceMode;
     sentenceIndex = 0;
@@ -780,22 +954,27 @@
     $("#practiceCounter").textContent = `${practiceIndex + 1} / ${practiceItems.length}`;
     $("#practiceProgressFill").style.width = `${((practiceIndex + 1) / practiceItems.length) * 100}%`;
     $("#practiceProfessor").innerHTML = `<img src="${professor.image}" alt="${professor.name}"><div><small>${professor.name}</small><strong>説明を使って確かめよう。</strong></div>`;
-    $("#practiceQuestion").innerHTML = `<h2>${item.prompt}</h2>${item.supportText ? `<div class="test-support">${item.supportText}</div>` : ""}`;
+    const normalizedItem = normalizePracticeItem(item, activeProblem);
+    practiceItems[practiceIndex] = normalizedItem;
+    $("#practiceQuestion").innerHTML = `<h2>${escapeHtml(normalizedItem.prompt)}</h2>${normalizedItem.supportText ? `<div class="test-support">${escapeHtml(normalizedItem.supportText)}</div>` : ""}`;
     $("#practiceExplanationKey").textContent = activeProblem.correctExplanation;
     $("#practiceExplanationKey").classList.add("hidden");
     $("#togglePracticeKeyBtn").textContent = "説明を確認する";
     $("#practiceFeedback").classList.add("hidden");
     $("#checkPracticeBtn").classList.remove("hidden");
     $("#practiceDots").innerHTML = practiceItems.map((_,i)=>`<span class="practice-dot ${practiceResults[i]===true?'good':practiceResults[i]===false?'bad':i===practiceIndex?'current':''}">${i+1}</span>`).join("");
-    if (item.type === "choice") {
-      $("#practiceAnswerArea").innerHTML = item.choices.map(choice=>`<label class="choice explanation-choice"><input type="radio" name="practiceChoice" value="${choice}"><span>${choice}</span></label>`).join("");
+    if (normalizedItem.type === "choice") {
+      $("#practiceAnswerArea").innerHTML = normalizedItem.choices.map(choice=>`<label class="choice explanation-choice"><input type="radio" name="practiceChoice" value="${escapeHtml(choice)}"><span>${escapeHtml(choice)}</span></label>`).join("");
     } else {
-      $("#practiceAnswerArea").innerHTML = `<div class="cloze-card"><p>${item.clozeText.replace("［　］",'<span id="practiceBlank" class="cloze-blank">ここを選ぶ</span>')}</p><div class="cloze-options">${item.blankChoices.map(v=>`<button class="practice-cloze-option cloze-option" data-value="${v}" type="button">${v}</button>`).join("")}</div><input id="practiceClozeAnswer" type="hidden"></div>`;
+      const practiceClozeHtml = normalizedItem.clozeText.split("<br>").map((part) => escapeHtml(part)).join("<br>")
+        .replace("［　］",'<span id="practiceBlank" class="cloze-blank">ここを選ぶ</span>');
+      $("#practiceAnswerArea").innerHTML = `<div class="cloze-card"><p class="cloze-instruction"><strong>［　］に入る答えを選びましょう。</strong></p><p class="cloze-full-text">${practiceClozeHtml}</p><div class="cloze-options">${normalizedItem.blankChoices.map(v=>`<button class="practice-cloze-option cloze-option" data-value="${escapeHtml(v)}" type="button">${escapeHtml(v)}</button>`).join("")}</div><input id="practiceClozeAnswer" type="hidden"></div>`;
       $$(".practice-cloze-option").forEach(button=>button.addEventListener("click",()=>{
         $$(".practice-cloze-option").forEach(x=>x.classList.toggle("selected",x===button));
         $("#practiceClozeAnswer").value=button.dataset.value; $("#practiceBlank").textContent=button.dataset.value;
       }));
     }
+    scheduleAccessibility();
   }
 
   $("#togglePracticeKeyBtn").addEventListener("click", () => {
@@ -932,7 +1111,7 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.7</h2>
+        <h2>Version 11.8</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1269,4 +1448,7 @@
     if (existing) Object.assign(existing,problem); else appData.problems.push(problem);
     saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と実際に解く確認問題を作成しました");
   });
+  const accessibilityObserver = new MutationObserver(() => scheduleAccessibility());
+  accessibilityObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+
 })();

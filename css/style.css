@@ -188,3 +188,20 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}button{
   .assignment-mail-item{grid-template-columns:36px 1fr}
   .assignment-mail-item>button{grid-column:2}
 }
+
+
+/* Version 11.8 accessibility and cloze debug */
+.global-accessibility-tools{display:flex;gap:7px;align-items:center;margin-left:auto}
+.top-accessibility-btn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:inherit;border-radius:10px;padding:8px 10px;font:inherit;font-weight:800;cursor:pointer}
+.top-accessibility-btn.active{background:#fff4bf;color:#5e4800;border-color:#e4c85e;box-shadow:0 0 0 2px rgba(255,244,191,.28)}
+ruby[data-auto-ruby="true"]{ruby-position:over}
+ruby[data-auto-ruby="true"] rt{font-size:.52em;line-height:1;color:#4d6577;font-weight:700}
+.global-large-text #studentHomeView,.global-large-text #problemView,.global-large-text #practiceView,.global-large-text #profileView,.global-large-text #assignmentMailPopup,.global-large-text #assignmentInboxDialog,.global-large-text .topbar{font-size:1.22rem}
+.global-large-text h1{font-size:clamp(2rem,4vw,3rem)}
+.global-large-text h2{font-size:clamp(1.55rem,3vw,2.25rem)}
+.global-large-text h3{font-size:1.3rem}
+.global-large-text p,.global-large-text button,.global-large-text label,.global-large-text select,.global-large-text input,.global-large-text small{line-height:1.65}
+.cloze-instruction{margin:0 0 11px;padding:9px 11px;border-radius:10px;background:#edf6ff;color:#315b7c}
+.cloze-full-text{display:block;min-height:2.8em;margin:0 0 16px;padding:15px;border:2px solid #c8dbea;border-radius:13px;background:#fff;font-size:1.18em;line-height:1.9}
+.cloze-full-text .cloze-blank{display:inline-block;min-width:7em;text-align:center}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.global-accessibility-tools{order:3;width:100%;justify-content:flex-end}.global-large-text #studentHomeView,.global-large-text #problemView,.global-large-text #practiceView,.global-large-text #profileView{font-size:1.12rem}}
