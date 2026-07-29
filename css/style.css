@@ -1108,3 +1108,46 @@ dialog{max-height:calc(100vh - 24px);overflow:auto}img{max-width:100%}
   background:radial-gradient(circle at 50% 25%,#f8f2d7,#28305f);
   border-radius:18px;
 }
+
+
+/* Version 14.1: correctly isolated navigation icons */
+.v13-nav-tile span:first-child,
+.v13-help-tile > span:first-child{
+  width:88px;
+  height:88px;
+  display:grid;
+  place-items:center;
+  margin:0 auto 4px;
+  flex:0 0 auto;
+}
+.v13-nav-tile span:first-child::after,
+.v13-help-tile > span:first-child::after{
+  width:88px !important;
+  height:88px !important;
+  background-position:center !important;
+  background-size:contain !important;
+  background-repeat:no-repeat !important;
+}
+.v13-nav-tile{
+  grid-template-rows:92px auto auto;
+  align-content:center;
+  justify-items:center;
+}
+.v13-help-tile{
+  grid-template-columns:100px 1fr;
+  align-items:center;
+}
+.v13-help-tile > span:first-child{
+  margin:0;
+}
+@media(max-width:680px){
+  .v13-nav-tile span:first-child,
+  .v13-help-tile > span:first-child,
+  .v13-nav-tile span:first-child::after,
+  .v13-help-tile > span:first-child::after{
+    width:76px !important;
+    height:76px !important;
+  }
+  .v13-nav-tile{grid-template-rows:80px auto auto}
+  .v13-help-tile{grid-template-columns:84px 1fr}
+}

@@ -1,18 +1,16 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "14.0";
+  const APP_VERSION = "14.1";
   const APP_BUILD_DATE = "2026.07.30";
   const DATA_SCHEMA_VERSION = 13;
   const RUNTIME_ERROR_KEY = "sansuDaigakuRuntimeErrors";
   const APP_RELEASE_NOTES = [
-    "ゲーム内の主要画像をオリジナルの魔法大学RPG風アートへ刷新",
-    "キャンパス5段階を高精細なゲーム背景へ置換",
-    "教授7人の立ち絵を統一したオリジナルデザインへ置換",
-    "児童アバター4色を統一したゲーム風画像へ置換",
-    "学習・キャンパス・プロフィール・コレクション・ヘルプ用の画像素材を追加",
-    "画像形式をPNG・WebPへ整理し、Chromebookでの読み込みを軽量化",
-    "Version 13.0の学習・提出・分析・キャンパス機能を維持"
+    "ホームメニュー5項目の画像を独立した透過PNGとして作り直し",
+    "画像内に混ざっていた文字・カード背景・不要な余白を除去",
+    "各アイコンを512×512pxの中央配置へ統一",
+    "学習・キャンパス・マイページ・コレクション・ヘルプの配置を修正",
+    "Version 14.0の学習・提出・分析・キャンパス機能を維持"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
