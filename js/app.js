@@ -655,7 +655,10 @@
     $("#independentModeBtn").classList.toggle("active", learningRoute === "independent");
     $("#smallStepModeBtn").classList.toggle("active", learningRoute === "smallStep");
     $("#smallStepPanel").classList.toggle("hidden", learningRoute !== "smallStep");
-    $("#answerModeTabs").closest(".panel").classList.toggle("answer-panel-muted", learningRoute === "smallStep" && stepIndex < (activeProblem.smallSteps || []).length);
+    $("#answerModeTabs").closest(".panel").classList.toggle(
+      "answer-panel-muted",
+      learningRoute === "smallStep" && stepIndex < explanationSteps(activeProblem).length
+    );
 
     if (learningRoute === "smallStep") renderSmallStep();
     renderAnswerModes();
@@ -715,9 +718,25 @@
 
 
   function explanationSteps(problem) {
+    const fullClozeText = normalizeClozeText(problem);
     return [
-      { prompt: `${problem.concept || problem.unit}について、正しい説明を選びましょう。`, type: "choice", options: shuffle([problem.correctExplanation, ...(problem.distractors || [])]), correct: problem.correctExplanation, support: problem.hint || "正しい説明をもう一度見比べよう。" },
-      { prompt: "説明の大切な言葉を入れましょう。", type: "choice", options: shuffle([problem.blankPhrase, ...(problem.blankDistractors || [])]), correct: problem.blankPhrase, support: `正しい説明は「${problem.correctExplanation}」です。` }
+      {
+        prompt: `${problem.concept || problem.unit}について、正しいせつめいを1つえらびましょう。`,
+        instruction: "三つの文を、はじめからゆっくり読みましょう。",
+        type: "choice",
+        options: shuffle([problem.correctExplanation, ...(problem.distractors || [])].filter(Boolean)),
+        correct: problem.correctExplanation,
+        support: problem.hint || "三つの文を、もう一度ゆっくり読みくらべましょう。"
+      },
+      {
+        prompt: "文を読んで、［　］に入る言葉をえらびましょう。",
+        instruction: "文の中の［　］に、どの言葉が入るか考えましょう。",
+        type: "cloze-choice",
+        clozeText: fullClozeText,
+        options: shuffle([problem.blankPhrase, ...(problem.blankDistractors || [])].filter(Boolean)),
+        correct: problem.blankPhrase,
+        support: `もとの文は「${problem.correctExplanation}」です。`
+      }
     ];
   }
 
@@ -742,10 +761,49 @@
     $("#prevStepBtn").disabled = stepIndex === 0;
 
     if (step.type === "choice") {
-      $("#stepContent").innerHTML = `<div class="step-choice-list">${step.options.map((option) =>
-        `<label class="choice"><input type="radio" name="stepChoice" value="${option}">${option}</label>`
-      ).join("")}</div>`;
+      $("#stepContent").innerHTML = `
+        <p class="small-step-instruction">${escapeHtml(step.instruction || "")}</p>
+        <div class="step-choice-list">
+          ${step.options.map((option) =>
+            `<label class="choice small-step-choice">
+              <input type="radio" name="stepChoice" value="${escapeHtml(option)}">
+              <span>${escapeHtml(option)}</span>
+            </label>`
+          ).join("")}
+        </div>`;
+    } else if (step.type === "cloze-choice") {
+      const safeClozeText = String(step.clozeText || "").trim();
+      const repairedClozeText = safeClozeText.includes("［　］")
+        ? safeClozeText
+        : normalizeClozeText(activeProblem);
+      const clozeHtml = repairedClozeText
+        .split("<br>")
+        .map((part) => escapeHtml(part))
+        .join("<br>")
+        .replace("［　］", '<span id="smallStepBlank" class="cloze-blank small-step-blank">［　］</span>');
+
+      $("#stepContent").innerHTML = `
+        <p class="small-step-instruction">${escapeHtml(step.instruction || "")}</p>
+        <div class="small-step-cloze-card">
+          <p class="small-step-cloze-text">${clozeHtml}</p>
+        </div>
+        <div class="step-choice-list">
+          ${step.options.map((option) =>
+            `<label class="choice small-step-choice">
+              <input type="radio" name="stepChoice" value="${escapeHtml(option)}">
+              <span>${escapeHtml(option)}</span>
+            </label>`
+          ).join("")}
+        </div>`;
+
+      document.querySelectorAll('input[name="stepChoice"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          const blank = $("#smallStepBlank");
+          if (blank) blank.textContent = input.value;
+        });
+      });
     }
+    scheduleAccessibility();
   }
 
   function collectStepAnswer() {
@@ -775,7 +833,8 @@
     if (correct) {
       $("#checkStepBtn").classList.add("hidden");
       $("#nextStepBtn").classList.remove("hidden");
-      $("#nextStepBtn").textContent = stepIndex === (activeProblem.smallSteps || []).length - 1
+      const totalSteps = explanationSteps(activeProblem).length;
+      $("#nextStepBtn").textContent = stepIndex === totalSteps - 1
         ? "最後の答えへ →" : "次の段へ →";
     }
   }
@@ -813,8 +872,8 @@
     }
   });
   $("#nextStepBtn").addEventListener("click", () => {
-    const steps = explanationSteps(activeProblem);
-    if (stepIndex < steps.length - 1) {
+    const totalSteps = explanationSteps(activeProblem).length;
+    if (stepIndex < totalSteps - 1) {
       stepIndex += 1;
       renderSmallStep();
     } else {
@@ -1185,7 +1244,7 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.9.1</h2>
+        <h2>Version 11.9.2</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
