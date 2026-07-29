@@ -962,3 +962,75 @@ ruby[data-auto-ruby="true"] rt{
   .campus-stage-copy p{min-height:0}
   .campus-unlock-dialog h2{font-size:25px}
 }
+
+
+/* =========================================================
+   Version 13.0 Phase 3: growth, level-up and achievement effects
+   ========================================================= */
+.campus-celebration-layer{
+  position:absolute;inset:0;z-index:9;pointer-events:none;overflow:hidden;opacity:0;
+}
+.campus-celebration-layer.active{opacity:1}
+.campus-celebration-layer span{
+  position:absolute;left:var(--x);top:-8%;
+  font-size:var(--size);animation:campusParticle var(--duration) ease-in var(--delay) forwards;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))
+}
+.campus-celebration-layer.reduced{
+  background:radial-gradient(circle at 50% 45%,rgba(255,230,116,.34),transparent 40%);
+  animation:reducedFlash .8s ease both
+}
+.campus-new-badge{
+  position:absolute;right:30px;top:132px;z-index:10;
+  padding:9px 16px;border-radius:999px;background:linear-gradient(135deg,#ffda49,#ff9d1b);
+  color:#4b2a00;font-weight:1000;border:2px solid #fff0a7;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);animation:newBadge 1s ease both
+}
+@keyframes campusParticle{
+  0%{transform:translate(-50%,0) rotate(0deg);opacity:0}
+  12%{opacity:1}
+  100%{transform:translate(calc(-50% + var(--drift)),1080px) rotate(480deg);opacity:0}
+}
+@keyframes reducedFlash{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+@keyframes newBadge{0%{transform:scale(.5) rotate(-8deg);opacity:0}65%{transform:scale(1.1) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+
+.level-up-dialog,.achievement-dialog{
+  width:min(700px,calc(100vw - 24px));text-align:center;
+  background:linear-gradient(180deg,#fffdf1,#e8efff);border:3px solid #d8ae3f
+}
+.level-up-dialog::backdrop,.achievement-dialog::backdrop{
+  background:rgba(2,10,28,.82);backdrop-filter:blur(5px)
+}
+.level-up-sparkles{font-size:31px;animation:levelSparkle .85s ease-in-out infinite alternate}
+.level-up-dialog h2{font-size:32px;color:#233f70;margin-bottom:8px}
+.level-up-number{
+  width:190px;height:190px;margin:16px auto;display:grid;place-items:center;
+  border-radius:50%;background:radial-gradient(circle,#fff8b7,#ffc51b);
+  border:8px solid #fff;box-shadow:0 0 0 5px #d49a13,0 15px 35px rgba(85,57,0,.3)
+}
+.level-up-number span{font-size:22px;font-weight:900}.level-up-number strong{display:block;font-size:76px;line-height:.85;color:#573500}
+.level-up-close{min-width:220px}
+@keyframes levelSparkle{from{transform:scale(.92);opacity:.7}to{transform:scale(1.08);opacity:1}}
+
+.achievement-intro{padding:13px;border-radius:13px;background:#fff4c9;font-weight:900}
+.achievement-grid{display:grid;gap:11px;margin-top:14px}
+.achievement-card{display:grid;grid-template-columns:65px 1fr;gap:12px;align-items:center;text-align:left;padding:14px;border-radius:16px;background:#fff;border:2px solid #d8c37d}
+.achievement-icon{font-size:42px}.achievement-card h3{margin:0;color:#2a466b}.achievement-card p{margin:5px 0 0;line-height:1.6}
+.campus-achievement-section{margin-top:14px;padding:15px;border-radius:15px;background:#f2f6fb}
+.achievement-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.achievement-mini{min-height:96px;display:grid;place-items:center;text-align:center;padding:9px;border-radius:13px;border:1px solid #d6e0e7}
+.achievement-mini span{font-size:30px}.achievement-mini strong{font-size:12px}
+.achievement-mini.unlocked{background:#fff8d8;border-color:#d9b951}
+.achievement-mini.locked{background:#e8edf1;color:#7b8992}
+.motion-toggle{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;background:#fff;font-weight:900}
+.motion-toggle input{width:20px;height:20px}
+
+@media(prefers-reduced-motion:reduce){
+  .campus-celebration-layer span,.campus-new-badge,.level-up-sparkles{animation:none!important}
+  .v13-campus-background{transition:none!important}
+}
+@media(max-width:650px){
+  .achievement-mini-grid{grid-template-columns:repeat(2,1fr)}
+  .campus-new-badge{top:105px;right:12px;font-size:12px}
+  .level-up-number{width:150px;height:150px}.level-up-number strong{font-size:58px}
+}

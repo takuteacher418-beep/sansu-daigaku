@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "13.0-phase2";
+  const APP_VERSION = "13.0-phase3";
   const APP_BUILD_DATE = "2026.07.30";
   const APP_RELEASE_NOTES = [
     "日本語表記の分数を教科書型の分数記号へ変換",
@@ -11,7 +11,9 @@
     "分数同士の演算記号を分数線の中央に配置",
     "CSS・JavaScriptが読み込まれない表示崩れを修正",
     "児童ホーム画面をLDに配慮した大きなカードUIへ全面刷新",
-    "既存の学習・課題・プロフィール機能との接続を維持"
+    "既存の学習・課題・プロフィール機能との接続を維持",
+    "キャンパス成長・レベルアップ・実績解放の演出を追加",
+    "視覚過敏に配慮して演出を自動短縮できる設定へ対応"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
@@ -541,7 +543,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#researchDetailDialog"),$("#campusDetailDialog"),$("#campusUnlockDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#researchDetailDialog"),$("#campusDetailDialog"),$("#campusUnlockDialog"),$("#levelUpDialog"),$("#achievementDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -715,6 +717,18 @@
       unlocks: ["大本館", "魔法の噴水", "光の石畳", "七つの塔"]
     }
   ];
+
+  const ACHIEVEMENTS = [
+    { id:"first-clear", icon:"🌱", title:"はじめの一歩", description:"はじめて問題をクリアした", test:(student, progress) => progress.clears >= 1 },
+    { id:"three-clear", icon:"📘", title:"学びの習慣", description:"異なる問題を3問クリアした", test:(student, progress) => progress.clears >= 3 },
+    { id:"eight-clear", icon:"🏰", title:"学院の仲間", description:"魔法学院の本館を解放した", test:(student, progress) => progress.stageIndex >= 2 },
+    { id:"fifteen-clear", icon:"✨", title:"名門への道", description:"名門・算数大学を解放した", test:(student, progress) => progress.stageIndex >= 3 },
+    { id:"grand-campus", icon:"👑", title:"大魔法大学の創設者", description:"最高段階のキャンパスを完成させた", test:(student, progress) => progress.stageIndex >= 4 },
+    { id:"self-mark-5", icon:"✅", title:"自分でたしかめる力", description:"自分で丸つけを5回行った", test:(student) => student.history.filter((item) => item.finalTestMarking === "self").length >= 5 },
+    { id:"teacher-submit-5", icon:"📮", title:"先生に届けた学び", description:"先生へ丸つけを5回お願いした", test:(student) => student.history.filter((item) => item.finalTestMarking === "teacher").length >= 5 },
+    { id:"support-user", icon:"🧰", title:"自分に合う学び方", description:"支援機能を使って学習した", test:(student) => student.history.some((item) => Object.values(item.supports || {}).some(Boolean)) }
+  ];
+
   const AVATAR_IMAGES = [
     "images/avatars/avatar-blue.svg",
     "images/avatars/avatar-green.svg",
@@ -737,6 +751,15 @@
     if (!student.profile || typeof student.profile !== "object") student.profile = {};
     if (!Number.isInteger(student.profile.lastSeenCampusStage)) {
       student.profile.lastSeenCampusStage = 0;
+    }
+    if (!Number.isInteger(student.profile.lastSeenLevel)) {
+      student.profile.lastSeenLevel = levelFromXp(Number(student.xp || 0));
+    }
+    if (!Array.isArray(student.profile.unlockedAchievements)) {
+      student.profile.unlockedAchievements = [];
+    }
+    if (typeof student.profile.reduceMotion !== "boolean") {
+      student.profile.reduceMotion = false;
     }
   }
 
@@ -774,6 +797,89 @@
     </article>`;
   }
 
+
+  function prefersReducedMotion(student = currentStudent()) {
+    return Boolean(student?.profile?.reduceMotion)
+      || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  }
+
+  function playCampusCelebration(kind = "campus") {
+    const layer = $("#campusCelebrationLayer");
+    if (!layer) return;
+    layer.innerHTML = "";
+    const student = currentStudent();
+    if (prefersReducedMotion(student)) {
+      layer.className = `campus-celebration-layer active reduced ${kind}`;
+      window.setTimeout(() => {
+        layer.className = "campus-celebration-layer";
+      }, 900);
+      return;
+    }
+    const symbols = kind === "level" ? ["⭐","✨","＋","Σ"] : ["✨","⭐","🌟","✦"];
+    for (let i = 0; i < 26; i += 1) {
+      const particle = document.createElement("span");
+      particle.textContent = symbols[i % symbols.length];
+      particle.style.setProperty("--x", `${8 + Math.random() * 84}%`);
+      particle.style.setProperty("--delay", `${Math.random() * .65}s`);
+      particle.style.setProperty("--duration", `${1.6 + Math.random() * 1.2}s`);
+      particle.style.setProperty("--drift", `${-80 + Math.random() * 160}px`);
+      particle.style.setProperty("--size", `${18 + Math.random() * 21}px`);
+      layer.appendChild(particle);
+    }
+    layer.className = `campus-celebration-layer active ${kind}`;
+    window.setTimeout(() => {
+      layer.className = "campus-celebration-layer";
+      layer.innerHTML = "";
+    }, 3300);
+  }
+
+  function renderAchievementCard(achievement) {
+    return `<article class="achievement-card">
+      <span class="achievement-icon">${achievement.icon}</span>
+      <div><h3>${escapeHtml(achievement.title)}</h3><p>${escapeHtml(achievement.description)}</p></div>
+    </article>`;
+  }
+
+  function checkNewAchievements(student, progress) {
+    ensureCampusProfile(student);
+    const unlocked = new Set(student.profile.unlockedAchievements);
+    const newlyUnlocked = ACHIEVEMENTS.filter((achievement) =>
+      !unlocked.has(achievement.id) && achievement.test(student, progress)
+    );
+    if (!newlyUnlocked.length) return [];
+    newlyUnlocked.forEach((achievement) => unlocked.add(achievement.id));
+    student.profile.unlockedAchievements = [...unlocked];
+    saveData();
+    return newlyUnlocked;
+  }
+
+  function showAchievementDialog(achievements) {
+    if (!achievements.length) return;
+    $("#achievementContent").innerHTML = `
+      <div class="achievement-intro">がんばりが新しい実績になりました！</div>
+      <div class="achievement-grid">${achievements.map(renderAchievementCard).join("")}</div>`;
+    $("#achievementDialog").showModal();
+    playCampusCelebration("achievement");
+  }
+
+  function showLevelUpIfNeeded(student) {
+    ensureCampusProfile(student);
+    const currentLevel = levelFromXp(Number(student.xp || 0));
+    const seenLevel = Number(student.profile.lastSeenLevel || 1);
+    if (currentLevel <= seenLevel) return false;
+    $("#levelUpContent").innerHTML = `
+      <div class="level-up-sparkles" aria-hidden="true">✦ ⭐ ✨ ⭐ ✦</div>
+      <p class="eyebrow">LEVEL UP!</p>
+      <h2>レベルが上がりました！</h2>
+      <div class="level-up-number"><span>Lv.</span><strong>${currentLevel}</strong></div>
+      <p>今日のがんばりが、キャンパスを育てる力になりました。</p>`;
+    student.profile.lastSeenLevel = currentLevel;
+    saveData();
+    $("#levelUpDialog").showModal();
+    playCampusCelebration("level");
+    return true;
+  }
+
   function renderCampusDetail() {
     const student = currentStudent();
     if (!student) return;
@@ -795,8 +901,28 @@
       <section class="campus-growth-rule">
         <h3>キャンパスが育つ条件</h3>
         <p>同じ問題を何度も解いた回数ではなく、60点以上でクリアした<strong>問題の種類</strong>によって成長します。</p>
+      </section>
+      <section class="campus-achievement-section">
+        <div class="section-head compact">
+          <div><h3>集めた実績</h3><p class="muted">学習の歩みを記録します。</p></div>
+          <label class="motion-toggle"><input id="reduceMotionField" type="checkbox" ${student.profile.reduceMotion ? "checked" : ""}> 演出を少なくする</label>
+        </div>
+        <div class="achievement-mini-grid">
+          ${ACHIEVEMENTS.map((achievement) => {
+            const unlocked = student.profile.unlockedAchievements.includes(achievement.id);
+            return `<div class="achievement-mini ${unlocked ? "unlocked" : "locked"}">
+              <span>${unlocked ? achievement.icon : "🔒"}</span>
+              <strong>${unlocked ? escapeHtml(achievement.title) : "まだひみつ"}</strong>
+            </div>`;
+          }).join("")}
+        </div>
       </section>`;
     $("#campusDetailDialog").showModal();
+    $("#reduceMotionField")?.addEventListener("change", (event) => {
+      student.profile.reduceMotion = event.target.checked;
+      saveData();
+      showToast(event.target.checked ? "演出を少なくしました" : "演出を通常に戻しました");
+    });
   }
 
   function showCampusUnlockIfNeeded(student, progress) {
@@ -817,7 +943,10 @@
       </div>`;
     student.profile.lastSeenCampusStage = progress.stageIndex;
     saveData();
+    $("#campusNewBadge").classList.remove("hidden");
+    window.setTimeout(() => $("#campusNewBadge").classList.add("hidden"), 5000);
     $("#campusUnlockDialog").showModal();
+    playCampusCelebration("campus");
   }
 
   function profileLabels(profile) {
@@ -967,7 +1096,16 @@
 
     renderStudentAssignments();
     renderReturnedMarkNotification();
-    window.setTimeout(() => showCampusUnlockIfNeeded(student, campusProgress), 250);
+    const newAchievements = checkNewAchievements(student, campusProgress);
+    window.setTimeout(() => {
+      const levelShown = showLevelUpIfNeeded(student);
+      if (!levelShown) {
+        showCampusUnlockIfNeeded(student, campusProgress);
+        if (!$("#campusUnlockDialog").open && newAchievements.length) showAchievementDialog(newAchievements);
+      } else {
+        window.pendingCampusUnlock = { student, campusProgress, newAchievements };
+      }
+    }, 250);
   }
 
 
@@ -1476,9 +1614,25 @@
   });
   $("#homeCampusBtn").addEventListener("click", renderCampusDetail);
   $("#closeCampusDetailDialogBtn").addEventListener("click", () => $("#campusDetailDialog").close());
+  $("#closeLevelUpDialogBtn").addEventListener("click", () => {
+    $("#levelUpDialog").close();
+    const pending = window.pendingCampusUnlock;
+    window.pendingCampusUnlock = null;
+    if (!pending) return;
+    showCampusUnlockIfNeeded(pending.student, pending.campusProgress);
+    if (!$("#campusUnlockDialog").open && pending.newAchievements.length) {
+      showAchievementDialog(pending.newAchievements);
+    } else {
+      window.pendingAchievements = pending.newAchievements;
+    }
+  });
+  $("#closeAchievementDialogBtn").addEventListener("click", () => $("#achievementDialog").close());
   $("#closeCampusUnlockDialogBtn").addEventListener("click", () => {
     $("#campusUnlockDialog").close();
-    renderCampusDetail();
+    const pendingAchievements = window.pendingAchievements || [];
+    window.pendingAchievements = null;
+    if (pendingAchievements.length) showAchievementDialog(pendingAchievements);
+    else renderCampusDetail();
   });
   $("#homeCollectionBtn").addEventListener("click", () => {
     showToast("コレクションは次のアップデートで追加予定です");

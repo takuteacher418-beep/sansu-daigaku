@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 13.0-phase2</title>
-  <link rel="stylesheet" href="css/style.css?v=13.0-phase2" />
+  <title>算数大学 Version 13.0-phase3</title>
+  <link rel="stylesheet" href="css/style.css?v=13.0-phase3" />
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -64,6 +64,8 @@
           <img id="campusGrowthImage" class="v13-campus-background" src="images/campus/campus-1.svg" alt="成長していく算数大学キャンパス">
           <div class="v13-night-overlay"></div>
           <div class="v13-stars" aria-hidden="true"></div>
+          <div id="campusCelebrationLayer" class="campus-celebration-layer" aria-hidden="true"></div>
+          <div id="campusNewBadge" class="campus-new-badge hidden">NEW CAMPUS!</div>
 
           <header class="v13-hero-header">
             <button id="studentAvatarBtn" class="v13-student-profile avatar-button" type="button" aria-label="自分のアバターを見る">
@@ -374,6 +376,20 @@
     <button id="closeCampusUnlockDialogBtn" class="btn primary campus-unlock-close" type="button">新しいキャンパスを見る</button>
   </dialog>
 
+
+  <dialog id="levelUpDialog" class="modal level-up-dialog">
+    <div id="levelUpContent"></div>
+    <button id="closeLevelUpDialogBtn" class="btn primary level-up-close" type="button">つぎへ</button>
+  </dialog>
+
+  <dialog id="achievementDialog" class="modal achievement-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">ACHIEVEMENT</p><h2>新しい実績</h2></div>
+      <button id="closeAchievementDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div id="achievementContent"></div>
+  </dialog>
+
   <dialog id="assignmentInboxDialog" class="modal assignment-inbox-dialog">
     <div class="section-head">
       <div><p class="eyebrow">ASSIGNMENT MAIL</p><h2>先生からの課題</h2></div>
@@ -539,7 +555,7 @@
     </form>
   </dialog>
 
-  <script src="js/data.js?v=13.0-phase2"></script>
-  <script src="js/app.js?v=13.0-phase2"></script>
+  <script src="js/data.js?v=13.0-phase3"></script>
+  <script src="js/app.js?v=13.0-phase3"></script>
 </body>
 </html>
