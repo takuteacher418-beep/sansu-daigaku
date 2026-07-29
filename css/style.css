@@ -625,3 +625,25 @@ ruby[data-auto-ruby="true"] rt{
   .math-fraction{margin-left:.08em;margin-right:.08em}
   #questionText .math-fraction{font-size:1.1em}
 }
+
+
+/* Version 12.3.1 fraction visibility fix */
+.math-fraction{
+  min-width:1.65em;
+  padding:0 .04em;
+  vertical-align:-.52em;
+}
+.math-numerator{
+  border-bottom:2px solid currentColor;
+  padding-bottom:.12em;
+}
+.math-denominator{
+  padding-top:.12em;
+}
+.choice .math-fraction,
+.cloze-option .math-fraction,
+.final-test-option .math-fraction,
+.marking-answer-block .math-fraction,
+.returned-answer-row .math-fraction{
+  font-size:1.18em;
+}

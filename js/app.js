@@ -60,23 +60,36 @@
 
   function formatMathText(value, options = {}) {
     const { lineBreaks = false } = options;
-    let text = escapeHtml(value);
+    const source = String(value ?? "");
+    const tokens = [];
+    const token = (html) => {
+      const key = `@@MATH_${tokens.length}@@`;
+      tokens.push(html);
+      return key;
+    };
 
-    // 帯分数を先に変換する。「1 1/2」→ 1と2分の1
-    text = text.replace(
-      /(^|[^\d])(\d+)[ \u3000]+(\d+)\s*\/\s*(\d+)(?![\d/])/g,
+    // 帯分数。半角・全角スペース、半角・全角スラッシュに対応。
+    let protectedText = source.replace(
+      /(^|[^\d])(\d+)[ \u3000]+(\d+)\s*[\/／]\s*(\d+)(?![\d\/／])/g,
       (match, prefix, whole, numerator, denominator) =>
-        `${prefix}<span class="mixed-number" role="img" aria-label="${whole}と${denominator}分の${numerator}">`
-        + `<span class="mixed-whole">${whole}</span>${fractionMarkup(numerator, denominator, "mixed-fraction")}</span>`
+        `${prefix}${token(
+          `<span class="mixed-number" role="img" aria-label="${escapeHtml(whole)}と${escapeHtml(denominator)}分の${escapeHtml(numerator)}">`
+          + `<span class="mixed-whole">${escapeHtml(whole)}</span>`
+          + `${fractionMarkup(numerator, denominator, "mixed-fraction")}</span>`
+        )}`
     );
 
-    // 真分数・仮分数。「1/2」「7 / 4」に対応する。
-    text = text.replace(
-      /(^|[^\d>])(\d+)\s*\/\s*(\d+)(?![\d/])/g,
+    // 真分数・仮分数。日付やURLの連続スラッシュは対象外。
+    protectedText = protectedText.replace(
+      /(^|[^\d\/／])(\d+)\s*[\/／]\s*(\d+)(?![\d\/／])/g,
       (match, prefix, numerator, denominator) =>
-        `${prefix}${fractionMarkup(numerator, denominator)}`
+        `${prefix}${token(fractionMarkup(numerator, denominator))}`
     );
 
+    let text = escapeHtml(protectedText);
+    tokens.forEach((html, index) => {
+      text = text.replace(`@@MATH_${index}@@`, html);
+    });
     if (lineBreaks) text = text.replace(/\r?\n/g, "<br>");
     return text;
   }
@@ -87,15 +100,25 @@
     const targets = [];
     while (walker.nextNode()) {
       const node = walker.currentNode;
-      if (!node.nodeValue?.includes("/")) continue;
-      if (node.parentElement?.closest(".math-fraction, .mixed-number, input, textarea, option, script, style")) continue;
+      if (!/[\/／]/.test(node.nodeValue || "")) continue;
+      if (node.parentElement?.closest(".math-fraction, .mixed-number, input, textarea, option, script, style, code, pre")) continue;
       targets.push(node);
     }
     targets.forEach((node) => {
+      const formatted = formatMathText(node.nodeValue);
+      if (formatted === escapeHtml(node.nodeValue)) return;
       const template = document.createElement("template");
-      template.innerHTML = formatMathText(node.nodeValue);
+      template.innerHTML = formatted;
       node.replaceWith(template.content);
     });
+  }
+
+  function formatAllVisibleMath() {
+    [
+      "#studentHomeView", "#problemView", "#practiceView", "#profileView",
+      "#teacherView", "#assignmentInboxDialog", "#returnedMarkDialog",
+      "#researchDetailDialog", "#markingImageDialog"
+    ].forEach((selector) => formatMathInElement($(selector)));
   }
 
 
@@ -481,11 +504,28 @@
 
   let accessibilityTimer = null;
   function scheduleAccessibility() {
-    ["#problemList","#questionText","#answerArea","#stepContent","#practiceQuestion","#practiceAnswerArea","#practiceFeedback","#assignmentProblemPreview","#returnedMarkContent"].forEach((selector) => formatMathInElement($(selector)));
+    formatAllVisibleMath();
     if (accessibilityApplying || !session || session.role !== "student") return;
     clearTimeout(accessibilityTimer);
     accessibilityTimer = setTimeout(applyAccessibility, 0);
   }
+
+  let mathObserverTimer = null;
+  const mathObserver = new MutationObserver((mutations) => {
+    if (!mutations.some((mutation) => mutation.addedNodes?.length || mutation.type === "characterData")) return;
+    clearTimeout(mathObserverTimer);
+    mathObserverTimer = setTimeout(formatAllVisibleMath, 0);
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    mathObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+    formatAllVisibleMath();
+  });
+
   function loadData() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -1834,7 +1874,7 @@
         <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 12.3</h2>
+        <h2>Version 12.3.1</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
