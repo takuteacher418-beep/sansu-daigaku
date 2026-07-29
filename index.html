@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.2</title>
+  <title>算数大学 Version 11.3</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.2</span>
+        <span class="version">Version 11.3</span>
       </section>
 
       <section class="login-panel">
@@ -48,7 +48,7 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.2</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.3</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
     </header>
@@ -126,18 +126,54 @@
             <div><p class="eyebrow">PROFESSOR BATTLE</p><h2 id="problemProfessor"></h2></div>
           </div>
 
+          <section class="learning-route-panel">
+            <p class="eyebrow">CHOOSE YOUR ROUTE</p>
+            <h3>今日は、どの進め方にする？</h3>
+            <div class="route-buttons">
+              <button id="independentModeBtn" class="route-btn active" type="button">
+                <span>🚀</span><strong>自分で解く</strong><small>問題全体を見て挑戦</small>
+              </button>
+              <button id="smallStepModeBtn" class="route-btn" type="button">
+                <span>🪜</span><strong>少しずつ解く</strong><small>一段ずつ一緒に進む</small>
+              </button>
+            </div>
+          </section>
+
           <div class="toolbar">
             <button id="readAloudBtn" class="tool-btn" type="button">🔊 読み上げ</button>
             <button id="furiganaBtn" class="tool-btn" type="button">ふりがな</button>
             <button id="largeTextBtn" class="tool-btn" type="button">文字を大きく</button>
+            <button id="sentenceModeBtn" class="tool-btn" type="button">📖 一文ずつ</button>
+            <button id="lineFocusBtn" class="tool-btn" type="button">🔎 読む場所を強調</button>
           </div>
 
           <div class="question-card">
             <small id="problemMeta"></small>
             <h1 id="problemTitle"></h1>
+            <div id="sentenceProgress" class="sentence-progress hidden"></div>
             <div id="questionText" class="question-text"></div>
+            <div id="sentenceNavigation" class="sentence-navigation hidden">
+              <button id="prevSentenceBtn" class="btn ghost" type="button">← 前の文</button>
+              <button id="showAllSentencesBtn" class="btn soft" type="button">全体を見る</button>
+              <button id="nextSentenceBtn" class="btn primary" type="button">次の文 →</button>
+            </div>
             <div id="visualAid" class="visual-aid hidden"></div>
           </div>
+
+          <section id="smallStepPanel" class="small-step-panel hidden">
+            <div class="step-header">
+              <div><p class="eyebrow">SMALL STEPS</p><h2 id="stepTitle">一段ずつ考えよう</h2></div>
+              <span id="stepCounter" class="step-counter">STEP 1</span>
+            </div>
+            <div class="step-progress"><div id="stepProgressFill"></div></div>
+            <div id="stepContent"></div>
+            <div class="step-actions">
+              <button id="prevStepBtn" class="btn ghost" type="button">← 前へ</button>
+              <button id="checkStepBtn" class="btn primary" type="button">この段を確かめる</button>
+              <button id="nextStepBtn" class="btn gold hidden" type="button">次の段へ →</button>
+            </div>
+            <div id="stepFeedback" class="step-feedback hidden"></div>
+          </section>
 
           <div id="hintBox" class="hint-box hidden"></div>
           <button id="showHintBtn" class="btn soft" type="button">ヒントを見る</button>
@@ -145,7 +181,8 @@
 
         <article class="panel">
           <p class="eyebrow">YOUR ANSWER</p>
-          <h2>自分の考えを伝えよう</h2>
+          <h2>答え方を選ぼう</h2>
+          <p class="answer-choice-note">書く・選ぶ・式を作る。自分が伝えやすい方法で答えられます。</p>
           <div id="answerModeTabs" class="answer-tabs"></div>
           <div id="answerArea"></div>
           <button id="submitAnswerBtn" class="btn primary large full" type="button">教授に答える</button>
@@ -169,7 +206,7 @@
         <button class="teacher-tab active" data-view="dashboard" type="button">概要</button>
         <button class="teacher-tab" data-view="students" type="button">児童・LDIR</button>
         <button class="teacher-tab" data-view="problems" type="button">問題管理</button>
-        <button class="teacher-tab" data-view="results" type="button">結果</button>
+        <button class="teacher-tab" data-view="results" type="button">結果・支援分析</button>
       </nav>
       <section id="teacherContent"></section>
     </main>

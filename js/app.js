@@ -6,6 +6,15 @@
   let session = null;
   let activeProblem = null;
   let answerMode = "text";
+  let learningRoute = "independent";
+  let sentenceMode = false;
+  let lineFocusMode = false;
+  let sentenceIndex = 0;
+  let stepIndex = 0;
+  let stepAnswers = [];
+  let supportUsage = {};
+  let problemStartedAt = null;
+  let hintCount = 0;
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -25,10 +34,21 @@
         students: Array.isArray(parsed.students) ? parsed.students : clone(DEFAULT_APP_DATA.students),
         problems: Array.isArray(parsed.problems) ? parsed.problems : clone(DEFAULT_APP_DATA.problems)
       };
+      merged.students = merged.students.map((student) => ({
+        ...student,
+        history: Array.isArray(student.history) ? student.history : [],
+        profile: {
+          audio: false, ruby: false, large: false, choice: false,
+          template: false, visual: false, steps: false, easy: false,
+          ...student.profile
+        }
+      }));
       merged.problems = merged.problems.map((problem, index) => ({
         ...clone(DEFAULT_APP_DATA.problems[index] || {}),
         ...problem,
-        professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授"
+        professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授",
+        formulaCards: problem.formulaCards || DEFAULT_APP_DATA.problems[index]?.formulaCards || [],
+        smallSteps: problem.smallSteps || DEFAULT_APP_DATA.problems[index]?.smallSteps || []
       }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       return merged;
@@ -192,8 +212,52 @@
     activeProblem = appData.problems.find((problem) => problem.id === problemId);
     if (!activeProblem) return;
     answerMode = currentStudent().profile.choice ? "choice" : "text";
+    learningRoute = currentStudent().profile.steps ? "smallStep" : "independent";
+    sentenceMode = false;
+    lineFocusMode = false;
+    sentenceIndex = 0;
+    stepIndex = 0;
+    stepAnswers = [];
+    hintCount = 0;
+    problemStartedAt = Date.now();
+    supportUsage = {
+      audio: false, ruby: Boolean(currentStudent().profile.ruby),
+      large: Boolean(currentStudent().profile.large), visual: Boolean(currentStudent().profile.visual),
+      sentenceMode: false, lineFocus: false, hint: false,
+      route: learningRoute, answerMode
+    };
     showPage("problemView");
     renderProblem();
+  }
+
+  function getProblemSentences() {
+    const source = currentStudent().profile.easy ? activeProblem.simpleQuestion : activeProblem.question;
+    return source.split(/(?<=[。！？?])/).map((item) => item.trim()).filter(Boolean);
+  }
+
+  function renderQuestionText() {
+    const profile = currentStudent().profile;
+    const sentences = getProblemSentences();
+    const useRuby = profile.ruby && !sentenceMode && activeProblem.rubyText;
+    let content;
+
+    if (sentenceMode && sentences.length) {
+      content = `<span class="focused-sentence">${sentences[sentenceIndex]}</span>`;
+      $("#sentenceProgress").textContent = `${sentenceIndex + 1} / ${sentences.length} 文`;
+      $("#sentenceProgress").classList.remove("hidden");
+      $("#sentenceNavigation").classList.remove("hidden");
+      $("#prevSentenceBtn").disabled = sentenceIndex === 0;
+      $("#nextSentenceBtn").disabled = sentenceIndex === sentences.length - 1;
+    } else {
+      content = useRuby ? activeProblem.rubyText : (profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
+      $("#sentenceProgress").classList.add("hidden");
+      $("#sentenceNavigation").classList.add("hidden");
+    }
+
+    $("#questionText").innerHTML = content;
+    $("#questionText").classList.toggle("ruby-on", profile.ruby);
+    $("#questionText").classList.toggle("large", profile.large);
+    $("#questionText").classList.toggle("line-focus", lineFocusMode);
   }
 
   function renderProblem() {
@@ -204,28 +268,39 @@
     $("#battleProfessorImage").alt = professor.name;
     $("#problemMeta").textContent = `${activeProblem.unit}｜難易度 ${"★".repeat(activeProblem.difficulty)}`;
     $("#problemTitle").textContent = activeProblem.title;
-    $("#questionText").innerHTML = profile.easy ? activeProblem.simpleQuestion : (activeProblem.rubyText || activeProblem.question);
-    $("#questionText").classList.toggle("ruby-on", profile.ruby);
-    $("#questionText").classList.toggle("large", profile.large);
+
+    renderQuestionText();
+
     $("#visualAid").innerHTML = activeProblem.visual || "";
     $("#visualAid").classList.toggle("hidden", !profile.visual || !activeProblem.visual);
     $("#readAloudBtn").classList.toggle("hidden", !profile.audio);
-    $("#furiganaBtn").classList.toggle("hidden", !profile.ruby);
+    $("#furiganaBtn").classList.toggle("active", profile.ruby);
+    $("#largeTextBtn").classList.toggle("active", profile.large);
+    $("#sentenceModeBtn").classList.toggle("active", sentenceMode);
+    $("#lineFocusBtn").classList.toggle("active", lineFocusMode);
     $("#hintBox").classList.add("hidden");
     $("#feedbackBox").classList.add("hidden");
+
+    $("#independentModeBtn").classList.toggle("active", learningRoute === "independent");
+    $("#smallStepModeBtn").classList.toggle("active", learningRoute === "smallStep");
+    $("#smallStepPanel").classList.toggle("hidden", learningRoute !== "smallStep");
+    $("#answerModeTabs").closest(".panel").classList.toggle("answer-panel-muted", learningRoute === "smallStep" && stepIndex < (activeProblem.smallSteps || []).length);
+
+    if (learningRoute === "smallStep") renderSmallStep();
     renderAnswerModes();
   }
 
   function renderAnswerModes() {
     const profile = currentStudent().profile;
-    const modes = [["text", "文章"], ["choice", "選択"]];
-    if (profile.template) modes.push(["template", "文の型"]);
+    const modes = [["text", "文章で答える"], ["choice", "選んで答える"], ["formula", "式を作る"]];
+    if (profile.template) modes.push(["template", "文の型で答える"]);
 
     $("#answerModeTabs").innerHTML = modes.map(([id, label]) =>
       `<button class="answer-tab ${answerMode === id ? "active" : ""}" data-mode="${id}" type="button">${label}</button>`
     ).join("");
     $$(".answer-tab").forEach((button) => button.addEventListener("click", () => {
       answerMode = button.dataset.mode;
+      supportUsage.answerMode = answerMode;
       renderAnswerModes();
     }));
 
@@ -235,6 +310,8 @@
       $("#answerArea").innerHTML = (activeProblem.choices || []).map((choice) =>
         `<label class="choice"><input type="radio" name="choiceAnswer" value="${choice}" />${choice}</label>`
       ).join("");
+    } else if (answerMode === "formula") {
+      renderFormulaBuilder("#answerArea", activeProblem.formulaCards || [], "mainFormula");
     } else {
       $("#answerArea").innerHTML = `
         <label>まず、何をしましたか<input id="template1" /></label>
@@ -243,26 +320,217 @@
     }
   }
 
+  function renderFormulaBuilder(containerSelector, cards, builderId) {
+    const container = $(containerSelector);
+    container.innerHTML = `
+      <div class="formula-builder" data-builder="${builderId}">
+        <div class="formula-output" id="${builderId}Output"><span class="formula-placeholder">カードを押して式を作ろう</span></div>
+        <div class="formula-palette">
+          ${cards.map((card, index) => `<button class="formula-card" data-value="${card}" data-index="${index}" type="button">${card}</button>`).join("")}
+        </div>
+        <div class="formula-controls">
+          <button class="btn ghost formula-undo" type="button">1つ戻す</button>
+          <button class="btn ghost formula-clear" type="button">全部消す</button>
+        </div>
+      </div>`;
+    const builder = container.querySelector(".formula-builder");
+    builder.dataset.values = "[]";
+    builder.querySelectorAll(".formula-card").forEach((button) => button.addEventListener("click", () => {
+      const values = JSON.parse(builder.dataset.values);
+      values.push(button.dataset.value);
+      builder.dataset.values = JSON.stringify(values);
+      updateFormulaOutput(builder, builderId);
+    }));
+    builder.querySelector(".formula-undo").addEventListener("click", () => {
+      const values = JSON.parse(builder.dataset.values);
+      values.pop();
+      builder.dataset.values = JSON.stringify(values);
+      updateFormulaOutput(builder, builderId);
+    });
+    builder.querySelector(".formula-clear").addEventListener("click", () => {
+      builder.dataset.values = "[]";
+      updateFormulaOutput(builder, builderId);
+    });
+  }
+
+  function updateFormulaOutput(builder, builderId) {
+    const values = JSON.parse(builder.dataset.values || "[]");
+    const output = $("#" + builderId + "Output");
+    output.innerHTML = values.length
+      ? values.map((value) => `<span>${value}</span>`).join("")
+      : '<span class="formula-placeholder">カードを押して式を作ろう</span>';
+  }
+
+  function formulaValue(builderId) {
+    const builder = document.querySelector(`[data-builder="${builderId}"]`);
+    return builder ? JSON.parse(builder.dataset.values || "[]").join("") : "";
+  }
+
   function collectAnswer() {
     if (answerMode === "text") return $("#freeAnswer")?.value.trim() || "";
     if (answerMode === "choice") return document.querySelector('input[name="choiceAnswer"]:checked')?.value || "";
+    if (answerMode === "formula") return formulaValue("mainFormula");
     return [$("#template1")?.value, $("#template2")?.value, $("#template3")?.value].filter(Boolean).join("。");
+  }
+
+
+  function currentStep() {
+    return (activeProblem.smallSteps || [])[stepIndex];
+  }
+
+  function renderSmallStep() {
+    const steps = activeProblem.smallSteps || [];
+    if (!steps.length) {
+      $("#stepContent").innerHTML = '<p class="notice">この問題のスモールステップは準備中です。自分で解くに切り替えてください。</p>';
+      $("#checkStepBtn").classList.add("hidden");
+      return;
+    }
+    const step = steps[stepIndex];
+    $("#stepCounter").textContent = `STEP ${stepIndex + 1} / ${steps.length}`;
+    $("#stepProgressFill").style.width = `${((stepIndex + 1) / steps.length) * 100}%`;
+    $("#stepTitle").textContent = step.prompt;
+    $("#stepFeedback").classList.add("hidden");
+    $("#nextStepBtn").classList.add("hidden");
+    $("#checkStepBtn").classList.remove("hidden");
+    $("#prevStepBtn").disabled = stepIndex === 0;
+
+    if (step.type === "choice") {
+      $("#stepContent").innerHTML = `<div class="step-choice-list">${step.options.map((option) =>
+        `<label class="choice"><input type="radio" name="stepChoice" value="${option}">${option}</label>`
+      ).join("")}</div>`;
+    } else if (step.type === "formula") {
+      $("#stepContent").innerHTML = '<div id="stepFormulaArea"></div>';
+      renderFormulaBuilder("#stepFormulaArea", step.cards || activeProblem.formulaCards || [], "stepFormula");
+    } else {
+      $("#stepContent").innerHTML = `
+        <div class="step-template">
+          ${(step.fields || ["答え"]).map((field, index) => `<label>${field}<input class="step-template-input" data-index="${index}" /></label>`).join("")}
+        </div>`;
+    }
+  }
+
+  function collectStepAnswer() {
+    const step = currentStep();
+    if (!step) return "";
+    if (step.type === "choice") return document.querySelector('input[name="stepChoice"]:checked')?.value || "";
+    if (step.type === "formula") return formulaValue("stepFormula");
+    return [...document.querySelectorAll(".step-template-input")].map((input) => input.value.trim()).filter(Boolean).join("。");
+  }
+
+  function checkCurrentStep() {
+    const step = currentStep();
+    const answer = collectStepAnswer();
+    if (!answer) {
+      showToast("この段の答えを入力または選択してください");
+      return;
+    }
+
+    let correct = false;
+    if (step.type === "choice") correct = answer === step.correct;
+    if (step.type === "formula") correct = answer.replace(/\s/g, "") === (step.target || "").replace(/\s/g, "");
+    if (step.type === "template") correct = (step.expected || []).every((word) => answer.includes(word));
+
+    stepAnswers[stepIndex] = { answer, correct };
+    $("#stepFeedback").className = `step-feedback ${correct ? "good" : "retry"}`;
+    $("#stepFeedback").innerHTML = correct
+      ? `<strong>この段はクリア！</strong><p>考え方が一つつながりました。</p>`
+      : `<strong>ここまで考えられています。</strong><p>${step.support || "もう一度、問題文や図を確かめよう。"}</p>`;
+    $("#stepFeedback").classList.remove("hidden");
+
+    if (correct) {
+      $("#checkStepBtn").classList.add("hidden");
+      $("#nextStepBtn").classList.remove("hidden");
+      $("#nextStepBtn").textContent = stepIndex === (activeProblem.smallSteps || []).length - 1
+        ? "最後の答えへ →" : "次の段へ →";
+    }
+  }
+
+  function finishSmallSteps() {
+    const assembled = stepAnswers.map((item) => item?.answer).filter(Boolean).join("。");
+    learningRoute = "independent";
+    supportUsage.route = "smallStep";
+    renderProblem();
+    answerMode = currentStudent().profile.template ? "template" : "text";
+    renderAnswerModes();
+    if ($("#freeAnswer")) $("#freeAnswer").value = assembled;
+    showToast("一段ずつ考えた内容を、最後の答えにつなげよう");
   }
 
   $("#backToHomeBtn").addEventListener("click", renderStudentHome);
   $("#openProfileBtn").addEventListener("click", renderProfile);
   $("#backFromProfileBtn").addEventListener("click", renderStudentHome);
+  $("#independentModeBtn").addEventListener("click", () => {
+    learningRoute = "independent";
+    supportUsage.route = "independent";
+    renderProblem();
+  });
+  $("#smallStepModeBtn").addEventListener("click", () => {
+    learningRoute = "smallStep";
+    supportUsage.route = "smallStep";
+    stepIndex = 0;
+    stepAnswers = [];
+    renderProblem();
+  });
+  $("#checkStepBtn").addEventListener("click", checkCurrentStep);
+  $("#prevStepBtn").addEventListener("click", () => {
+    if (stepIndex > 0) {
+      stepIndex -= 1;
+      renderSmallStep();
+    }
+  });
+  $("#nextStepBtn").addEventListener("click", () => {
+    const steps = activeProblem.smallSteps || [];
+    if (stepIndex < steps.length - 1) {
+      stepIndex += 1;
+      renderSmallStep();
+    } else {
+      finishSmallSteps();
+    }
+  });
   $("#showHintBtn").addEventListener("click", () => {
     $("#hintBox").textContent = activeProblem.hint || "ヒントはありません。";
     $("#hintBox").classList.remove("hidden");
+    hintCount += 1;
+    supportUsage.hint = true;
   });
   $("#furiganaBtn").addEventListener("click", () => {
-    $("#questionText").classList.toggle("ruby-on");
-    $("#furiganaBtn").classList.toggle("active");
+    currentStudent().profile.ruby = !currentStudent().profile.ruby;
+    supportUsage.ruby = currentStudent().profile.ruby;
+    renderQuestionText();
+    $("#furiganaBtn").classList.toggle("active", currentStudent().profile.ruby);
   });
   $("#largeTextBtn").addEventListener("click", () => {
-    $("#questionText").classList.toggle("large");
-    $("#largeTextBtn").classList.toggle("active");
+    currentStudent().profile.large = !currentStudent().profile.large;
+    supportUsage.large = currentStudent().profile.large;
+    renderQuestionText();
+    $("#largeTextBtn").classList.toggle("active", currentStudent().profile.large);
+  });
+  $("#sentenceModeBtn").addEventListener("click", () => {
+    sentenceMode = !sentenceMode;
+    sentenceIndex = 0;
+    supportUsage.sentenceMode = sentenceMode;
+    renderQuestionText();
+    $("#sentenceModeBtn").classList.toggle("active", sentenceMode);
+  });
+  $("#lineFocusBtn").addEventListener("click", () => {
+    lineFocusMode = !lineFocusMode;
+    supportUsage.lineFocus = lineFocusMode;
+    renderQuestionText();
+    $("#lineFocusBtn").classList.toggle("active", lineFocusMode);
+  });
+  $("#prevSentenceBtn").addEventListener("click", () => {
+    if (sentenceIndex > 0) sentenceIndex -= 1;
+    renderQuestionText();
+  });
+  $("#nextSentenceBtn").addEventListener("click", () => {
+    const sentences = getProblemSentences();
+    if (sentenceIndex < sentences.length - 1) sentenceIndex += 1;
+    renderQuestionText();
+  });
+  $("#showAllSentencesBtn").addEventListener("click", () => {
+    sentenceMode = false;
+    renderQuestionText();
+    $("#sentenceModeBtn").classList.remove("active");
   });
   $("#readAloudBtn").addEventListener("click", () => {
     if (!("speechSynthesis" in window)) {
@@ -270,7 +538,10 @@
       return;
     }
     speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(currentStudent().profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
+    supportUsage.audio = true;
+    const sentences = getProblemSentences();
+    const readText = sentenceMode && sentences.length ? sentences[sentenceIndex] : (currentStudent().profile.easy ? activeProblem.simpleQuestion : activeProblem.question);
+    const utterance = new SpeechSynthesisUtterance(readText);
     utterance.lang = "ja-JP";
     utterance.rate = 0.85;
     speechSynthesis.speak(utterance);
@@ -288,7 +559,16 @@
 
     const student = currentStudent();
     const gain = score >= 80 ? 30 : score >= 60 ? 20 : 10;
-    student.history.push({ problemId: activeProblem.id, score, answer, answerMode, date: new Date().toISOString() });
+    const elapsedSeconds = Math.max(1, Math.round((Date.now() - problemStartedAt) / 1000));
+    student.history.push({
+      problemId: activeProblem.id, score, answer, answerMode,
+      route: supportUsage.route || learningRoute,
+      supports: { ...supportUsage, answerMode },
+      hintCount,
+      stepAnswers: clone(stepAnswers),
+      elapsedSeconds,
+      date: new Date().toISOString()
+    });
     student.xp += gain;
     student.points += Math.ceil(gain / 2);
     saveData();
@@ -392,8 +672,8 @@
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.0</h2>
-        <p>児童別のプロフィールに応じ、読み上げ・ふりがな・文字サイズ・回答形式・図・簡略問題を切り替えます。</p>
+        <h2>Version 11.3</h2>
+        <p>児童が学び方と回答方法を選び、一文表示・読む場所の強調・式カード・スモールステップを利用できます。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
   }
@@ -428,14 +708,55 @@
   }
 
   function renderTeacherResults() {
-    const rows = appData.students.flatMap((student) => student.history.map((result) => {
+    const allResults = appData.students.flatMap((student) =>
+      student.history.map((result) => ({ ...result, studentName: student.name }))
+    );
+    const supportNames = {
+      audio: "読み上げ", ruby: "ふりがな", large: "文字拡大",
+      visual: "図", sentenceMode: "一文表示", lineFocus: "読む場所強調",
+      hint: "ヒント"
+    };
+    const supportStats = {};
+    allResults.forEach((result) => {
+      Object.entries(result.supports || {}).forEach(([key, used]) => {
+        if (!supportNames[key] || !used) return;
+        if (!supportStats[key]) supportStats[key] = { count: 0, totalScore: 0, totalTime: 0 };
+        supportStats[key].count += 1;
+        supportStats[key].totalScore += result.score || 0;
+        supportStats[key].totalTime += result.elapsedSeconds || 0;
+      });
+    });
+
+    const analytics = Object.entries(supportStats).map(([key, stat]) => `
+      <div class="support-stat-card">
+        <span>${supportNames[key]}</span>
+        <strong>${stat.count}回</strong>
+        <small>平均 ${Math.round(stat.totalScore / stat.count)}点・${Math.round(stat.totalTime / stat.count)}秒</small>
+      </div>`).join("");
+
+    const rows = allResults.reverse().map((result) => {
       const problem = appData.problems.find((item) => item.id === result.problemId);
-      return `<tr><td>${student.name}</td><td>${problem?.title || "削除済み"}</td><td>${result.answerMode}</td><td>${result.score}</td><td>${new Date(result.date).toLocaleDateString("ja-JP")}</td></tr>`;
-    })).reverse().join("");
+      const supports = Object.entries(result.supports || {})
+        .filter(([key, used]) => supportNames[key] && used)
+        .map(([key]) => supportNames[key]).join("・") || "なし";
+      const route = result.route === "smallStep" ? "少しずつ" : "自分で";
+      return `<tr>
+        <td>${result.studentName}</td><td>${problem?.title || "削除済み"}</td>
+        <td>${route}</td><td>${result.answerMode}</td><td>${supports}</td>
+        <td>${result.score}</td><td>${result.elapsedSeconds || "-"}秒</td>
+        <td>${new Date(result.date).toLocaleDateString("ja-JP")}</td>
+      </tr>`;
+    }).join("");
+
     $("#teacherContent").innerHTML = `
-      <section class="panel"><h2>学習結果</h2><div class="table-wrap"><table>
-      <thead><tr><th>児童</th><th>問題</th><th>回答形式</th><th>点</th><th>日付</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="5">まだ結果がありません。</td></tr>'}</tbody></table></div></section>`;
+      <section class="panel">
+        <p class="eyebrow">SUPPORT ANALYTICS</p><h2>支援の利用状況</h2>
+        <p class="muted">正答率だけでなく、利用回数と回答時間を併せて確認します。</p>
+        <div class="support-stat-grid">${analytics || '<p class="muted">支援の利用記録はまだありません。</p>'}</div>
+      </section>
+      <section class="panel" style="margin-top:12px"><h2>学習結果</h2><div class="table-wrap"><table>
+      <thead><tr><th>児童</th><th>問題</th><th>進め方</th><th>回答形式</th><th>使った支援</th><th>点</th><th>時間</th><th>日付</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="8">まだ結果がありません。</td></tr>'}</tbody></table></div></section>`;
   }
 
   function openStudentDialog(studentId = "") {

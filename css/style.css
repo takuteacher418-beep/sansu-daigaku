@@ -54,3 +54,35 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}button{
 @media(max-width:560px){.student-sidebar{grid-template-columns:1fr}.featured-content{align-items:stretch;flex-direction:column}.featured-content .btn{width:100%}.professor-gallery{grid-template-columns:1fr}.professor-card img{height:455px}.problem-selector-head{align-items:flex-start;flex-direction:column}.professor-detail-copy{padding:25px 20px}}
 
 .recommendation-professor{display:flex;align-items:center;gap:12px}.recommendation-professor img{width:58px;height:68px;border-radius:12px;object-fit:cover;object-position:center top;border:2px solid #e3b958}.recommendation-professor p{margin:6px 0 0;color:var(--muted)}
+
+
+/* Version 11.3: LD-friendly learning routes and small steps */
+.learning-route-panel{margin:14px 0;padding:14px;border-radius:17px;background:linear-gradient(145deg,#f2f8ff,#fff9e9);border:1px solid #cddfeb}
+.learning-route-panel h3{margin:0 0 10px}
+.route-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.route-btn{display:grid;grid-template-columns:45px 1fr;column-gap:8px;align-items:center;text-align:left;padding:12px;border:2px solid #d5e2ec;border-radius:15px;background:#fff;color:var(--ink)}
+.route-btn span{grid-row:1/3;font-size:29px;text-align:center}.route-btn strong,.route-btn small{display:block}.route-btn small{color:var(--muted)}
+.route-btn.active{border-color:var(--blue);background:#edf6ff;box-shadow:0 5px 15px rgba(39,107,193,.15)}
+.sentence-progress{display:inline-block;margin:8px 0;padding:6px 10px;border-radius:999px;background:#e7f2ff;color:#245fa9;font-weight:900}
+.sentence-navigation{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.focused-sentence{display:block;padding:14px;border-radius:13px;background:#fff4a9;border-left:6px solid #e1a322}
+.question-text.line-focus{position:relative;padding:18px 14px;background:linear-gradient(to bottom,rgba(255,255,255,.35) 0 18%,#fff1a8 18% 70%,rgba(255,255,255,.35) 70% 100%);border-radius:12px}
+.small-step-panel{margin-top:14px;padding:17px;border-radius:19px;background:linear-gradient(145deg,#f6f2ff,#eff8ff);border:2px solid #a9bce7}
+.step-header{display:flex;justify-content:space-between;align-items:center;gap:10px}.step-header h2{margin:0}
+.step-counter{padding:7px 11px;border-radius:999px;background:#6349b8;color:#fff;font-weight:900}
+.step-progress{height:11px;margin:11px 0 16px;border-radius:999px;background:#dcdcec;overflow:hidden}.step-progress div{height:100%;background:linear-gradient(90deg,#6b55c4,#33a0d8)}
+.step-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:13px}
+.step-feedback{margin-top:12px;padding:12px;border-radius:12px;border-left:6px solid #d1972d;background:#fff7da}
+.step-feedback.good{border-color:#3aa26a;background:#effbf4}.step-feedback.retry{border-color:#dd9c2d;background:#fff8e0}
+.step-choice-list{display:grid;gap:8px}.step-template{display:grid;gap:10px}
+.answer-choice-note{margin:6px 0 12px;color:var(--muted);font-size:13px}
+.answer-panel-muted{outline:2px dashed #c5cee2;opacity:.96}
+.formula-builder{display:grid;gap:12px}.formula-output{min-height:72px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;padding:12px;border:2px solid #b6cce0;border-radius:14px;background:#f9fcff;font-size:24px;font-weight:900}
+.formula-output span:not(.formula-placeholder){display:inline-grid;place-items:center;min-width:42px;padding:7px;border-radius:9px;background:#fff;border:1px solid #cbdbe8}
+.formula-placeholder{color:#91a0ae;font-size:14px;font-weight:700}
+.formula-palette{display:flex;flex-wrap:wrap;gap:8px}.formula-card{min-width:48px;padding:11px 13px;border:2px solid #d9bd67;border-radius:12px;background:linear-gradient(#fffdf5,#fff0bb);color:#3a4a57;font-weight:900;box-shadow:0 3px 0 #cfad50}
+.formula-card:active{transform:translateY(2px);box-shadow:0 1px 0 #cfad50}.formula-controls{display:flex;gap:7px}
+.support-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.support-stat-card{padding:13px;border-radius:14px;background:#f1f7fc;border:1px solid var(--line)}
+.support-stat-card span,.support-stat-card strong,.support-stat-card small{display:block}.support-stat-card strong{font-size:25px;margin:4px 0}.support-stat-card small{color:var(--muted)}
+@media(max-width:850px){.support-stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.route-buttons,.sentence-navigation{grid-template-columns:1fr}.step-actions{flex-direction:column}.support-stat-grid{grid-template-columns:1fr}}
