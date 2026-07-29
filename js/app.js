@@ -156,7 +156,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -269,6 +269,42 @@
     return professorByName(problem?.professor);
   }
 
+  const CAMPUS_STAGES = [
+    { minClears: 0, image: "images/campus/campus-1.svg", title: "はじまりの校舎" },
+    { minClears: 3, image: "images/campus/campus-2.svg", title: "緑のキャンパス" },
+    { minClears: 8, image: "images/campus/campus-3.svg", title: "研究棟のある大学" },
+    { minClears: 15, image: "images/campus/campus-4.svg", title: "時計塔のキャンパス" },
+    { minClears: 25, image: "images/campus/campus-5.svg", title: "光り輝く算数大学" }
+  ];
+  const AVATAR_IMAGES = [
+    "images/avatars/avatar-blue.svg",
+    "images/avatars/avatar-green.svg",
+    "images/avatars/avatar-orange.svg",
+    "images/avatars/avatar-purple.svg"
+  ];
+
+  function avatarVariantFromId(id) {
+    return Array.from(String(id || "student")).reduce((sum, character) => sum + character.charCodeAt(0), 0) % AVATAR_IMAGES.length;
+  }
+
+  function avatarImageForStudent(student) {
+    const variant = Number.isInteger(student.profile?.avatarVariant)
+      ? student.profile.avatarVariant % AVATAR_IMAGES.length
+      : avatarVariantFromId(student.id);
+    return AVATAR_IMAGES[variant];
+  }
+
+  function campusProgressForStudent(student) {
+    const clears = new Set(student.history.filter((item) => item.score >= 60).map((item) => item.problemId)).size;
+    let stageIndex = 0;
+    CAMPUS_STAGES.forEach((stage, index) => {
+      if (clears >= stage.minClears) stageIndex = index;
+    });
+    const stage = CAMPUS_STAGES[stageIndex];
+    const next = CAMPUS_STAGES[stageIndex + 1] || null;
+    return { clears, stageIndex, stage, next };
+  }
+
   function profileLabels(profile) {
     const labels = [];
     if (profile.audio) labels.push("音声で聞く");
@@ -359,7 +395,14 @@
 
     $("#studentDisplayName").textContent = student.name + " さん";
     $("#studentLevel").textContent = level;
-    $("#campusLevel").textContent = "Lv." + Math.max(1, Math.floor(level / 2));
+    const campusProgress = campusProgressForStudent(student);
+    $("#studentAvatarImage").src = avatarImageForStudent(student);
+    $("#campusGrowthImage").src = campusProgress.stage.image;
+    $("#campusGrowthTitle").textContent = campusProgress.stage.title;
+    $("#campusGrowthNext").textContent = campusProgress.next
+      ? `あと${campusProgress.next.minClears - campusProgress.clears}問クリアでキャンパスが成長`
+      : "キャンパスが最高ランクになりました！";
+    $("#campusLevel").textContent = `キャンパス Lv.${campusProgress.stageIndex + 1}`;
     $("#studentPoints").textContent = student.points + " pt";
     $("#studentClears").textContent = new Set(student.history.filter((item) => item.score >= 60).map((item) => item.problemId)).size + " 問";
     $("#studentStyleText").textContent = labels.slice(0, 3).join("・") || "スタンダードな学び方";
@@ -1089,6 +1132,18 @@
     $("#professorDetailDialog").showModal();
   }
 
+  function openAvatarDialog() {
+    const student = currentStudent();
+    if (!student) return;
+    $("#avatarDialogImage").src = avatarImageForStudent(student);
+    $("#avatarDialogName").textContent = student.name + " さん";
+    $("#avatarDialogLevel").textContent = `学生レベル ${levelFromXp(student.xp)}｜${student.points} pt`;
+    $("#avatarDialog").showModal();
+    scheduleAccessibility();
+  }
+  $("#studentAvatarBtn").addEventListener("click", openAvatarDialog);
+  $("#closeAvatarDialogBtn").addEventListener("click", () => $("#avatarDialog").close());
+
   $("#openProfessorListBtn").addEventListener("click", () => {
     renderProfessorGallery();
     $("#professorDialog").showModal();
@@ -1124,7 +1179,7 @@
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.8.1</h2>
+        <h2>Version 11.9</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;

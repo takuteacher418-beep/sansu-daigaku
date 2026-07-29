@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" role="img" aria-label="はじまりの校舎">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop stop-color="#cfe8ff"/><stop offset="1" stop-color="#f8fcff"/>
+        </linearGradient>
+        <linearGradient id="roof" x1="0" x2="1">
+          <stop stop-color="#86b5df"/><stop offset="1" stop-color="#355f8d"/>
+        </linearGradient>
+      </defs>
+      <rect width="720" height="380" rx="28" fill="url(#sky)"/>
+      <circle cx="620" cy="64" r="34" fill="#fff4a8" opacity=".9"/>
+      
+      <path d="M0 305C145 270 245 320 360 294C500 262 600 283 720 254V380H0Z" fill="#80b46f"/>
+      <path d="M0 331C175 296 284 348 410 318C530 290 615 304 720 286V380H0Z" fill="#5f9c59"/>
+      
+      <g transform="translate(172 145)">
+        <rect x="0" y="48" width="370" height="130" rx="12" fill="#fff9ea" stroke="#86b5df" stroke-width="6"/>
+        <path d="M-15 50L185 -25L385 50Z" fill="url(#roof)"/>
+        <rect x="150" y="92" width="70" height="86" rx="6" fill="#8c654a"/>
+        <g fill="#83c4e7" stroke="#547b99" stroke-width="3">
+          <rect x="25" y="82" width="52" height="43" rx="5"/>
+          <rect x="92" y="82" width="52" height="43" rx="5"/>
+          <rect x="226" y="82" width="52" height="43" rx="5"/>
+          <rect x="293" y="82" width="52" height="43" rx="5"/>
+        </g>
+        <rect x="75" y="140" width="48" height="38" fill="#d6ecfa" stroke="#547b99" stroke-width="3"/>
+        <rect x="247" y="140" width="48" height="38" fill="#d6ecfa" stroke="#547b99" stroke-width="3"/>
+        <rect x="126" y="31" width="118" height="33" rx="9" fill="#fff" stroke="#86b5df" stroke-width="4"/>
+        <text x="185" y="54" text-anchor="middle" font-family="sans-serif" font-size="17" font-weight="700" fill="#244867">算数大学</text>
+      </g>
+      
+      <path d="M285 380L337 312H383L442 380Z" fill="#e7d4a5"/>
+      <g transform="translate(45 28)">
+        <rect width="185" height="38" rx="19" fill="#ffffff" opacity=".9"/>
+        <text x="92" y="25" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#284963">はじまりの校舎</text>
+      </g>
+    </svg>

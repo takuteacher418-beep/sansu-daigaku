@@ -246,3 +246,67 @@ ruby[data-auto-ruby="true"] rt{
 .global-large-text .unit-filter-label select{
   font-size:1.05rem !important;
 }
+
+
+/* Version 11.9: growing campus and student avatar */
+.avatar-button{
+  position:relative;padding:0;overflow:visible;cursor:pointer;background:linear-gradient(145deg,#e8f4ff,#fff);
+}
+.avatar-button img{width:100%;height:100%;object-fit:cover;border-radius:15px;display:block}
+.avatar-edit-badge{
+  position:absolute;right:-5px;bottom:-5px;width:22px;height:22px;display:grid;place-items:center;
+  border-radius:50%;background:#f1c63d;color:#354355;border:2px solid #fff;font-weight:900;font-size:15px;
+}
+.avatar-button:hover{transform:translateY(-2px);box-shadow:0 7px 15px rgba(34,72,104,.2)}
+
+.campus-banner{min-height:205px;padding-right:390px}
+.campus-growth-area{
+  position:absolute;right:18px;top:40px;bottom:15px;width:350px;z-index:2;
+  border-radius:18px;overflow:hidden;background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.35);box-shadow:0 10px 25px rgba(5,35,70,.2);
+}
+.campus-growth-area img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s ease,transform .3s ease}
+.campus-growth-area:hover img{transform:scale(1.025)}
+.campus-growth-caption{
+  position:absolute;left:10px;right:10px;bottom:9px;padding:7px 10px;border-radius:11px;
+  background:rgba(20,55,86,.82);backdrop-filter:blur(5px);display:flex;justify-content:space-between;gap:10px;align-items:center;
+}
+.campus-growth-caption strong{font-size:13px;color:#fff}
+.campus-growth-caption small{font-size:10px;color:#e8f4ff;text-align:right}
+.campus-level-pill{right:18px}
+
+.avatar-dialog{width:min(760px,calc(100vw - 30px))}
+.avatar-room{display:grid;grid-template-columns:280px 1fr;gap:22px;align-items:stretch}
+.avatar-stage{
+  position:relative;min-height:360px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;
+  border-radius:22px;overflow:hidden;background:linear-gradient(160deg,#e6f4ff,#fff7d7);
+  border:2px solid #cfdeeb;
+}
+.avatar-stage-glow{position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,224,105,.35);filter:blur(8px)}
+.avatar-stage img{position:relative;width:190px;height:190px;filter:drop-shadow(0 15px 15px rgba(35,61,82,.2))}
+.avatar-stage strong,.avatar-stage .tag{position:relative}
+.avatar-stage strong{font-size:23px}
+.avatar-future-panel{padding:18px;border-radius:19px;background:#f5f9fc;border:1px solid #d6e2eb}
+.avatar-future-panel h3{margin-top:0;font-size:22px}
+.avatar-future-panel p{line-height:1.8;color:#526674}
+.future-item-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.future-item-grid span{padding:12px;border-radius:12px;background:#fff;border:1px solid #d8e3eb;font-weight:800}
+.avatar-coming-soon{padding:13px;border-radius:12px;text-align:center;background:#243f63;color:#fff;font-weight:900;letter-spacing:.12em}
+
+.global-large-text .campus-growth-caption strong{font-size:1rem}
+.global-large-text .campus-growth-caption small{font-size:.82rem}
+
+@media(max-width:980px){
+  .campus-banner{padding-right:285px}
+  .campus-growth-area{width:255px}
+  .campus-growth-caption{display:block}
+  .campus-growth-caption small{display:block;margin-top:2px;text-align:left}
+}
+@media(max-width:700px){
+  .campus-banner{min-height:360px;padding:22px}
+  .campus-banner-copy{align-self:flex-start}
+  .campus-growth-area{left:16px;right:16px;top:145px;bottom:15px;width:auto}
+  .campus-level-pill{top:12px;right:12px}
+  .avatar-room{grid-template-columns:1fr}
+  .avatar-stage{min-height:300px}
+}

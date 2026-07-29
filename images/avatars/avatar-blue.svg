@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="学生アバター">
+      <rect width="160" height="160" rx="36" fill="#d8ecff"/>
+      <circle cx="80" cy="67" r="39" fill="#f4c9a8"/>
+      <path d="M42 65C41 32 59 18 82 18C112 18 124 38 117 68C104 50 84 51 65 43C62 55 53 63 42 65Z" fill="#473427"/>
+      <circle cx="66" cy="69" r="4" fill="#273746"/><circle cx="95" cy="69" r="4" fill="#273746"/>
+      <path d="M68 88Q80 98 93 87" fill="none" stroke="#a45d57" stroke-width="4" stroke-linecap="round"/>
+      <path d="M35 158C40 116 56 103 80 103C105 103 121 116 126 158Z" fill="#2e6ca4"/>
+      <path d="M65 104L80 122L95 104" fill="#fff"/>
+      <path d="M80 122L73 150H87Z" fill="#f3ca3e"/>
+      <path d="M38 35L79 13L123 35L80 54Z" fill="#243f63"/>
+      <rect x="66" y="46" width="29" height="8" rx="4" fill="#243f63"/>
+      <path d="M118 36V62" stroke="#f2c643" stroke-width="4"/><circle cx="118" cy="66" r="5" fill="#f2c643"/>
+    </svg>

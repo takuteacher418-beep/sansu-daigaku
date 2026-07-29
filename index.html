@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.8.1</title>
+  <title>算数大学 Version 11.9</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.8.1</span>
+        <span class="version">Version 11.9</span>
       </section>
 
       <section class="login-panel">
@@ -48,7 +48,7 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.8.1</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.9</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <div id="globalAccessibilityTools" class="global-accessibility-tools hidden" aria-label="表示の設定">
         <button id="globalFuriganaBtn" class="top-accessibility-btn" type="button" aria-pressed="false">ふりがな</button>
@@ -62,7 +62,10 @@
         <aside class="student-sidebar">
           <article class="panel student-card">
             <div class="student-card-top">
-              <div class="student-mini-avatar">🎓</div>
+              <button id="studentAvatarBtn" class="student-mini-avatar avatar-button" type="button" aria-label="自分のアバターを見る">
+                <img id="studentAvatarImage" src="images/avatars/avatar-blue.svg" alt="自分のアバター">
+                <span class="avatar-edit-badge">+</span>
+              </button>
               <div><p class="eyebrow">STUDENT</p><h2 id="studentDisplayName"></h2><p id="studentStyleText" class="muted"></p></div>
             </div>
             <div class="level-line"><span>レベル</span><strong id="studentLevel">1</strong></div>
@@ -93,7 +96,13 @@
               <h1>算数大学キャンパス</h1>
               <p>問題を選んで、今日の研究を始めよう。</p>
             </div>
-            <div class="campus-scenery"><span>📚</span><span>🏛️</span><span>🔭</span></div>
+            <div class="campus-growth-area">
+              <img id="campusGrowthImage" src="images/campus/campus-1.svg" alt="成長していく算数大学キャンパス">
+              <div class="campus-growth-caption">
+                <strong id="campusGrowthTitle">はじまりの校舎</strong>
+                <small id="campusGrowthNext">あと3問クリアでキャンパスが成長</small>
+              </div>
+            </div>
             <span id="campusLevel" class="campus-level-pill">キャンパス Lv.1</span>
           </article>
 
@@ -275,6 +284,30 @@
       <button id="closeAssignmentInboxBtn" class="btn ghost" type="button">×</button>
     </div>
     <div id="assignmentInboxList" class="assignment-inbox-list"></div>
+  </dialog>
+
+
+  <dialog id="avatarDialog" class="modal avatar-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">MY AVATAR</p><h2>自分のアバター</h2></div>
+      <button id="closeAvatarDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div class="avatar-room">
+      <div class="avatar-stage">
+        <div class="avatar-stage-glow"></div>
+        <img id="avatarDialogImage" src="images/avatars/avatar-blue.svg" alt="自分のアバター">
+        <strong id="avatarDialogName"></strong>
+        <span id="avatarDialogLevel" class="tag"></span>
+      </div>
+      <div class="avatar-future-panel">
+        <h3>アバターの成長</h3>
+        <p>今は自分専用の学生アバターです。今後、研究ポイントで服・帽子・アクセサリーを手に入れ、着せ替えられるようになります。</p>
+        <div class="future-item-grid">
+          <span>👕 服</span><span>🎩 帽子</span><span>👓 アクセサリー</span><span>🎒 持ち物</span>
+        </div>
+        <div class="avatar-coming-soon">COMING SOON</div>
+      </div>
+    </div>
   </dialog>
 
   <dialog id="professorDialog" class="modal professor-modal">
