@@ -1,15 +1,17 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "12.5.1";
-  const APP_BUILD_DATE = "2026.07.29";
+  const APP_VERSION = "13.0";
+  const APP_BUILD_DATE = "2026.07.30";
   const APP_RELEASE_NOTES = [
     "日本語表記の分数を教科書型の分数記号へ変換",
     "半角・全角スラッシュの分数表示を改善",
     "バージョン番号を1か所で管理",
     "教師画面にビルド情報と更新内容を表示",
     "分数同士の演算記号を分数線の中央に配置",
-    "CSS・JavaScriptが読み込まれない表示崩れを修正"
+    "CSS・JavaScriptが読み込まれない表示崩れを修正",
+    "児童ホーム画面をLDに配慮した大きなカードUIへ全面刷新",
+    "既存の学習・課題・プロフィール機能との接続を維持"
   ];
 
   const STORAGE_KEY = "sansuDaigakuV11Fixed";
@@ -655,6 +657,7 @@
     ["studentHomeView", "problemView", "practiceView", "profileView", "teacherView"].forEach((id) => {
       $("#" + id).classList.toggle("hidden", id !== pageId);
     });
+    document.body.classList.toggle("v13-student-home-active", pageId === "studentHomeView");
     scheduleAccessibility();
   }
   function currentStudent() {
@@ -803,7 +806,7 @@
     $("#campusGrowthNext").textContent = campusProgress.next
       ? `あと${campusProgress.next.minClears - campusProgress.clears}問クリアでキャンパスが成長`
       : "キャンパスが最高ランクになりました！";
-    $("#campusLevel").textContent = `キャンパス Lv.${campusProgress.stageIndex + 1}`;
+    $("#campusLevel").textContent = `Lv.${campusProgress.stageIndex + 1}`;
     $("#studentPoints").textContent = student.points + " pt";
     $("#studentClears").textContent = new Set(student.history.filter((item) => item.score >= 60).map((item) => item.problemId)).size + " 問";
     $("#studentStyleText").textContent = labels.slice(0, 3).join("・") || "スタンダードな学び方";
@@ -811,7 +814,10 @@
     $("#xpFill").style.width = (student.xp % 100) + "%";
     $("#xpText").textContent = `${student.xp % 100} / 100 EXP`;
     const homeProfessor = professorForProblem(recommendation);
-    $("#recommendationBox").innerHTML = `<div class="recommendation-professor"><img src="${homeProfessor.image}" alt="${homeProfessor.name}"><div><strong>${recommendation.unit}｜${recommendation.title}</strong><p>担当：${homeProfessor.name}　${student.profile.visual ? "図を使って" : "自分の言葉で"}考えよう。</p></div></div>`;
+    $("#homeProfessorImage").src = homeProfessor.image;
+    $("#homeProfessorImage").alt = homeProfessor.name;
+    $("#recommendationBox").innerHTML = `<div class="v13-recommendation-copy"><strong>${homeProfessor.name}</strong><p>今日は「${escapeHtml(recommendation.unit)}」にチャレンジしよう！<br>いっしょにがんばろう！</p></div>`;
+    $("#homeRecommendationTitle").textContent = `${recommendation.unit}｜${recommendation.title}`;
     $("#startRecommendationBtn").onclick = () => { activeAssignmentId = null; openProblem(recommendation.id); };
 
     const gradeOptions = [
@@ -832,6 +838,18 @@
     const average = student.history.length
       ? Math.round(student.history.reduce((sum, item) => sum + item.score, 0) / student.history.length)
       : 0;
+    const todayKey = new Date().toLocaleDateString("ja-JP");
+    const todayHistory = student.history.filter((item) => new Date(item.date).toLocaleDateString("ja-JP") === todayKey);
+    const todayXp = todayHistory.reduce((sum, item) => sum + Math.max(0, Math.round(Number(item.score || 0) / 10)), 0);
+    $("#homeTodaySolved").textContent = `${todayHistory.length} 問`;
+    $("#homeTodayXp").textContent = `${todayXp} pt`;
+    const nextCampusMinimum = campusProgress.next?.minClears ?? campusProgress.clears;
+    const previousCampusMinimum = campusProgress.stage.minClears;
+    const stageRange = Math.max(1, nextCampusMinimum - previousCampusMinimum);
+    const stageProgress = campusProgress.next
+      ? Math.max(0, Math.min(100, ((campusProgress.clears - previousCampusMinimum) / stageRange) * 100))
+      : 100;
+    $("#homeCampusProgress").style.width = `${stageProgress}%`;
     $("#studentMetrics").innerHTML = `
       <div class="metric"><span>挑戦回数</span><strong>${student.history.length}</strong></div>
       <div class="metric"><span>平均点</span><strong>${average}</strong></div>`;
@@ -866,6 +884,8 @@
 
     $("#assignmentInboxBtn").classList.toggle("hidden", assignments.length === 0);
     $("#assignmentInboxCount").textContent = pending.length;
+    $("#homeAnnouncementBadge").textContent = pending.length;
+    $("#homeAnnouncementBadge").classList.toggle("hidden", pending.length === 0);
     $("#assignmentInboxCount").classList.toggle("hidden", pending.length === 0);
     $("#assignmentInboxText").textContent = pending.length
       ? `取り組む課題が ${pending.length} 件あります`
@@ -1343,6 +1363,31 @@
   }
 
   $("#backToHomeBtn").addEventListener("click", renderStudentHome);
+  $("#homeLearningBtn").addEventListener("click", () => {
+    $("#homeLearningSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("#homeCampusBtn").addEventListener("click", () => {
+    $(".v13-campus-status")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    showToast("学習を続けるとキャンパスが成長します");
+  });
+  $("#homeCollectionBtn").addEventListener("click", () => {
+    showToast("コレクションは次のアップデートで追加予定です");
+  });
+  $("#homeHelpBtn").addEventListener("click", () => {
+    showToast("黄色い「学習をはじめる」を押すと学習できます");
+  });
+  $("#homeChooseGoalBtn").addEventListener("click", () => {
+    showToast("まずは今日1問に挑戦してみよう！");
+  });
+  $("#homeAnnouncementBtn").addEventListener("click", () => {
+    if (!$("#assignmentInboxBtn").classList.contains("hidden")) $("#assignmentInboxBtn").click();
+    else showToast("新しいお知らせはありません");
+  });
+  $("#homeSettingsBtn").addEventListener("click", () => {
+    $("#globalAccessibilityTools").classList.toggle("hidden");
+    showToast("上の表示設定を使えます");
+  });
+
   $("#openProfileBtn").addEventListener("click", renderProfile);
   $("#backFromProfileBtn").addEventListener("click", renderStudentHome);
   $("#independentModeBtn").addEventListener("click", () => {

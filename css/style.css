@@ -713,3 +713,185 @@ ruby[data-auto-ruby="true"] rt{
   .fraction-expression{gap:.25em}
   .math-operator{font-size:1em}
 }
+
+
+/* =========================================================
+   Version 13.0 Phase 1: LD-friendly magical campus home UI
+   ========================================================= */
+.v13-home-page{
+  width:min(1540px,calc(100% - 20px));
+  margin:10px auto 42px;
+}
+.v13-home-shell{display:grid;gap:18px}
+.v13-magic-hero{
+  position:relative;
+  min-height:860px;
+  overflow:hidden;
+  border-radius:28px;
+  border:2px solid rgba(239,196,94,.72);
+  background:#071938;
+  box-shadow:0 24px 70px rgba(4,18,43,.28);
+  color:#fff;
+  isolation:isolate;
+}
+.v13-campus-background{
+  position:absolute;
+  inset:0;
+  z-index:-4;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  transform:scale(1.06);
+  filter:saturate(.86) brightness(.58) contrast(1.08);
+}
+.v13-night-overlay{
+  position:absolute;
+  inset:0;
+  z-index:-3;
+  background:
+    linear-gradient(180deg,rgba(3,17,52,.48),rgba(5,18,42,.34) 45%,rgba(3,13,31,.78)),
+    radial-gradient(circle at 48% 8%,rgba(87,105,220,.32),transparent 38%),
+    linear-gradient(90deg,rgba(4,16,38,.74),transparent 25%,transparent 72%,rgba(4,16,38,.77));
+}
+.v13-stars{
+  position:absolute;inset:0;z-index:-2;opacity:.72;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 7% 8%,#fff 0 1px,transparent 2px),
+    radial-gradient(circle at 18% 14%,#ffe696 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 36% 6%,#fff 0 1px,transparent 2px),
+    radial-gradient(circle at 58% 13%,#ffe696 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 76% 7%,#fff 0 1px,transparent 2px),
+    radial-gradient(circle at 91% 17%,#ffe696 0 1.5px,transparent 2.5px);
+}
+.v13-hero-header{
+  display:grid;
+  grid-template-columns:minmax(235px,1fr) minmax(380px,1.45fr) minmax(205px,1fr);
+  align-items:center;
+  gap:18px;
+  padding:18px 20px 10px;
+}
+.v13-student-profile{
+  display:flex;align-items:center;gap:12px;
+  width:max-content;max-width:100%;
+  padding:9px 18px 9px 9px;
+  border:2px solid rgba(231,190,92,.58);
+  border-radius:22px;
+  color:#fff;background:rgba(6,23,53,.84);
+  box-shadow:0 8px 25px rgba(0,0,0,.19);
+}
+.v13-profile-avatar{position:relative;width:72px;height:72px;display:block}
+.v13-profile-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #e8bd58;background:#fff}
+.v13-profile-copy{text-align:left}.v13-profile-copy strong{display:block;font-size:23px}.v13-profile-copy small{font-size:16px}
+.v13-brand{text-align:center;display:flex;align-items:center;justify-content:center;gap:12px}
+.v13-brand-mark{
+  width:60px;height:60px;display:grid;place-items:center;
+  border-radius:19px;background:linear-gradient(#fff5b9,#e8a62c);
+  color:#163d70;font-size:31px;font-weight:1000;border:3px solid rgba(255,255,255,.68)
+}
+.v13-brand h1{margin:0;color:#fff3d4;font-size:46px;letter-spacing:.08em;text-shadow:0 3px 10px #000}
+.v13-brand p{margin:7px 0 0;padding:7px 18px;border-radius:999px;background:rgba(55,38,130,.75);font-weight:800}
+.v13-header-actions{display:flex;justify-content:flex-end;gap:10px}
+.v13-icon-button{
+  position:relative;display:grid;place-items:center;gap:3px;
+  min-width:91px;min-height:88px;padding:9px;
+  border:2px solid rgba(231,190,92,.54);border-radius:21px;
+  background:rgba(6,23,53,.86);color:#fff;font-weight:900
+}
+.v13-icon-button>span{font-size:30px}.v13-icon-button small{font-size:13px}
+.v13-icon-button b{position:absolute;right:-4px;top:-6px;display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#e84e3e;color:#fff}
+.v13-hero-grid{
+  display:grid;
+  grid-template-columns:minmax(250px,.8fr) minmax(520px,1.5fr) minmax(270px,.85fr);
+  gap:18px;align-items:end;
+  padding:15px 20px 0;
+}
+.v13-professor-column{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end}
+.v13-professor-message{
+  position:relative;z-index:2;margin-bottom:-14px;padding:19px 20px 22px;
+  border-radius:24px;background:#fff9eb;color:#19334e;
+  border:3px solid #d2b36d;box-shadow:0 12px 25px rgba(0,0,0,.19)
+}
+.v13-professor-message:after{
+  content:"";position:absolute;left:68px;bottom:-23px;border:13px solid transparent;border-top-color:#fff9eb
+}
+.v13-message-label{display:block;margin-bottom:8px;font-size:13px;font-weight:900;color:#65558b}
+.v13-recommendation-copy strong{display:block;font-size:16px}.v13-recommendation-copy p{margin:7px 0 0;line-height:1.8;font-weight:900}
+.v13-professor-portrait{height:425px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.v13-professor-portrait img{height:100%;max-width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 14px 14px rgba(0,0,0,.35))}
+.v13-primary-column{display:grid;gap:15px;align-self:end}
+.v13-campus-status{text-align:center;padding:12px 20px;border-radius:22px;background:rgba(7,24,57,.86);border:2px solid rgba(204,158,75,.65);box-shadow:0 10px 28px rgba(0,0,0,.25)}
+.v13-campus-status span,.v13-campus-status small{display:block}.v13-campus-status span{color:#ecd88f;font-weight:900}.v13-campus-status strong{display:block;margin:5px 0;font-size:28px}.v13-campus-status small{color:#dbe7f9}
+.v13-main-action-card{padding:13px 18px 17px;border:3px solid #b98b32;border-radius:30px;background:rgba(5,22,52,.9);box-shadow:0 15px 35px rgba(0,0,0,.28)}
+.v13-action-kicker{text-align:center;margin:-2px 0 9px;font-size:20px;font-weight:1000;color:#fff2ba}
+.v13-start-button{
+  width:100%;min-height:164px;display:flex;align-items:center;justify-content:center;gap:20px;
+  border:0;border-radius:28px;padding:22px 28px;
+  background:linear-gradient(180deg,#ffd83a,#f7b707);
+  color:#3a2500;box-shadow:inset 0 0 0 4px rgba(255,242,148,.62),0 8px 0 #c98600;
+  transition:transform .16s,filter .16s
+}
+.v13-start-button:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.v13-start-button:active{transform:translateY(5px);box-shadow:inset 0 0 0 4px rgba(255,242,148,.62),0 3px 0 #c98600}
+.v13-play-icon{width:84px;height:84px;display:grid;place-items:center;border-radius:50%;background:#fff;color:#f0ad00;font-size:42px;box-shadow:0 6px 16px rgba(128,82,0,.18)}
+.v13-start-button strong{display:block;font-size:39px;letter-spacing:.03em}.v13-start-button small{display:block;margin-top:7px;font-size:15px}
+.v13-goal-button{display:block;margin:13px auto 0;padding:10px 25px;border:2px solid #d8b06b;border-radius:999px;background:#fff7e4;color:#513e2a;font-weight:900}
+.v13-teacher-message{
+  display:grid!important;grid-template-columns:50px 1fr auto;align-items:center;gap:12px;
+  width:100%;padding:14px 19px;border:2px solid #745bb3;border-radius:19px;
+  background:rgba(31,27,88,.93);color:#fff;text-align:left
+}
+.v13-teacher-message.hidden{display:none!important}.v13-teacher-message .mail-icon{font-size:32px}.v13-teacher-message small{display:block;color:#e3e5ff}
+.v13-progress-column{display:grid;gap:12px;align-self:stretch}
+.v13-dark-card{padding:17px;border-radius:22px;background:rgba(5,22,52,.9);border:2px solid rgba(198,159,84,.58);box-shadow:0 10px 25px rgba(0,0,0,.22)}
+.v13-level-card{text-align:center}.v13-level-card p{margin:0;font-weight:900}.v13-level-card>strong{display:block;margin:5px 0;font-size:38px;color:#fff2d0}.v13-level-card .xp-track{height:18px;background:#526073}.v13-level-card #xpFill{background:linear-gradient(90deg,#ffca17,#ffe15a)}.v13-level-card small{display:block;margin-top:8px}
+.v13-today-card h2{margin:0 0 11px;font-size:19px;text-align:center;color:#ffe59a}
+.v13-today-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.15)}.v13-today-row strong{font-size:20px;color:#ffe06c}
+.v13-growth-card small{display:block;margin-top:8px;color:#d9e6f7}.v13-growth-head{display:flex;justify-content:space-between;font-weight:900}.v13-growth-head b{color:#ffe274}
+.v13-growth-track{height:15px;margin-top:12px;border-radius:999px;background:#42536d;overflow:hidden}.v13-growth-track div{height:100%;background:linear-gradient(90deg,#6da642,#d7db50,#ffe880);border-radius:999px}
+.v13-main-nav{display:grid;grid-template-columns:repeat(4,1fr) 1.22fr;gap:11px;padding:17px 20px 20px;background:rgba(4,16,38,.82)}
+.v13-nav-tile,.v13-help-tile{min-height:138px;border-radius:22px;border:2px solid rgba(255,255,255,.54);padding:15px;display:grid;place-items:center;text-align:center;color:#17334f;box-shadow:0 8px 18px rgba(0,0,0,.2)}
+.v13-nav-tile span,.v13-help-tile span{font-size:39px}.v13-nav-tile strong,.v13-help-tile strong{display:block;font-size:21px}.v13-nav-tile small,.v13-help-tile small{display:block}
+.v13-nav-tile.learning{background:linear-gradient(145deg,#dff1ff,#97c8f6)}
+.v13-nav-tile.campus{background:linear-gradient(145deg,#efffdc,#b7dd91)}
+.v13-nav-tile.profile{background:linear-gradient(145deg,#f2eaff,#c1abe9)}
+.v13-nav-tile.collection{background:linear-gradient(145deg,#fff2d7,#e9bd6e)}
+.v13-help-tile{grid-template-columns:55px 1fr;background:linear-gradient(145deg,#fff5fb,#ddbddd);text-align:left}
+.v13-below-fold{display:grid;gap:14px}
+.v13-quick-summary{display:grid;grid-template-columns:1.3fr 1fr auto;gap:18px;align-items:center}
+.v13-summary-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}.v13-summary-metrics .metric-row{margin:0}.v13-summary-actions{display:flex;justify-content:flex-end}
+.v13-history-panel .history-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.v13-student-home-active .topbar{background:rgba(5,19,45,.97);color:#fff;border-bottom-color:#715b34}
+.v13-student-home-active .topbar .mini-brand small,.v13-student-home-active .topbar .session-info small{color:#d8e4f5}
+.v13-student-home-active .topbar .btn.ghost{background:#fff;color:#23496d}
+.v13-student-home-active{background:linear-gradient(180deg,#071936,#eaf6ff 900px,#fff9ee)}
+.v13-student-home-active #globalAccessibilityTools{background:rgba(255,255,255,.08);padding:5px;border-radius:12px}
+
+@media(max-width:1200px){
+  .v13-hero-header{grid-template-columns:1fr 1.3fr auto}
+  .v13-hero-grid{grid-template-columns:230px minmax(430px,1.45fr) 250px}
+  .v13-brand h1{font-size:38px}
+  .v13-start-button strong{font-size:32px}
+  .v13-main-nav{grid-template-columns:repeat(4,1fr)}
+  .v13-help-tile{grid-column:1/-1;min-height:90px}
+}
+@media(max-width:960px){
+  .v13-magic-hero{min-height:auto}
+  .v13-hero-header{grid-template-columns:1fr auto}.v13-brand{grid-column:1/-1;grid-row:1;text-align:center}.v13-student-profile{grid-row:2}.v13-header-actions{grid-row:2}
+  .v13-hero-grid{grid-template-columns:1fr 1fr}.v13-professor-column{grid-column:1}.v13-primary-column{grid-column:2}.v13-progress-column{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
+  .v13-professor-portrait{height:340px}
+  .v13-main-nav{grid-template-columns:repeat(2,1fr)}
+  .v13-help-tile{grid-column:1/-1}
+  .v13-quick-summary{grid-template-columns:1fr}.v13-summary-actions{justify-content:stretch}.v13-summary-actions button{width:100%}
+}
+@media(max-width:680px){
+  .v13-home-page{width:min(100% - 10px,1540px);margin-top:5px}
+  .v13-magic-hero{border-radius:19px}
+  .v13-hero-header{padding:12px;gap:8px}.v13-student-profile{padding:6px 10px 6px 6px}.v13-profile-avatar{width:54px;height:54px}.v13-profile-copy strong{font-size:17px}.v13-profile-copy small{font-size:12px}
+  .v13-brand{display:block}.v13-brand-mark{display:none}.v13-brand h1{font-size:34px}.v13-brand p{font-size:12px;padding:6px 10px}
+  .v13-icon-button{min-width:66px;min-height:66px;border-radius:16px}.v13-icon-button>span{font-size:24px}.v13-icon-button small{font-size:10px}
+  .v13-hero-grid{grid-template-columns:1fr;padding:8px 12px 0}.v13-professor-column,.v13-primary-column,.v13-progress-column{grid-column:1}.v13-professor-column{display:grid;grid-template-columns:1fr 120px;align-items:end}.v13-professor-message{margin:0 -20px 10px 0}.v13-professor-portrait{height:190px}
+  .v13-campus-status strong{font-size:22px}.v13-start-button{min-height:130px;padding:16px;gap:12px}.v13-play-icon{width:65px;height:65px;font-size:31px}.v13-start-button strong{font-size:27px}.v13-start-button small{font-size:12px}
+  .v13-progress-column{grid-template-columns:1fr}.v13-main-nav{grid-template-columns:1fr 1fr;padding:12px}.v13-nav-tile{min-height:120px}.v13-help-tile{grid-column:1/-1}
+  .v13-quick-summary{padding:14px}.v13-summary-metrics{grid-template-columns:1fr}.v13-history-panel .history-list{grid-template-columns:1fr}
+}
