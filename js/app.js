@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "13.0";
+  const APP_VERSION = "13.0-phase2";
   const APP_BUILD_DATE = "2026.07.30";
   const APP_RELEASE_NOTES = [
     "日本語表記の分数を教科書型の分数記号へ変換",
@@ -541,7 +541,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#researchDetailDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#researchDetailDialog"),$("#campusDetailDialog"),$("#campusUnlockDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -674,11 +674,46 @@
   }
 
   const CAMPUS_STAGES = [
-    { minClears: 0, image: "images/campus/campus-1.svg", title: "はじまりの校舎" },
-    { minClears: 3, image: "images/campus/campus-2.svg", title: "緑のキャンパス" },
-    { minClears: 8, image: "images/campus/campus-3.svg", title: "研究棟のある大学" },
-    { minClears: 15, image: "images/campus/campus-4.svg", title: "時計塔のキャンパス" },
-    { minClears: 25, image: "images/campus/campus-5.svg", title: "光り輝く算数大学" }
+    {
+      minClears: 0,
+      image: "images/campus-v13/stage-1-hut.svg",
+      title: "はじまりの小屋",
+      shortTitle: "小さな学び舎",
+      description: "森の中に建った、小さな算数の学び舎です。",
+      unlocks: ["小さな教室", "土の通学路"]
+    },
+    {
+      minClears: 3,
+      image: "images/campus-v13/stage-2-school.svg",
+      title: "見習いの校舎",
+      shortTitle: "石造りの校舎",
+      description: "問題を解いた力で、石造りの校舎と時計塔が建ちました。",
+      unlocks: ["時計塔", "魔法の街灯"]
+    },
+    {
+      minClears: 8,
+      image: "images/campus-v13/stage-3-academy.svg",
+      title: "魔法学院の本館",
+      shortTitle: "魔法学院",
+      description: "塔や中庭が増え、たくさんの学びが集まる学院になりました。",
+      unlocks: ["中央塔", "中庭の噴水", "研究室"]
+    },
+    {
+      minClears: 15,
+      image: "images/campus-v13/stage-4-university.svg",
+      title: "名門・算数大学",
+      shortTitle: "名門大学",
+      description: "夜の校舎に明かりが灯り、名門大学へ成長しました。",
+      unlocks: ["大図書館", "星明かりの庭", "講堂"]
+    },
+    {
+      minClears: 25,
+      image: "images/campus-v13/stage-5-grand.svg",
+      title: "星明かりの大魔法大学",
+      shortTitle: "大魔法大学",
+      description: "努力の光が集まり、夜空に輝く最高のキャンパスが完成しました。",
+      unlocks: ["大本館", "魔法の噴水", "光の石畳", "七つの塔"]
+    }
   ];
   const AVATAR_IMAGES = [
     "images/avatars/avatar-blue.svg",
@@ -698,15 +733,91 @@
     return AVATAR_IMAGES[variant];
   }
 
+  function ensureCampusProfile(student) {
+    if (!student.profile || typeof student.profile !== "object") student.profile = {};
+    if (!Number.isInteger(student.profile.lastSeenCampusStage)) {
+      student.profile.lastSeenCampusStage = 0;
+    }
+  }
+
   function campusProgressForStudent(student) {
-    const clears = new Set(student.history.filter((item) => item.score >= 60).map((item) => item.problemId)).size;
+    ensureCampusProfile(student);
+    const history = Array.isArray(student.history) ? student.history : [];
+    const clears = new Set(history.filter((item) => Number(item.score || 0) >= 60).map((item) => item.problemId)).size;
     let stageIndex = 0;
     CAMPUS_STAGES.forEach((stage, index) => {
       if (clears >= stage.minClears) stageIndex = index;
     });
     const stage = CAMPUS_STAGES[stageIndex];
     const next = CAMPUS_STAGES[stageIndex + 1] || null;
-    return { clears, stageIndex, stage, next };
+    const stageStart = stage.minClears;
+    const stageEnd = next?.minClears ?? stageStart;
+    const stagePercent = next
+      ? Math.max(0, Math.min(100, ((clears - stageStart) / Math.max(1, stageEnd - stageStart)) * 100))
+      : 100;
+    return { clears, stageIndex, stage, next, stageStart, stageEnd, stagePercent };
+  }
+
+  function campusStageSummary(stage, index, currentIndex) {
+    const state = index < currentIndex ? "cleared" : index === currentIndex ? "current" : "locked";
+    const stateLabel = state === "cleared" ? "完成" : state === "current" ? "現在" : `${stage.minClears}問で解放`;
+    return `<article class="campus-stage-card ${state}">
+      <div class="campus-stage-image-wrap">
+        <img src="${stage.image}" alt="${escapeHtml(stage.title)}">
+        <span>STAGE ${index + 1}</span>
+      </div>
+      <div class="campus-stage-copy">
+        <h3>${escapeHtml(stage.title)}</h3>
+        <p>${escapeHtml(stage.description)}</p>
+        <small>${stateLabel}</small>
+      </div>
+    </article>`;
+  }
+
+  function renderCampusDetail() {
+    const student = currentStudent();
+    if (!student) return;
+    const progress = campusProgressForStudent(student);
+    $("#campusDetailContent").innerHTML = `
+      <section class="campus-detail-current">
+        <img src="${progress.stage.image}" alt="${escapeHtml(progress.stage.title)}">
+        <div>
+          <span class="tag">現在のキャンパス</span>
+          <h3>${escapeHtml(progress.stage.title)}</h3>
+          <p>${escapeHtml(progress.stage.description)}</p>
+          <div class="campus-detail-progress"><div style="width:${progress.stagePercent}%"></div></div>
+          <small>${progress.next ? `あと${progress.next.minClears - progress.clears}問クリアで「${escapeHtml(progress.next.title)}」` : "すべてのキャンパスが完成しました"}</small>
+        </div>
+      </section>
+      <section class="campus-stage-grid">
+        ${CAMPUS_STAGES.map((stage, index) => campusStageSummary(stage, index, progress.stageIndex)).join("")}
+      </section>
+      <section class="campus-growth-rule">
+        <h3>キャンパスが育つ条件</h3>
+        <p>同じ問題を何度も解いた回数ではなく、60点以上でクリアした<strong>問題の種類</strong>によって成長します。</p>
+      </section>`;
+    $("#campusDetailDialog").showModal();
+  }
+
+  function showCampusUnlockIfNeeded(student, progress) {
+    ensureCampusProfile(student);
+    const seenStage = Number(student.profile.lastSeenCampusStage || 0);
+    if (progress.stageIndex <= seenStage) return;
+    const unlockedStages = CAMPUS_STAGES.slice(seenStage + 1, progress.stageIndex + 1);
+    const newest = unlockedStages[unlockedStages.length - 1];
+    $("#campusUnlockContent").innerHTML = `
+      <div class="campus-unlock-sparkles" aria-hidden="true">✦　✨　✦</div>
+      <p class="eyebrow">CAMPUS LEVEL UP!</p>
+      <h2>キャンパスが成長しました！</h2>
+      <img src="${newest.image}" alt="${escapeHtml(newest.title)}">
+      <h3>${escapeHtml(newest.title)}</h3>
+      <p>${escapeHtml(newest.description)}</p>
+      <div class="campus-unlock-items">
+        ${newest.unlocks.map((item) => `<span>🔓 ${escapeHtml(item)}</span>`).join("")}
+      </div>`;
+    student.profile.lastSeenCampusStage = progress.stageIndex;
+    saveData();
+    $("#campusUnlockDialog").showModal();
   }
 
   function profileLabels(profile) {
@@ -802,6 +913,8 @@
     const campusProgress = campusProgressForStudent(student);
     $("#studentAvatarImage").src = avatarImageForStudent(student);
     $("#campusGrowthImage").src = campusProgress.stage.image;
+    $("#campusGrowthImage").alt = campusProgress.stage.title;
+    $(".v13-magic-hero").dataset.campusStage = String(campusProgress.stageIndex + 1);
     $("#campusGrowthTitle").textContent = campusProgress.stage.title;
     $("#campusGrowthNext").textContent = campusProgress.next
       ? `あと${campusProgress.next.minClears - campusProgress.clears}問クリアでキャンパスが成長`
@@ -843,13 +956,7 @@
     const todayXp = todayHistory.reduce((sum, item) => sum + Math.max(0, Math.round(Number(item.score || 0) / 10)), 0);
     $("#homeTodaySolved").textContent = `${todayHistory.length} 問`;
     $("#homeTodayXp").textContent = `${todayXp} pt`;
-    const nextCampusMinimum = campusProgress.next?.minClears ?? campusProgress.clears;
-    const previousCampusMinimum = campusProgress.stage.minClears;
-    const stageRange = Math.max(1, nextCampusMinimum - previousCampusMinimum);
-    const stageProgress = campusProgress.next
-      ? Math.max(0, Math.min(100, ((campusProgress.clears - previousCampusMinimum) / stageRange) * 100))
-      : 100;
-    $("#homeCampusProgress").style.width = `${stageProgress}%`;
+    $("#homeCampusProgress").style.width = `${campusProgress.stagePercent}%`;
     $("#studentMetrics").innerHTML = `
       <div class="metric"><span>挑戦回数</span><strong>${student.history.length}</strong></div>
       <div class="metric"><span>平均点</span><strong>${average}</strong></div>`;
@@ -860,6 +967,7 @@
 
     renderStudentAssignments();
     renderReturnedMarkNotification();
+    window.setTimeout(() => showCampusUnlockIfNeeded(student, campusProgress), 250);
   }
 
 
@@ -1366,9 +1474,11 @@
   $("#homeLearningBtn").addEventListener("click", () => {
     $("#homeLearningSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
-  $("#homeCampusBtn").addEventListener("click", () => {
-    $(".v13-campus-status")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    showToast("学習を続けるとキャンパスが成長します");
+  $("#homeCampusBtn").addEventListener("click", renderCampusDetail);
+  $("#closeCampusDetailDialogBtn").addEventListener("click", () => $("#campusDetailDialog").close());
+  $("#closeCampusUnlockDialogBtn").addEventListener("click", () => {
+    $("#campusUnlockDialog").close();
+    renderCampusDetail();
   });
   $("#homeCollectionBtn").addEventListener("click", () => {
     showToast("コレクションは次のアップデートで追加予定です");

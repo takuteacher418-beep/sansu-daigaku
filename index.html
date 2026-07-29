@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 13.0</title>
-  <link rel="stylesheet" href="css/style.css?v=13.0" />
+  <title>算数大学 Version 13.0-phase2</title>
+  <link rel="stylesheet" href="css/style.css?v=13.0-phase2" />
 </head>
 <body>
   <div id="toast" class="toast" aria-live="polite"></div>
@@ -360,6 +360,20 @@
     </div>
   </section>
 
+
+  <dialog id="campusDetailDialog" class="modal campus-detail-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">MY CAMPUS</p><h2>キャンパスの成長</h2></div>
+      <button id="closeCampusDetailDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div id="campusDetailContent"></div>
+  </dialog>
+
+  <dialog id="campusUnlockDialog" class="modal campus-unlock-dialog">
+    <div id="campusUnlockContent"></div>
+    <button id="closeCampusUnlockDialogBtn" class="btn primary campus-unlock-close" type="button">新しいキャンパスを見る</button>
+  </dialog>
+
   <dialog id="assignmentInboxDialog" class="modal assignment-inbox-dialog">
     <div class="section-head">
       <div><p class="eyebrow">ASSIGNMENT MAIL</p><h2>先生からの課題</h2></div>
@@ -525,7 +539,7 @@
     </form>
   </dialog>
 
-  <script src="js/data.js?v=13.0"></script>
-  <script src="js/app.js?v=13.0"></script>
+  <script src="js/data.js?v=13.0-phase2"></script>
+  <script src="js/app.js?v=13.0-phase2"></script>
 </body>
 </html>
