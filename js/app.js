@@ -24,6 +24,12 @@
   let activeFinalAnswer = "";
   let pendingPracticeSummary = null;
   let popupReturnedSubmissionId = null;
+  let activeMarkCanvas = null;
+  let activeMarkCanvasContext = null;
+  let isDrawingMark = false;
+  let markPenSize = 7;
+  let markPenMode = "pen";
+  let markCanvasDirty = false;
   const dismissedAssignmentIds = new Set();
   const dismissedReturnedSubmissionIds = new Set();
 
@@ -36,6 +42,108 @@
     return String(value ?? "").replace(/[&<>"']/g, (character) => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
     }[character]));
+  }
+
+
+  function dataUrlIsImage(value) {
+    return typeof value === "string" && value.startsWith("data:image/");
+  }
+
+  function initMarkCanvas(savedImage = "") {
+    activeMarkCanvas = $("#teacherMarkCanvas");
+    if (!activeMarkCanvas) return;
+    const ratio = window.devicePixelRatio || 1;
+    const cssWidth = Math.max(640, activeMarkCanvas.parentElement?.clientWidth || 640);
+    const cssHeight = 420;
+    activeMarkCanvas.width = cssWidth * ratio;
+    activeMarkCanvas.height = cssHeight * ratio;
+    activeMarkCanvas.style.width = cssWidth + "px";
+    activeMarkCanvas.style.height = cssHeight + "px";
+
+    activeMarkCanvasContext = activeMarkCanvas.getContext("2d");
+    activeMarkCanvasContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    activeMarkCanvasContext.lineCap = "round";
+    activeMarkCanvasContext.lineJoin = "round";
+    activeMarkCanvasContext.lineWidth = markPenSize;
+    activeMarkCanvasContext.strokeStyle = "#e23e3e";
+    activeMarkCanvasContext.fillStyle = "#fff";
+    activeMarkCanvasContext.fillRect(0, 0, cssWidth, cssHeight);
+
+    const background = new Image();
+    background.onload = () => {
+      activeMarkCanvasContext.drawImage(background, 0, 0, cssWidth, cssHeight);
+      markCanvasDirty = false;
+    };
+    if (dataUrlIsImage(savedImage)) background.src = savedImage;
+    else drawMarkCanvasTemplate();
+
+    function pointFromEvent(event) {
+      const rect = activeMarkCanvas.getBoundingClientRect();
+      const source = event.touches?.[0] || event;
+      return { x: source.clientX - rect.left, y: source.clientY - rect.top };
+    }
+    function startDrawing(event) {
+      event.preventDefault();
+      isDrawingMark = true;
+      const point = pointFromEvent(event);
+      activeMarkCanvasContext.beginPath();
+      activeMarkCanvasContext.moveTo(point.x, point.y);
+    }
+    function draw(event) {
+      if (!isDrawingMark) return;
+      event.preventDefault();
+      const point = pointFromEvent(event);
+      activeMarkCanvasContext.globalCompositeOperation = markPenMode === "eraser" ? "destination-out" : "source-over";
+      activeMarkCanvasContext.strokeStyle = markPenMode === "eraser" ? "rgba(0,0,0,1)" : "#e23e3e";
+      activeMarkCanvasContext.lineWidth = markPenMode === "eraser" ? Math.max(18, markPenSize * 3) : markPenSize;
+      activeMarkCanvasContext.lineTo(point.x, point.y);
+      activeMarkCanvasContext.stroke();
+      markCanvasDirty = true;
+    }
+    function stopDrawing(event) {
+      if (event) event.preventDefault();
+      isDrawingMark = false;
+      activeMarkCanvasContext.beginPath();
+    }
+
+    activeMarkCanvas.addEventListener("mousedown", startDrawing);
+    activeMarkCanvas.addEventListener("mousemove", draw);
+    window.addEventListener("mouseup", stopDrawing);
+    activeMarkCanvas.addEventListener("touchstart", startDrawing, { passive: false });
+    activeMarkCanvas.addEventListener("touchmove", draw, { passive: false });
+    activeMarkCanvas.addEventListener("touchend", stopDrawing, { passive: false });
+  }
+
+  function drawMarkCanvasTemplate() {
+    if (!activeMarkCanvas || !activeMarkCanvasContext) return;
+    const width = parseFloat(activeMarkCanvas.style.width);
+    const height = parseFloat(activeMarkCanvas.style.height);
+    const context = activeMarkCanvasContext;
+    context.save();
+    context.globalCompositeOperation = "source-over";
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, width, height);
+    context.strokeStyle = "#d4dee6";
+    context.lineWidth = 1;
+    for (let y = 42; y < height; y += 42) {
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(width, y);
+      context.stroke();
+    }
+    context.fillStyle = "#587080";
+    context.font = "700 15px sans-serif";
+    context.fillText("ここに、花丸・赤丸・線・ことばなどを書けます。", 20, 28);
+    context.restore();
+    markCanvasDirty = false;
+  }
+
+  function clearMarkCanvas() {
+    drawMarkCanvasTemplate();
+  }
+
+  function markCanvasDataUrl() {
+    return activeMarkCanvas ? activeMarkCanvas.toDataURL("image/png") : "";
   }
 
   function normalizeClozeText(problem) {
@@ -204,7 +312,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#markingImageDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -637,6 +745,11 @@
           <span>正しい答え</span>
           <strong>${escapeHtml(submission.correctAnswer)}</strong>
         </div>
+        ${dataUrlIsImage(submission.markingImage) ? `
+          <button id="openMarkingImageBtn" class="returned-handwriting-card" type="button">
+            <img src="${submission.markingImage}" alt="先生の手書き丸つけ">
+            <span>先生の手書き丸つけを見る</span>
+          </button>` : ""}
         <div class="returned-teacher-comment">
           <div class="teacher-comment-avatar">👩‍🏫</div>
           <div><small>先生から</small><p>${escapeHtml(submission.comment).replace(/\n/g, "<br>")}</p></div>
@@ -645,6 +758,11 @@
       </article>`;
     $("#returnedMarkDialog").showModal();
     $("#closeReturnedFromContentBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
+    const handwritingButton = $("#openMarkingImageBtn");
+    if (handwritingButton) handwritingButton.addEventListener("click", () => {
+      $("#markingImageLarge").src = submission.markingImage;
+      $("#markingImageDialog").showModal();
+    });
     popupReturnedSubmissionId = null;
     scheduleAccessibility();
   }
@@ -658,6 +776,7 @@
     popupReturnedSubmissionId = null;
   });
   $("#closeReturnedMarkDialogBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
+  $("#closeMarkingImageDialogBtn").addEventListener("click", () => $("#markingImageDialog").close());
 
   function renderUnitFilter() {
     const gradeValue = $("#gradeFilter").value;
@@ -1556,7 +1675,7 @@
         <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 12.0</h2>
+        <h2>Version 12.1</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1839,6 +1958,32 @@
             </div>
           </div>
 
+          <section class="hand-marking-section">
+            <div class="section-head compact">
+              <div>
+                <h3>手書きで丸つけ</h3>
+                <p class="muted">マウス・指・ペンで、花丸や赤ペンを書けます。</p>
+              </div>
+              <span class="tag">赤ペン</span>
+            </div>
+            <div class="mark-canvas-toolbar">
+              <button id="markPenBtn" class="btn soft active" type="button">✏️ 書く</button>
+              <button id="markEraserBtn" class="btn ghost" type="button">消しゴム</button>
+              <label>太さ
+                <select id="markPenSizeField">
+                  <option value="4">細い</option>
+                  <option value="7" selected>ふつう</option>
+                  <option value="12">太い</option>
+                </select>
+              </label>
+              <button id="markFlowerBtn" class="btn gold" type="button">💮 花丸を押す</button>
+              <button id="clearMarkCanvasBtn" class="btn ghost" type="button">全部消す</button>
+            </div>
+            <div class="mark-canvas-wrap">
+              <canvas id="teacherMarkCanvas" aria-label="手書き丸つけキャンバス"></canvas>
+            </div>
+          </section>
+
           <label class="teacher-comment-field">
             先生からのコメント
             <textarea id="teacherSubmissionComment" rows="4" maxlength="300" placeholder="できたことを具体的にほめましょう。">${escapeHtml(submission.comment || "")}</textarea>
@@ -1861,6 +2006,49 @@
       $("#markPreview").textContent = selectedMark;
       $("#markPreview").className = `mark-preview ${selectedMark}`;
     }));
+
+    initMarkCanvas(submission.markingImage || "");
+    $("#markPenBtn").addEventListener("click", () => {
+      markPenMode = "pen";
+      $("#markPenBtn").classList.add("active");
+      $("#markEraserBtn").classList.remove("active");
+    });
+    $("#markEraserBtn").addEventListener("click", () => {
+      markPenMode = "eraser";
+      $("#markEraserBtn").classList.add("active");
+      $("#markPenBtn").classList.remove("active");
+    });
+    $("#markPenSizeField").addEventListener("change", (event) => {
+      markPenSize = Number(event.target.value) || 7;
+    });
+    $("#clearMarkCanvasBtn").addEventListener("click", clearMarkCanvas);
+    $("#markFlowerBtn").addEventListener("click", () => {
+      if (!activeMarkCanvasContext || !activeMarkCanvas) return;
+      const context = activeMarkCanvasContext;
+      const width = parseFloat(activeMarkCanvas.style.width);
+      context.save();
+      context.globalCompositeOperation = "source-over";
+      context.translate(width - 105, 100);
+      context.rotate(-0.12);
+      context.strokeStyle = "#e23e3e";
+      context.lineWidth = 6;
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+        context.beginPath();
+        context.ellipse(Math.cos(angle) * 35, Math.sin(angle) * 35, 20, 34, angle, 0, Math.PI * 2);
+        context.stroke();
+      }
+      context.beginPath();
+      context.arc(0, 0, 30, 0, Math.PI * 2);
+      context.stroke();
+      context.fillStyle = "#e23e3e";
+      context.font = "900 22px sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("よくできました", 0, 0);
+      context.restore();
+      markCanvasDirty = true;
+    });
+
     $$(".quick-comment-btn").forEach((button) => button.addEventListener("click", () => {
       const field = $("#teacherSubmissionComment");
       field.value = field.value.trim()
@@ -1880,6 +2068,7 @@
       }
       submission.mark = selectedMark;
       submission.comment = comment;
+      submission.markingImage = markCanvasDataUrl();
       submission.status = "returned";
       submission.reviewedAt = new Date().toISOString();
       submission.returnedAt = new Date().toISOString();
@@ -1892,55 +2081,140 @@
   }
 
   function renderTeacherResults() {
-    const allResults = appData.students.flatMap((student) =>
-      student.history.map((result) => ({ ...result, studentName: student.name }))
-    );
-    const supportNames = {
-      audio: "読み上げ", ruby: "ふりがな", large: "文字拡大",
-      visual: "図", sentenceMode: "一文表示", lineFocus: "読む場所強調",
-      hint: "ヒント"
-    };
-    const supportStats = {};
-    allResults.forEach((result) => {
-      Object.entries(result.supports || {}).forEach(([key, used]) => {
-        if (!supportNames[key] || !used) return;
-        if (!supportStats[key]) supportStats[key] = { count: 0, totalScore: 0, totalTime: 0 };
-        supportStats[key].count += 1;
-        supportStats[key].totalScore += result.score || 0;
-        supportStats[key].totalTime += result.elapsedSeconds || 0;
-      });
-    });
-
-    const analytics = Object.entries(supportStats).map(([key, stat]) => `
-      <div class="support-stat-card">
-        <span>${supportNames[key]}</span>
-        <strong>${stat.count}回</strong>
-        <small>平均 ${Math.round(stat.totalScore / stat.count)}点・${Math.round(stat.totalTime / stat.count)}秒</small>
-      </div>`).join("");
-
-    const rows = allResults.reverse().map((result) => {
-      const problem = appData.problems.find((item) => item.id === result.problemId);
-      const supports = Object.entries(result.supports || {})
-        .filter(([key, used]) => supportNames[key] && used)
-        .map(([key]) => supportNames[key]).join("・") || "なし";
-      const route = result.route === "smallStep" ? "少しずつ" : "自分で";
-      return `<tr>
-        <td>${result.studentName}</td><td>${problem?.title || "削除済み"}</td>
-        <td>${route}</td><td>${result.answerMode}</td><td>${supports}</td>
-        <td>${result.score}</td><td>${result.elapsedSeconds || "-"}秒</td>
-        <td>${new Date(result.date).toLocaleDateString("ja-JP")}</td>
-      </tr>`;
-    }).join("");
-
+    const students = appData.students;
+    const firstStudentId = students[0]?.id || "";
     $("#teacherContent").innerHTML = `
-      <section class="panel">
-        <p class="eyebrow">SUPPORT ANALYTICS</p><h2>支援の利用状況</h2>
-        <p class="muted">正答率だけでなく、利用回数と回答時間を併せて確認します。</p>
-        <div class="support-stat-grid">${analytics || '<p class="muted">支援の利用記録はまだありません。</p>'}</div>
-      </section>
-      <section class="panel" style="margin-top:12px"><h2>学習結果</h2><div class="table-wrap"><table>
-      <thead><tr><th>児童</th><th>問題</th><th>進め方</th><th>回答形式</th><th>使った支援</th><th>点</th><th>時間</th><th>日付</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="8">まだ結果がありません。</td></tr>'}</tbody></table></div></section>`;
+      <section class="panel student-analysis-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">STUDENT ANALYSIS</p>
+            <h2>結果・支援分析</h2>
+            <p class="muted">児童のタブを選ぶと、その児童の結果だけを確認できます。</p>
+          </div>
+        </div>
+        <div id="analysisStudentTabs" class="analysis-student-tabs">
+          ${students.map((student, index) => `
+            <button class="analysis-student-tab ${index === 0 ? "active" : ""}" data-student="${student.id}" type="button">
+              <span class="analysis-tab-avatar">${escapeHtml(student.name.slice(0,1))}</span>
+              <span><strong>${escapeHtml(student.name)}</strong><small>${student.grade}年</small></span>
+            </button>`).join("")}
+        </div>
+        <div id="studentAnalysisContent"></div>
+      </section>`;
+
+    function renderSelectedStudentAnalysis(studentId) {
+      const student = appData.students.find((item) => item.id === studentId);
+      if (!student) {
+        $("#studentAnalysisContent").innerHTML = '<p class="notice">児童が登録されていません。</p>';
+        return;
+      }
+      const history = [...(student.history || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+      const average = history.length
+        ? Math.round(history.reduce((sum,item) => sum + Number(item.score || 0), 0) / history.length)
+        : 0;
+      const completedProblems = new Set(history.map((item) => item.problemId)).size;
+      const selfMarked = history.filter((item) => item.finalTestMarking === "self").length;
+      const teacherMarked = history.filter((item) => item.finalTestMarking === "teacher").length;
+      const submissions = allSubmissionRows().filter((item) => item.studentId === student.id);
+      const returned = submissions.filter((item) => item.status === "returned").length;
+
+      const routeCounts = history.reduce((counts, item) => {
+        const route = item.route || "direct";
+        counts[route] = (counts[route] || 0) + 1;
+        return counts;
+      }, {});
+      const hintTotal = history.reduce((sum,item) => sum + Number(item.hintCount || 0), 0);
+      const supportCounts = history.reduce((counts,item) => {
+        const supports = item.supports || {};
+        ["ruby","large","easy","readAloud","lineFocus"].forEach((key) => {
+          if (supports[key]) counts[key] = (counts[key] || 0) + 1;
+        });
+        return counts;
+      }, {});
+
+      const recentRows = history.slice(0, 12).map((item) => {
+        const problem = appData.problems.find((entry) => entry.id === item.problemId);
+        const submission = item.submissionId
+          ? appData.submissions.find((entry) => entry.id === item.submissionId)
+          : null;
+        return `<tr>
+          <td>${new Date(item.date).toLocaleDateString("ja-JP")}</td>
+          <td>${escapeHtml(problem?.title || "問題")}</td>
+          <td>${item.score}点</td>
+          <td>${item.practiceCorrect ?? "—"} / ${item.practiceTotal ?? "—"}</td>
+          <td>${item.finalTestMarking === "teacher" ? "先生" : "自分"}</td>
+          <td>${submission?.mark || "—"}</td>
+        </tr>`;
+      }).join("");
+
+      const recentScores = history.slice(0, 8).reverse();
+      $("#studentAnalysisContent").innerHTML = `
+        <div class="selected-student-head">
+          <div>
+            <h3>${escapeHtml(student.name)}さんの学習結果</h3>
+            <p>${student.grade}年｜レベル ${levelFromXp(student.xp)}｜${student.points} pt</p>
+          </div>
+          <span class="analysis-average ${average >= 80 ? "good" : average >= 60 ? "middle" : "needs-support"}">${average}<small>平均点</small></span>
+        </div>
+
+        <div class="analysis-metric-grid">
+          <div class="analysis-metric"><span>取り組んだ問題</span><strong>${completedProblems}</strong><small>種類</small></div>
+          <div class="analysis-metric"><span>学習回数</span><strong>${history.length}</strong><small>回</small></div>
+          <div class="analysis-metric"><span>先生へ提出</span><strong>${teacherMarked}</strong><small>回</small></div>
+          <div class="analysis-metric"><span>返却済み</span><strong>${returned}</strong><small>件</small></div>
+        </div>
+
+        <div class="analysis-two-column">
+          <article class="analysis-card">
+            <h3>最近の点数</h3>
+            <div class="score-bar-list">
+              ${recentScores.length ? recentScores.map((item) => {
+                const problem = appData.problems.find((entry) => entry.id === item.problemId);
+                return `<div class="score-bar-row">
+                  <span>${escapeHtml(problem?.title || "問題")}</span>
+                  <div class="score-bar-track"><i style="width:${Math.max(0,Math.min(100,item.score))}%"></i></div>
+                  <strong>${item.score}</strong>
+                </div>`;
+              }).join("") : '<p class="notice">まだ学習結果がありません。</p>'}
+            </div>
+          </article>
+
+          <article class="analysis-card">
+            <h3>使った支援</h3>
+            <div class="support-chip-list">
+              <span>ふりがな <strong>${supportCounts.ruby || 0}</strong></span>
+              <span>文字拡大 <strong>${supportCounts.large || 0}</strong></span>
+              <span>やさしい文 <strong>${supportCounts.easy || 0}</strong></span>
+              <span>読み上げ <strong>${supportCounts.readAloud || 0}</strong></span>
+              <span>行の強調 <strong>${supportCounts.lineFocus || 0}</strong></span>
+              <span>ヒント <strong>${hintTotal}</strong></span>
+            </div>
+            <div class="support-summary">
+              <p><strong>自分で丸つけ：</strong>${selfMarked}回</p>
+              <p><strong>先生に依頼：</strong>${teacherMarked}回</p>
+              <p><strong>少しずつ考える：</strong>${routeCounts.smallStep || 0}回</p>
+            </div>
+          </article>
+        </div>
+
+        <article class="analysis-card analysis-history-card">
+          <div class="section-head compact">
+            <div><h3>学習履歴</h3><p class="muted">新しい順に12件まで表示します。</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>日</th><th>問題</th><th>点</th><th>確認問題</th><th>丸つけ</th><th>先生評価</th></tr></thead>
+              <tbody>${recentRows || '<tr><td colspan="6">まだ学習履歴がありません。</td></tr>'}</tbody>
+            </table>
+          </div>
+        </article>`;
+    }
+
+    $$(".analysis-student-tab").forEach((button) => button.addEventListener("click", () => {
+      $$(".analysis-student-tab").forEach((item) => item.classList.toggle("active", item === button));
+      renderSelectedStudentAnalysis(button.dataset.student);
+    }));
+    if (firstStudentId) renderSelectedStudentAnalysis(firstStudentId);
   }
 
   function openStudentDialog(studentId = "") {

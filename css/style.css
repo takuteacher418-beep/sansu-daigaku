@@ -468,3 +468,52 @@ ruby[data-auto-ruby="true"] rt{
   .returned-mark-popup{grid-template-columns:48px 1fr}.returned-mark-popup>button.btn{grid-column:2}
   .returned-answer-row{grid-template-columns:1fr}
 }
+
+
+/* Version 12.1: handwritten marking and student analysis tabs */
+.hand-marking-section{margin:18px 0;padding:16px;border-radius:17px;background:#fff8f8;border:2px solid #efb7b7}
+.mark-canvas-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.mark-canvas-toolbar label{display:flex;align-items:center;gap:6px;font-weight:800}
+.mark-canvas-toolbar select{padding:8px;border-radius:9px;border:1px solid #cbd8e2}
+.mark-canvas-toolbar .active{box-shadow:0 0 0 3px rgba(217,63,63,.18);border-color:#de5454}
+.mark-canvas-wrap{width:100%;overflow:auto;border:2px solid #d5dfe6;border-radius:14px;background:#fff;touch-action:none}
+#teacherMarkCanvas{display:block;cursor:crosshair;touch-action:none}
+.returned-handwriting-card{display:grid;grid-template-columns:135px 1fr;gap:12px;align-items:center;width:100%;margin:14px 0;padding:10px;border:2px solid #e4aaaa;border-radius:15px;background:#fff8f8;text-align:left;cursor:pointer;font:inherit;font-weight:900;color:#913636}
+.returned-handwriting-card img{width:135px;height:85px;object-fit:cover;border-radius:9px;border:1px solid #d7dfe5;background:#fff}
+.marking-image-dialog{width:min(920px,calc(100vw - 25px))}
+.marking-image-large{display:block;width:100%;max-height:75vh;object-fit:contain;border:2px solid #d4dde4;border-radius:14px;background:#fff}
+
+.analysis-student-panel{border-top:5px solid #496fba}
+.analysis-student-tabs{display:flex;gap:9px;overflow-x:auto;padding:3px 2px 13px;margin-bottom:12px;border-bottom:1px solid #d9e2e8}
+.analysis-student-tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 13px;border:2px solid #d4dfe7;border-radius:14px;background:#fff;color:#3f5668;cursor:pointer;font:inherit;text-align:left}
+.analysis-student-tab strong,.analysis-student-tab small{display:block}
+.analysis-student-tab small{font-size:10px;color:#71828e}
+.analysis-student-tab.active{border-color:#3e75b7;background:#edf5ff;color:#234d80;box-shadow:0 5px 12px rgba(46,91,142,.12)}
+.analysis-tab-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#e2edf7;font-weight:900}
+.analysis-student-tab.active .analysis-tab-avatar{background:#3e75b7;color:#fff}
+.selected-student-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#edf6ff,#fff8de)}
+.selected-student-head h3{margin:0 0 4px}.selected-student-head p{margin:0;color:#5c7080}
+.analysis-average{display:flex;flex-direction:column;justify-content:center;align-items:center;width:82px;height:82px;border-radius:50%;font-size:28px;font-weight:900;background:#fff;border:5px solid #9bb2c2}
+.analysis-average small{font-size:9px}.analysis-average.good{border-color:#54aa70;color:#287d48}.analysis-average.middle{border-color:#e0a642;color:#976812}.analysis-average.needs-support{border-color:#dc6b61;color:#a33d35}
+.analysis-metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:13px 0}
+.analysis-metric{padding:13px;border-radius:14px;background:#f4f8fb;border:1px solid #d6e2ea;text-align:center}
+.analysis-metric span,.analysis-metric small{display:block;color:#667a88}.analysis-metric strong{font-size:27px;color:#294d69}
+.analysis-two-column{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.analysis-card{padding:15px;border-radius:16px;background:#fff;border:1px solid #d7e2ea}
+.analysis-card h3{margin-top:0}
+.score-bar-list{display:grid;gap:9px}
+.score-bar-row{display:grid;grid-template-columns:minmax(90px,1.2fr) 2fr 35px;gap:8px;align-items:center;font-size:12px}
+.score-bar-track{height:11px;border-radius:999px;background:#e6edf2;overflow:hidden}
+.score-bar-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#5872cd,#35a2d5)}
+.support-chip-list{display:flex;gap:7px;flex-wrap:wrap}
+.support-chip-list span{padding:7px 9px;border-radius:999px;background:#edf4fa;color:#496276;font-size:12px}
+.support-chip-list strong{color:#244a68}
+.support-summary{margin-top:12px;padding:10px;border-radius:11px;background:#fff8da}
+.support-summary p{margin:5px 0}
+.analysis-history-card{margin-top:12px}
+@media(max-width:720px){
+  .analysis-metric-grid{grid-template-columns:1fr 1fr}
+  .analysis-two-column{grid-template-columns:1fr}
+  .returned-handwriting-card{grid-template-columns:95px 1fr}
+  .returned-handwriting-card img{width:95px}
+}
