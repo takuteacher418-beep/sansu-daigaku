@@ -14,7 +14,24 @@
   function loadData() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : clone(DEFAULT_APP_DATA);
+      if (!saved) return clone(DEFAULT_APP_DATA);
+      const parsed = JSON.parse(saved);
+      const merged = {
+        ...clone(DEFAULT_APP_DATA),
+        ...parsed,
+        professors: Array.isArray(parsed.professors) && parsed.professors.length
+          ? parsed.professors
+          : clone(DEFAULT_APP_DATA.professors),
+        students: Array.isArray(parsed.students) ? parsed.students : clone(DEFAULT_APP_DATA.students),
+        problems: Array.isArray(parsed.problems) ? parsed.problems : clone(DEFAULT_APP_DATA.problems)
+      };
+      merged.problems = merged.problems.map((problem, index) => ({
+        ...clone(DEFAULT_APP_DATA.problems[index] || {}),
+        ...problem,
+        professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授"
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      return merged;
     } catch (error) {
       console.error(error);
       return clone(DEFAULT_APP_DATA);
