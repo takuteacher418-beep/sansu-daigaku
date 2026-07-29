@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.5</title>
+  <title>算数大学 Version 11.6</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.5</span>
+        <span class="version">Version 11.6</span>
       </section>
 
       <section class="login-panel">
@@ -48,7 +48,7 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.5</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.6</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
     </header>
@@ -99,7 +99,10 @@
           <article class="panel problem-selector-panel">
             <div class="section-head problem-selector-head">
               <div><p class="eyebrow">CHALLENGE</p><h1>問題を選んで挑戦しよう</h1></div>
-              <label class="unit-filter-label">単元<select id="unitFilter"></select></label>
+              <div class="problem-filter-group">
+                <label class="unit-filter-label">学年<select id="gradeFilter"></select></label>
+                <label class="unit-filter-label">単元<select id="unitFilter"></select></label>
+              </div>
             </div>
             <div id="problemList" class="problem-list problem-list-main"></div>
           </article>

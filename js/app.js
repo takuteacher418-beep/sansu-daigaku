@@ -35,7 +35,18 @@
           ? parsed.professors
           : clone(DEFAULT_APP_DATA.professors),
         students: Array.isArray(parsed.students) ? parsed.students : clone(DEFAULT_APP_DATA.students),
-        problems: Array.isArray(parsed.problems) ? parsed.problems : clone(DEFAULT_APP_DATA.problems)
+        problems: (() => {
+          const savedProblems = Array.isArray(parsed.problems) ? parsed.problems : [];
+          const savedById = new Map(savedProblems.map((problem) => [problem.id, problem]));
+          const defaultsWithSavedEdits = clone(DEFAULT_APP_DATA.problems).map((defaultProblem) => ({
+            ...defaultProblem,
+            ...(savedById.get(defaultProblem.id) || {})
+          }));
+          const customProblems = savedProblems.filter((problem) =>
+            !DEFAULT_APP_DATA.problems.some((defaultProblem) => defaultProblem.id === problem.id)
+          );
+          return [...defaultsWithSavedEdits, ...customProblems];
+        })()
       };
       merged.students = merged.students.map((student) => ({
         ...student,
@@ -49,6 +60,7 @@
       merged.problems = merged.problems.map((problem, index) => ({
         ...clone(DEFAULT_APP_DATA.problems[index] || {}),
         ...problem,
+        grade: Number(problem.grade || DEFAULT_APP_DATA.problems[index]?.grade || 5),
         professor: problem.professor || DEFAULT_APP_DATA.problems[index]?.professor || "たっくん教授",
         correctExplanation: problem.correctExplanation || problem.modelAnswer || DEFAULT_APP_DATA.problems[index]?.correctExplanation || "",
         distractors: problem.distractors || (problem.choices || []).slice(1) || DEFAULT_APP_DATA.problems[index]?.distractors || [],
@@ -163,7 +175,11 @@
 
   function chooseRecommendation(student) {
     const completed = new Set(student.history.filter((item) => item.score >= 80).map((item) => item.problemId));
-    return appData.problems.find((problem) => !completed.has(problem.id)) || appData.problems[0];
+    const sameGrade = appData.problems.filter((problem) => Number(problem.grade) === Number(student.grade));
+    return sameGrade.find((problem) => !completed.has(problem.id))
+      || sameGrade[0]
+      || appData.problems.find((problem) => !completed.has(problem.id))
+      || appData.problems[0];
   }
 
   function renderStudentHome() {
@@ -186,9 +202,19 @@
     $("#recommendationBox").innerHTML = `<div class="recommendation-professor"><img src="${homeProfessor.image}" alt="${homeProfessor.name}"><div><strong>${recommendation.unit}｜${recommendation.title}</strong><p>担当：${homeProfessor.name}　${student.profile.visual ? "図を使って" : "自分の言葉で"}考えよう。</p></div></div>`;
     $("#startRecommendationBtn").onclick = () => openProblem(recommendation.id);
 
-    const units = ["すべて", ...new Set(appData.problems.map((problem) => problem.unit))];
-    $("#unitFilter").innerHTML = units.map((unit) => `<option value="${unit}">${unit}</option>`).join("");
+    const gradeOptions = [
+      { value: String(student.grade), label: `${student.grade}年生（おすすめ）` },
+      ...[1,2,3,4,5,6].filter((grade) => grade !== Number(student.grade)).map((grade) => ({ value: String(grade), label: `${grade}年生` })),
+      { value: "all", label: "すべての学年" }
+    ];
+    $("#gradeFilter").innerHTML = gradeOptions.map((item) => `<option value="${item.value}">${item.label}</option>`).join("");
+    $("#gradeFilter").value = String(student.grade);
+    $("#gradeFilter").onchange = () => {
+      renderUnitFilter();
+      renderProblemList();
+    };
     $("#unitFilter").onchange = renderProblemList;
+    renderUnitFilter();
     renderProblemList();
 
     const average = student.history.length
@@ -203,18 +229,33 @@
     }).join("") || '<p class="muted">まだ記録がありません。</p>';
   }
 
+  function renderUnitFilter() {
+    const gradeValue = $("#gradeFilter").value;
+    const gradeProblems = appData.problems.filter((problem) =>
+      gradeValue === "all" || Number(problem.grade) === Number(gradeValue)
+    );
+    const currentUnit = $("#unitFilter").value;
+    const units = ["すべて", ...new Set(gradeProblems.map((problem) => problem.unit))];
+    $("#unitFilter").innerHTML = units.map((unit) => `<option value="${unit}">${unit}</option>`).join("");
+    if (units.includes(currentUnit)) $("#unitFilter").value = currentUnit;
+  }
+
   function renderProblemList() {
     const student = currentStudent();
+    const gradeValue = $("#gradeFilter").value;
     const unit = $("#unitFilter").value;
-    const visibleProblems = appData.problems.filter((problem) => unit === "すべて" || problem.unit === unit);
+    const visibleProblems = appData.problems.filter((problem) =>
+      (gradeValue === "all" || Number(problem.grade) === Number(gradeValue))
+      && (unit === "すべて" || problem.unit === unit)
+    );
     $("#problemList").innerHTML = visibleProblems.map((problem) => {
       const best = Math.max(0, ...student.history.filter((item) => item.problemId === problem.id).map((item) => item.score));
       return `<article class="problem-card ${best >= 60 ? "done" : ""}">
-        <div class="row"><span class="tag">${problem.unit}</span><span>${"★".repeat(problem.difficulty)}</span></div>
+        <div class="row"><span class="tag">${problem.grade}年｜${problem.unit}</span><span>${"★".repeat(problem.difficulty)}</span></div>
         <h3>${problem.title}</h3><p>${problem.question}</p>
         <div class="row"><small>${best ? best + "点" : "未挑戦"}</small><button class="btn soft challenge-btn" data-id="${problem.id}" type="button">挑戦する</button></div>
       </article>`;
-    }).join("");
+    }).join("") || '<p class="notice">この条件の問題はありません。</p>';
     $$(".challenge-btn").forEach((button) => button.addEventListener("click", () => openProblem(button.dataset.id)));
   }
 
@@ -276,7 +317,7 @@
     $("#problemProfessor").textContent = professor.name;
     $("#battleProfessorImage").src = professor.image;
     $("#battleProfessorImage").alt = professor.name;
-    $("#problemMeta").textContent = `${activeProblem.unit}｜難易度 ${"★".repeat(activeProblem.difficulty)}`;
+    $("#problemMeta").textContent = `${activeProblem.grade}年生｜${activeProblem.unit}｜難易度 ${"★".repeat(activeProblem.difficulty)}`;
     $("#problemTitle").textContent = activeProblem.title;
 
     renderQuestionText();
@@ -775,8 +816,8 @@
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.5</h2>
-        <p>説明問題に特化し、選択式・穴埋め式で答えた後、理解確認の練習問題を3問出題します。</p>
+        <h2>Version 11.6</h2>
+        <p>1年生から6年生まで各10問、合計60問の説明問題を搭載しました。児童の学年を最初に表示し、他学年にも切り替えられます。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
   }
@@ -800,9 +841,9 @@
     $("#teacherContent").innerHTML = `
       <section class="panel">
         <div class="section-head"><div><h2>問題管理</h2><p class="muted">正しい説明と誤った説明を入力するだけで、選択式・穴埋め式・確認問題3問を作ります。</p></div><button id="addProblemBtn" class="btn primary" type="button">＋問題登録</button></div>
-        <div class="table-wrap"><table><thead><tr><th>単元</th><th>説明する内容</th><th>回答形式</th><th>教授</th><th>操作</th></tr></thead>
-        <tbody>${appData.problems.map((problem) => `<tr>
-          <td>${problem.unit}</td><td>${problem.title}</td><td>選択・穴埋め</td><td>${problem.professor}</td>
+        <div class="table-wrap"><table><thead><tr><th>学年</th><th>単元</th><th>説明する内容</th><th>回答形式</th><th>教授</th><th>操作</th></tr></thead>
+        <tbody>${appData.problems.slice().sort((a,b) => Number(a.grade)-Number(b.grade) || a.unit.localeCompare(b.unit, "ja")).map((problem) => `<tr>
+          <td>${problem.grade}年</td><td>${problem.unit}</td><td>${problem.title}</td><td>選択・穴埋め</td><td>${problem.professor}</td>
           <td><button class="btn soft edit-problem-btn" data-id="${problem.id}" type="button">編集</button></td>
         </tr>`).join("")}</tbody></table></div>
       </section>`;
@@ -917,6 +958,7 @@
   function openProblemDialog(problemId = "") {
     const problem = appData.problems.find((item) => item.id === problemId);
     $("#editingProblemId").value = problem?.id || "";
+    $("#problemGradeField").value = problem?.grade || 5;
     $("#problemUnitField").value = problem?.unit || "";
     $("#problemConceptField").value = problem?.concept || problem?.unit || "";
     $("#problemTitleField").value = problem?.title || "";
@@ -975,7 +1017,7 @@
     if (!correctExplanation.includes(blankPhrase)) { showToast("正しい説明の中に、穴埋めにする言葉を含めてください"); return; }
     if (!practiceItems.length) { showToast("確認問題を1問以上入力してください"); return; }
     const problem = {
-      id, unit: $("#problemUnitField").value.trim(), concept,
+      id, grade: Number($("#problemGradeField").value), unit: $("#problemUnitField").value.trim(), concept,
       title: $("#problemTitleField").value.trim(), professor: $("#problemProfessorField").value,
       difficulty: 2,
       question: `${concept}について、正しく説明している文を選びましょう。`,
