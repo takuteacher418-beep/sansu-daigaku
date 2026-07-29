@@ -555,3 +555,73 @@ ruby[data-auto-ruby="true"] rt{
   .research-metric-grid,.research-support-table{grid-template-columns:1fr 1fr}
   .unit-analysis-row{grid-template-columns:1fr 1.5fr 52px}.unit-analysis-row small{display:none}
 }
+
+
+/* Version 12.3: textbook-style fractions */
+.math-fraction{
+  display:inline-grid;
+  grid-template-rows:auto auto;
+  align-items:center;
+  justify-items:stretch;
+  min-width:1.45em;
+  margin:0 .12em;
+  vertical-align:-.48em;
+  line-height:1;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.math-numerator{
+  display:block;
+  padding:0 .18em .1em;
+  border-bottom:.1em solid currentColor;
+  font-size:.88em;
+}
+.math-denominator{
+  display:block;
+  padding:.1em .18em 0;
+  font-size:.88em;
+}
+.mixed-number{
+  display:inline-flex;
+  align-items:center;
+  gap:.03em;
+  margin:0 .08em;
+  vertical-align:middle;
+}
+.mixed-whole{
+  display:inline-block;
+  font-size:1em;
+  line-height:1;
+}
+.mixed-number .math-fraction{
+  margin-left:.02em;
+  margin-right:.02em;
+}
+.problem-card .math-fraction,
+.explanation-choice .math-fraction,
+.cloze-option .math-fraction,
+.final-test-option .math-fraction{
+  font-size:1.08em;
+}
+#questionText .math-fraction,
+.practice-question .math-fraction,
+.final-test-heading .math-fraction{
+  font-size:1.18em;
+}
+.cloze-blank .math-fraction{
+  vertical-align:-.42em;
+}
+.fraction-input-help{
+  margin:8px 0;
+  padding:9px 11px;
+  border-radius:10px;
+  background:#eef7ff;
+  border-left:4px solid #4d84b5;
+  color:#365d7b;
+  font-size:12px;
+  line-height:1.6;
+}
+@media(max-width:600px){
+  .math-fraction{margin-left:.08em;margin-right:.08em}
+  #questionText .math-fraction{font-size:1.1em}
+}

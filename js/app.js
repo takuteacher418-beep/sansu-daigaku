@@ -49,6 +49,55 @@
     }[character]));
   }
 
+  function fractionMarkup(numerator, denominator, extraClass = "") {
+    const numeratorText = String(numerator);
+    const denominatorText = String(denominator);
+    return `<span class="math-fraction ${extraClass}" role="img" aria-label="${escapeHtml(denominatorText)}分の${escapeHtml(numeratorText)}">`
+      + `<span class="math-numerator">${escapeHtml(numeratorText)}</span>`
+      + `<span class="math-denominator">${escapeHtml(denominatorText)}</span>`
+      + `</span>`;
+  }
+
+  function formatMathText(value, options = {}) {
+    const { lineBreaks = false } = options;
+    let text = escapeHtml(value);
+
+    // 帯分数を先に変換する。「1 1/2」→ 1と2分の1
+    text = text.replace(
+      /(^|[^\d])(\d+)[ \u3000]+(\d+)\s*\/\s*(\d+)(?![\d/])/g,
+      (match, prefix, whole, numerator, denominator) =>
+        `${prefix}<span class="mixed-number" role="img" aria-label="${whole}と${denominator}分の${numerator}">`
+        + `<span class="mixed-whole">${whole}</span>${fractionMarkup(numerator, denominator, "mixed-fraction")}</span>`
+    );
+
+    // 真分数・仮分数。「1/2」「7 / 4」に対応する。
+    text = text.replace(
+      /(^|[^\d>])(\d+)\s*\/\s*(\d+)(?![\d/])/g,
+      (match, prefix, numerator, denominator) =>
+        `${prefix}${fractionMarkup(numerator, denominator)}`
+    );
+
+    if (lineBreaks) text = text.replace(/\r?\n/g, "<br>");
+    return text;
+  }
+
+  function formatMathInElement(element) {
+    if (!element) return;
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const targets = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!node.nodeValue?.includes("/")) continue;
+      if (node.parentElement?.closest(".math-fraction, .mixed-number, input, textarea, option, script, style")) continue;
+      targets.push(node);
+    }
+    targets.forEach((node) => {
+      const template = document.createElement("template");
+      template.innerHTML = formatMathText(node.nodeValue);
+      node.replaceWith(template.content);
+    });
+  }
+
 
   function dataUrlIsImage(value) {
     return typeof value === "string" && value.startsWith("data:image/");
@@ -432,6 +481,7 @@
 
   let accessibilityTimer = null;
   function scheduleAccessibility() {
+    ["#problemList","#questionText","#answerArea","#stepContent","#practiceQuestion","#practiceAnswerArea","#practiceFeedback","#assignmentProblemPreview","#returnedMarkContent"].forEach((selector) => formatMathInElement($(selector)));
     if (accessibilityApplying || !session || session.role !== "student") return;
     clearTimeout(accessibilityTimer);
     accessibilityTimer = setTimeout(applyAccessibility, 0);
@@ -839,11 +889,11 @@
         <h2>${escapeHtml(problem?.title || "先生からのおへんじ")}</h2>
         <div class="returned-answer-row">
           <span>あなたの答え</span>
-          <strong>${escapeHtml(submission.answer)}</strong>
+          <strong>${formatMathText(submission.answer)}</strong>
         </div>
         <div class="returned-answer-row correct">
           <span>正しい答え</span>
-          <strong>${escapeHtml(submission.correctAnswer)}</strong>
+          <strong>${formatMathText(submission.correctAnswer)}</strong>
         </div>
         ${dataUrlIsImage(submission.markingImage) ? `
           <button id="openMarkingImageBtn" class="returned-handwriting-card" type="button">
@@ -860,7 +910,7 @@
           </div>` : ""}
         <div class="returned-teacher-comment">
           <div class="teacher-comment-avatar">👩‍🏫</div>
-          <div><small>先生から</small><p>${escapeHtml(submission.comment).replace(/\n/g, "<br>")}</p></div>
+          <div><small>先生から</small><p>${formatMathText(submission.comment, { lineBreaks: true })}</p></div>
         </div>
         <button id="closeReturnedFromContentBtn" class="btn primary large full" type="button">わかりました</button>
       </article>`;
@@ -910,7 +960,7 @@
       const best = Math.max(0, ...student.history.filter((item) => item.problemId === problem.id).map((item) => item.score));
       return `<article class="problem-card ${best >= 60 ? "done" : ""}">
         <div class="row"><span class="tag">${problem.grade}年｜${problem.unit}</span><span>${"★".repeat(problem.difficulty)}</span></div>
-        <h3>${problem.title}</h3><p>${problem.question}</p>
+        <h3>${formatMathText(problem.title)}</h3><p>${formatMathText(problem.question, { lineBreaks: true })}</p>
         <div class="row"><small>${best ? best + "点" : "未挑戦"}</small><button class="btn soft challenge-btn" data-id="${problem.id}" type="button">挑戦する</button></div>
       </article>`;
     }).join("") || '<p class="notice">この条件の問題はありません。</p>';
@@ -958,15 +1008,15 @@
     let content;
 
     if (sentenceMode && sentences.length) {
-      content = `<span class="focused-sentence">${escapeHtml(sentences[sentenceIndex])}</span>`;
+      content = `<span class="focused-sentence">${formatMathText(sentences[sentenceIndex])}</span>`;
       $("#sentenceProgress").textContent = `${sentenceIndex + 1} / ${sentences.length} 文`;
       $("#sentenceProgress").classList.remove("hidden");
       $("#sentenceNavigation").classList.remove("hidden");
       $("#prevSentenceBtn").disabled = sentenceIndex === 0;
       $("#nextSentenceBtn").disabled = sentenceIndex === sentences.length - 1;
     } else {
-      content = escapeHtml((profile.easy ? activeProblem.simpleQuestion : activeProblem.question)
-        || `「${activeProblem.concept || activeProblem.unit}」の正しいせつめいを1つえらびましょう。`);
+      content = formatMathText((profile.easy ? activeProblem.simpleQuestion : activeProblem.question)
+        || `「${activeProblem.concept || activeProblem.unit}」の正しいせつめいを1つえらびましょう。`, { lineBreaks: true });
       $("#sentenceProgress").classList.add("hidden");
       $("#sentenceNavigation").classList.add("hidden");
     }
@@ -1031,25 +1081,25 @@
         <div class="easy-choice-guide">三つの文をゆっくり読み、いちばん合う文を1つえらびましょう。</div>
         <div class="explanation-choice-list">
           ${safeChoices.map((choice) =>
-            `<label class="choice explanation-choice"><input type="radio" name="choiceAnswer" value="${escapeHtml(choice)}" /><span>${escapeHtml(choice)}</span></label>`
+            `<label class="choice explanation-choice"><input type="radio" name="choiceAnswer" value="${escapeHtml(choice)}" /><span>${formatMathText(choice)}</span></label>`
           ).join("")}
         </div>`;
     } else {
       const options = shuffle([activeProblem.blankPhrase, ...(activeProblem.blankDistractors || [])].filter(Boolean));
       const fullClozeText = normalizeClozeText(activeProblem);
-      const clozeHtml = fullClozeText.split("<br>").map((part) => escapeHtml(part)).join("<br>")
+      const clozeHtml = fullClozeText.split("<br>").map((part) => formatMathText(part)).join("<br>")
         .replace("［　］", '<span id="clozeBlank" class="cloze-blank">ここを選ぶ</span>');
       $("#answerArea").innerHTML = `
         <div class="cloze-card">
           <p class="cloze-instruction"><strong>［　］に入る言葉を選びましょう。</strong></p>
           <p class="cloze-full-text">${clozeHtml}</p>
-          <div class="cloze-options">${options.map((option) => `<button class="cloze-option" data-value="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>`).join("")}</div>
+          <div class="cloze-options">${options.map((option) => `<button class="cloze-option" data-value="${escapeHtml(option)}" type="button">${formatMathText(option)}</button>`).join("")}</div>
           <input id="clozeAnswer" type="hidden" />
         </div>`;
       $$(".cloze-option").forEach((button) => button.addEventListener("click", () => {
         $$(".cloze-option").forEach((item) => item.classList.toggle("selected", item === button));
         $("#clozeAnswer").value = button.dataset.value;
-        $("#clozeBlank").textContent = button.dataset.value;
+        $("#clozeBlank").innerHTML = formatMathText(button.dataset.value);
       }));
     }
   }
@@ -1317,7 +1367,7 @@
           <strong>${professor.name}：${correct ? professor.success : professor.retry}</strong>
         </div>
       </div>
-      <div class="explanation-confirmation"><small>正しい説明</small><strong>${activeProblem.correctExplanation}</strong></div>
+      <div class="explanation-confirmation"><small>正しい説明</small><strong>${formatMathText(activeProblem.correctExplanation)}</strong></div>
       ${correct ? '<button id="startPracticeBtn" class="btn gold large full" type="button">確認問題を3問やってみる</button>' : '<button id="retryExplanationBtn" class="btn soft large full" type="button">説明を選び直す</button>'}`;
 
     if (correct) {
@@ -1427,7 +1477,7 @@
     $("#practiceProfessor").innerHTML = `<img src="${professor.image}" alt="${professor.name}"><div><small>${professor.name}</small><strong>説明を使って確かめよう。</strong></div>`;
     const normalizedItem = normalizePracticeItem(item, activeProblem);
     practiceItems[practiceIndex] = normalizedItem;
-    $("#practiceQuestion").innerHTML = `<h2>${escapeHtml(normalizedItem.prompt)}</h2>${normalizedItem.supportText ? `<div class="test-support">${escapeHtml(normalizedItem.supportText)}</div>` : ""}`;
+    $("#practiceQuestion").innerHTML = `<h2>${formatMathText(normalizedItem.prompt, { lineBreaks: true })}</h2>${normalizedItem.supportText ? `<div class="test-support">${formatMathText(normalizedItem.supportText, { lineBreaks: true })}</div>` : ""}`;
     $("#practiceExplanationKey").textContent = activeProblem.correctExplanation;
     $("#practiceExplanationKey").classList.add("hidden");
     $("#togglePracticeKeyBtn").textContent = "説明を確認する";
@@ -1435,7 +1485,7 @@
     $("#checkPracticeBtn").classList.remove("hidden");
     $("#practiceDots").innerHTML = practiceItems.map((_,i)=>`<span class="practice-dot ${practiceResults[i]===true?'good':practiceResults[i]===false?'bad':i===practiceIndex?'current':''}">${i+1}</span>`).join("");
     if (normalizedItem.type === "choice") {
-      $("#practiceAnswerArea").innerHTML = normalizedItem.choices.map(choice=>`<label class="choice explanation-choice"><input type="radio" name="practiceChoice" value="${escapeHtml(choice)}"><span>${escapeHtml(choice)}</span></label>`).join("");
+      $("#practiceAnswerArea").innerHTML = normalizedItem.choices.map(choice=>`<label class="choice explanation-choice"><input type="radio" name="practiceChoice" value="${escapeHtml(choice)}"><span>${formatMathText(choice)}</span></label>`).join("");
     } else {
       const practiceClozeHtml = normalizedItem.clozeText.split("<br>").map((part) => escapeHtml(part)).join("<br>")
         .replace("［　］",'<span id="practiceBlank" class="cloze-blank">ここを選ぶ</span>');
@@ -1471,7 +1521,7 @@
     const correct = answer === (item.type === "choice" ? item.correct : item.blankCorrect);
     practiceResults[practiceIndex] = correct;
     $("#practiceFeedback").className = `feedback ${correct?'good':''}`;
-    $("#practiceFeedback").innerHTML = `<strong>${correct?'説明を実際の問題で使えた！':'使い方を確かめよう'}</strong><p>${item.explanation || activeProblem.correctExplanation}</p><button id="nextPracticeBtn" class="btn ${correct?'gold':'soft'}" type="button">${practiceIndex===practiceItems.length-1?'結果を見る':'次の問題へ'}</button>`;
+    $("#practiceFeedback").innerHTML = `<strong>${correct?'説明を実際の問題で使えた！':'使い方を確かめよう'}</strong><p>${formatMathText(item.explanation || activeProblem.correctExplanation, { lineBreaks: true })}</p><button id="nextPracticeBtn" class="btn ${correct?'gold':'soft'}" type="button">${practiceIndex===practiceItems.length-1?'結果を見る':'次の問題へ'}</button>`;
     $("#checkPracticeBtn").classList.add("hidden");
     $("#nextPracticeBtn").addEventListener("click",()=>{
       if (practiceIndex < practiceItems.length-1) { practiceIndex++; renderPracticeItem(); } else finishPracticeSession();
@@ -1504,7 +1554,7 @@
     $("#practiceQuestion").innerHTML = `
       <div class="final-test-heading">
         <span>さいごの かくにんテスト</span>
-        <h2>${escapeHtml(activeFinalTest.prompt).replace(/\n/g, "<br>")}</h2>
+        <h2>${formatMathText(activeFinalTest.prompt, { lineBreaks: true })}</h2>
       </div>`;
     $("#practiceExplanationKey").classList.add("hidden");
     $("#togglePracticeKeyBtn").classList.add("hidden");
@@ -1514,14 +1564,14 @@
 
     if (activeFinalTest.type === "cloze") {
       const clozeHtml = String(activeFinalTest.clozeText)
-        .split("<br>").map((part) => escapeHtml(part)).join("<br>")
+        .split("<br>").map((part) => formatMathText(part)).join("<br>")
         .replace("［　］", '<span id="finalTestBlank" class="cloze-blank">ここを選ぶ</span>');
       $("#practiceAnswerArea").innerHTML = `
         <div class="final-test-answer-card">
           <p class="cloze-full-text">${clozeHtml}</p>
           <div class="cloze-options">
             ${activeFinalTest.blankChoices.map((value) =>
-              `<button class="final-test-option cloze-option" data-value="${escapeHtml(value)}" type="button">${escapeHtml(value)}</button>`
+              `<button class="final-test-option cloze-option" data-value="${escapeHtml(value)}" type="button">${formatMathText(value)}</button>`
             ).join("")}
           </div>
           <input id="finalTestAnswer" type="hidden">
@@ -1530,7 +1580,7 @@
         $$(".final-test-option").forEach((item) => item.classList.toggle("selected", item === button));
         activeFinalAnswer = button.dataset.value;
         $("#finalTestAnswer").value = activeFinalAnswer;
-        $("#finalTestBlank").textContent = activeFinalAnswer;
+        $("#finalTestBlank").innerHTML = formatMathText(activeFinalAnswer);
       }));
     } else {
       $("#practiceAnswerArea").innerHTML = `
@@ -1538,7 +1588,7 @@
           ${activeFinalTest.choices.map((choice) =>
             `<label class="choice explanation-choice">
               <input type="radio" name="finalTestChoice" value="${escapeHtml(choice)}">
-              <span>${escapeHtml(choice)}</span>
+              <span>${formatMathText(choice)}</span>
             </label>`
           ).join("")}
         </div>`;
@@ -1628,9 +1678,9 @@
         <img src="${professor.image}" alt="${professor.name}">
         <div class="self-mark-symbol">${correct ? "○" : "△"}</div>
         <h2>${correct ? "正解です！" : "答えをたしかめました"}</h2>
-        <p><strong>あなたの答え：</strong>${escapeHtml(activeFinalAnswer)}</p>
-        <p><strong>正しい答え：</strong>${escapeHtml(correctAnswer)}</p>
-        <div class="teacher-style-comment">${escapeHtml(activeFinalTest.explanation || activeProblem.correctExplanation)}</div>
+        <p><strong>あなたの答え：</strong>${formatMathText(activeFinalAnswer)}</p>
+        <p><strong>正しい答え：</strong>${formatMathText(correctAnswer)}</p>
+        <div class="teacher-style-comment">${formatMathText(activeFinalTest.explanation || activeProblem.correctExplanation, { lineBreaks: true })}</div>
         <small>確認問題は ${summary.correctCount} / ${summary.practiceTotal} 問正解でした。</small>
       </div>`;
     $("#practiceAnswerArea").innerHTML = `<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
@@ -1669,7 +1719,7 @@
         <p>先生が丸つけをしたら、ホーム画面におへんじが届きます。</p>
         <div class="submitted-answer-preview">
           <small>あなたの答え</small>
-          <strong>${escapeHtml(activeFinalAnswer)}</strong>
+          <strong>${formatMathText(activeFinalAnswer)}</strong>
         </div>
       </div>`;
     $("#practiceAnswerArea").innerHTML = `<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
@@ -1784,7 +1834,7 @@
         <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 12.2</h2>
+        <h2>Version 12.3</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1893,7 +1943,7 @@
     function refreshAssignmentPreview() {
       const problem = appData.problems.find((item) => item.id === $("#assignmentProblemField").value);
       $("#assignmentProblemPreview").innerHTML = problem
-        ? `<span class="tag">${problem.grade}年｜${problem.unit}</span><strong>${problem.title}</strong><p>${problem.correctExplanation}</p>`
+        ? `<span class="tag">${problem.grade}年｜${escapeHtml(problem.unit)}</span><strong>${formatMathText(problem.title)}</strong><p>${formatMathText(problem.correctExplanation, { lineBreaks: true })}</p>`
         : '<p class="notice">この学年には問題がありません。</p>';
     }
 
@@ -2046,16 +2096,16 @@
 
           <div class="marking-question-block">
             <small>問題</small>
-            <p>${escapeHtml(submission.question).replace(/\n/g, "<br>")}</p>
+            <p>${formatMathText(submission.question, { lineBreaks: true })}</p>
           </div>
           <div class="marking-answer-block">
             <small>児童の答え</small>
-            <strong>${escapeHtml(submission.answer)}</strong>
+            <strong>${formatMathText(submission.answer)}</strong>
           </div>
           <details class="correct-answer-details">
             <summary>正しい答えを確認する</summary>
-            <p>${escapeHtml(submission.correctAnswer)}</p>
-            ${submission.teacherNote ? `<small>${escapeHtml(submission.teacherNote)}</small>` : ""}
+            <p>${formatMathText(submission.correctAnswer)}</p>
+            ${submission.teacherNote ? `<small>${formatMathText(submission.teacherNote, { lineBreaks: true })}</small>` : ""}
           </details>
 
           <div class="teacher-mark-controls">
