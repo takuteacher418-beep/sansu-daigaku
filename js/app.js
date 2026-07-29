@@ -56,6 +56,8 @@
         blankPhrase: problem.blankPhrase || DEFAULT_APP_DATA.problems[index]?.blankPhrase || "",
         blankDistractors: problem.blankDistractors || DEFAULT_APP_DATA.problems[index]?.blankDistractors || [],
         clozeText: problem.clozeText || DEFAULT_APP_DATA.problems[index]?.clozeText || "",
+        practiceKind: problem.practiceKind || DEFAULT_APP_DATA.problems[index]?.practiceKind || "manual",
+        practiceItems: problem.practiceItems || DEFAULT_APP_DATA.problems[index]?.practiceItems || [],
         smallSteps: problem.smallSteps || DEFAULT_APP_DATA.problems[index]?.smallSteps || []
       }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
@@ -541,27 +543,79 @@
     }
   });
 
-  function buildPracticeItems(problem) {
-    if (problem.practiceKind === "averageCalculation") {
-      const sets = [[4,6,8],[3,6,9],[5,10,15]];
-      return sets.map((nums, index) => {
-        const answer = nums.reduce((a,b)=>a+b,0) / nums.length;
-        const distractors = [answer + 1, nums.reduce((a,b)=>a+b,0), nums.length].filter((v,i,a)=>v !== answer && a.indexOf(v)===i);
-        return { type: index === 1 ? "cloze" : "choice", prompt: `${nums.join("、")}の平均を求めるとき、説明に合う答えを選びましょう。`, choices: shuffle([String(answer), ...distractors.slice(0,2).map(String)]), correct: String(answer), clozeText: `全部を足した合計を［　］で割ると、平均は${answer}です。`, blankChoices: shuffle([String(nums.length), String(nums.reduce((a,b)=>a+b,0)), String(Math.max(...nums))]), blankCorrect: String(nums.length) };
-      });
-    }
-    if (problem.practiceKind === "ratioMeaning") {
-      return [
-        {type:"choice",prompt:"50人をもとにして20人を比べます。割合を求める式はどれですか。",choices:["20÷50","50÷20","50－20"],correct:"20÷50"},
-        {type:"cloze",prompt:"割合の説明を完成させましょう。",clozeText:"割合は、比べる量が［　］の何倍かを表します。",blankChoices:["もとにする量","答え","差"],blankCorrect:"もとにする量"},
-        {type:"choice",prompt:"割合を求めるとき、基準になる量はどれですか。",choices:["もとにする量","比べる量だけ","二つの量の合計"],correct:"もとにする量"}
-      ];
-    }
-    const distractors = problem.distractors || [];
+  function generateAveragePracticeItems() {
     return [
-      {type:"choice",prompt:`${problem.concept}を正しく説明している文を選びましょう。`,choices:shuffle([problem.correctExplanation,...distractors]),correct:problem.correctExplanation},
-      {type:"cloze",prompt:"説明の大切な言葉を入れましょう。",clozeText:problem.clozeText,blankChoices:shuffle([problem.blankPhrase,...(problem.blankDistractors||[])]),blankCorrect:problem.blankPhrase},
-      {type:"choice",prompt:`教授に${problem.concept}を説明するなら、どの文がよいですか。`,choices:shuffle([problem.correctExplanation,...distractors]),correct:problem.correctExplanation}
+      {
+        type: "choice",
+        prompt: "4、6、8の平均を求めましょう。",
+        supportText: "4＋6＋8＝18",
+        choices: ["6", "18", "3"],
+        correct: "6",
+        explanation: "合計18を3個で割るので、平均は6です。"
+      },
+      {
+        type: "cloze",
+        prompt: "10、15、20の平均を求めましょう。",
+        clozeText: "10＋15＋20＝45。45を［　］で割ると、平均は15です。",
+        blankChoices: ["3", "15", "45"],
+        blankCorrect: "3",
+        explanation: "数が3個あるので、45÷3＝15です。"
+      },
+      {
+        type: "choice",
+        prompt: "3日間に歩いた歩数は、4000歩、5000歩、6000歩でした。1日平均は何歩ですか。",
+        supportText: "4000＋5000＋6000＝15000",
+        choices: ["5000歩", "15000歩", "3歩"],
+        correct: "5000歩",
+        explanation: "合計15000歩を3日で割るので、5000歩です。"
+      }
+    ];
+  }
+
+  function generateRatioPracticeItems() {
+    return [
+      {
+        type: "choice",
+        prompt: "もとにする量が100人、比べる量が40人です。割合はいくつですか。",
+        supportText: "40÷100",
+        choices: ["0.4", "2.5", "60"],
+        correct: "0.4",
+        explanation: "比べる量40÷もとにする量100＝0.4です。"
+      },
+      {
+        type: "cloze",
+        prompt: "もとにする量が50個、比べる量が20個です。割合を求めましょう。",
+        clozeText: "20÷50＝［　］",
+        blankChoices: ["0.4", "2.5", "30"],
+        blankCorrect: "0.4",
+        explanation: "20÷50＝0.4です。"
+      },
+      {
+        type: "choice",
+        prompt: "クラス40人のうち8人が図書委員です。クラス全体をもとにした割合はいくつですか。",
+        supportText: "8÷40",
+        choices: ["0.2", "5", "32"],
+        correct: "0.2",
+        explanation: "8÷40＝0.2です。"
+      }
+    ];
+  }
+
+  function buildPracticeItems(problem) {
+    if (Array.isArray(problem.practiceItems) && problem.practiceItems.length >= 1) {
+      return clone(problem.practiceItems);
+    }
+    if (problem.practiceKind === "averageCalculation") return generateAveragePracticeItems();
+    if (problem.practiceKind === "ratioCalculation" || problem.practiceKind === "ratioMeaning") return generateRatioPracticeItems();
+
+    return [
+      {
+        type: "choice",
+        prompt: `${problem.concept}を使う簡単な問題です。教師画面で確認問題を設定してください。`,
+        choices: ["準備中", "あとで挑戦", "教師に知らせる"],
+        correct: "教師に知らせる",
+        explanation: "この説明問題には、まだ活用問題が設定されていません。"
+      }
     ];
   }
 
@@ -581,8 +635,10 @@
     $("#practiceCounter").textContent = `${practiceIndex + 1} / ${practiceItems.length}`;
     $("#practiceProgressFill").style.width = `${((practiceIndex + 1) / practiceItems.length) * 100}%`;
     $("#practiceProfessor").innerHTML = `<img src="${professor.image}" alt="${professor.name}"><div><small>${professor.name}</small><strong>説明を使って確かめよう。</strong></div>`;
-    $("#practiceQuestion").innerHTML = `<h2>${item.prompt}</h2>`;
+    $("#practiceQuestion").innerHTML = `<h2>${item.prompt}</h2>${item.supportText ? `<div class="test-support">${item.supportText}</div>` : ""}`;
     $("#practiceExplanationKey").textContent = activeProblem.correctExplanation;
+    $("#practiceExplanationKey").classList.add("hidden");
+    $("#togglePracticeKeyBtn").textContent = "説明を確認する";
     $("#practiceFeedback").classList.add("hidden");
     $("#checkPracticeBtn").classList.remove("hidden");
     $("#practiceDots").innerHTML = practiceItems.map((_,i)=>`<span class="practice-dot ${practiceResults[i]===true?'good':practiceResults[i]===false?'bad':i===practiceIndex?'current':''}">${i+1}</span>`).join("");
@@ -597,6 +653,14 @@
     }
   }
 
+  $("#togglePracticeKeyBtn").addEventListener("click", () => {
+    const key = $("#practiceExplanationKey");
+    const willShow = key.classList.contains("hidden");
+    key.classList.toggle("hidden", !willShow);
+    $("#togglePracticeKeyBtn").textContent = willShow ? "説明を隠す" : "説明を確認する";
+    if (willShow) supportUsage.practiceKeyViewed = true;
+  });
+
   $("#checkPracticeBtn").addEventListener("click", () => {
     const item = practiceItems[practiceIndex];
     const answer = item.type === "choice" ? document.querySelector('input[name="practiceChoice"]:checked')?.value : $("#practiceClozeAnswer")?.value;
@@ -604,7 +668,7 @@
     const correct = answer === (item.type === "choice" ? item.correct : item.blankCorrect);
     practiceResults[practiceIndex] = correct;
     $("#practiceFeedback").className = `feedback ${correct?'good':''}`;
-    $("#practiceFeedback").innerHTML = `<strong>${correct?'説明を使えている！':'説明をもう一度見てみよう'}</strong><p>${correct?'考え方と答えがつながりました。':activeProblem.correctExplanation}</p><button id="nextPracticeBtn" class="btn ${correct?'gold':'soft'}" type="button">${practiceIndex===practiceItems.length-1?'結果を見る':'次の問題へ'}</button>`;
+    $("#practiceFeedback").innerHTML = `<strong>${correct?'説明を実際の問題で使えた！':'使い方を確かめよう'}</strong><p>${item.explanation || activeProblem.correctExplanation}</p><button id="nextPracticeBtn" class="btn ${correct?'gold':'soft'}" type="button">${practiceIndex===practiceItems.length-1?'結果を見る':'次の問題へ'}</button>`;
     $("#checkPracticeBtn").classList.add("hidden");
     $("#nextPracticeBtn").addEventListener("click",()=>{
       if (practiceIndex < practiceItems.length-1) { practiceIndex++; renderPracticeItem(); } else finishPracticeSession();
@@ -711,7 +775,7 @@
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.4</h2>
+        <h2>Version 11.5</h2>
         <p>説明問題に特化し、選択式・穴埋め式で答えた後、理解確認の練習問題を3問出題します。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -863,8 +927,25 @@
     $("#problemBlankDistractorsField").value = (problem?.blankDistractors || []).join("\n");
     $("#problemVisualField").value = problem?.visual?.replaceAll("<br>", "\n") || "";
     $("#problemHintField").value = problem?.hint || "";
+    $("#problemPracticeKindField").value = problem?.practiceKind || "manual";
+    const practices = problem?.practiceItems || [];
+    [1,2,3].forEach((number, index) => {
+      const item = practices[index] || {};
+      $("#practicePrompt" + number).value = item.prompt || "";
+      const choices = item.type === "cloze" ? (item.blankChoices || []) : (item.choices || []);
+      const correct = item.type === "cloze" ? item.blankCorrect : item.correct;
+      const ordered = correct ? [correct, ...choices.filter((choice) => choice !== correct)] : choices;
+      $("#practiceChoices" + number).value = ordered.join("\n");
+    });
+    updatePracticeBuilderVisibility();
     $("#problemDialog").showModal();
   }
+
+  function updatePracticeBuilderVisibility() {
+    const manual = $("#problemPracticeKindField").value === "manual";
+    $("#manualPracticeFields").classList.toggle("hidden", !manual);
+  }
+  $("#problemPracticeKindField").addEventListener("change", updatePracticeBuilderVisibility);
 
   $("#closeProblemDialogBtn").addEventListener("click", () => $("#problemDialog").close());
   $("#problemForm").addEventListener("submit", (event) => {
@@ -876,8 +957,23 @@
     const distractors = $("#problemDistractorsField").value.split("\n").map(x=>x.trim()).filter(Boolean);
     const blankPhrase = $("#problemBlankPhraseField").value.trim();
     const blankDistractors = $("#problemBlankDistractorsField").value.split("\n").map(x=>x.trim()).filter(Boolean);
+    const practiceKind = $("#problemPracticeKindField").value;
+    let practiceItems = [];
+    if (practiceKind === "manual") {
+      practiceItems = [1,2,3].map((number) => {
+        const prompt = $("#practicePrompt" + number).value.trim();
+        const choices = $("#practiceChoices" + number).value.split("\n").map(x => x.trim()).filter(Boolean);
+        if (!prompt || choices.length < 2) return null;
+        return { type: "choice", prompt, choices, correct: choices[0], explanation: `正解は「${choices[0]}」です。` };
+      }).filter(Boolean);
+    } else if (practiceKind === "averageCalculation") {
+      practiceItems = generateAveragePracticeItems();
+    } else if (practiceKind === "ratioCalculation") {
+      practiceItems = generateRatioPracticeItems();
+    }
     if (distractors.length < 2) { showToast("まちがった説明を2つ以上入力してください"); return; }
     if (!correctExplanation.includes(blankPhrase)) { showToast("正しい説明の中に、穴埋めにする言葉を含めてください"); return; }
+    if (!practiceItems.length) { showToast("確認問題を1問以上入力してください"); return; }
     const problem = {
       id, unit: $("#problemUnitField").value.trim(), concept,
       title: $("#problemTitleField").value.trim(), professor: $("#problemProfessorField").value,
@@ -889,9 +985,10 @@
       correctExplanation, distractors, choices: [correctExplanation,...distractors],
       blankPhrase, blankDistractors,
       clozeText: correctExplanation.replace(blankPhrase,"［　］"),
-      hint: $("#problemHintField").value.trim()
+      hint: $("#problemHintField").value.trim(),
+      practiceKind, practiceItems
     };
     if (existing) Object.assign(existing,problem); else appData.problems.push(problem);
-    saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と確認問題3問を作成しました");
+    saveData(); $("#problemDialog").close(); renderTeacherProblems(); showToast("説明問題と実際に解く確認問題を作成しました");
   });
 })();

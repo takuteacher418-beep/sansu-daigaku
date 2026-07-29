@@ -103,3 +103,18 @@ button,input,select,textarea{font:inherit}.hidden{display:none!important}button{
 .practice-result{text-align:center;padding:25px}.practice-result img{width:180px;height:210px;object-fit:cover;border-radius:22px;border:3px solid #e3b452}.practice-result h2{margin-top:15px;font-size:30px}
 .builder-preview{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;padding:13px;border-radius:14px;background:#eef7ff}.builder-preview strong{width:100%}.builder-preview span{padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #c8dbea;font-size:12px;font-weight:900}
 @media(max-width:800px){.practice-shell{grid-template-columns:1fr}.practice-summary{order:-1}.cloze-card p{font-size:17px}.cloze-blank{min-width:110px}}
+
+
+/* Version 11.5: test-style application practice */
+.test-support{
+  margin:12px 0;padding:12px 14px;border-radius:13px;
+  background:#f3f8ff;border:2px solid #bdd5eb;
+  font-size:20px;font-weight:900;text-align:center;
+}
+.practice-builder-fieldset{
+  margin:16px 0;padding:16px;border:2px solid #b7cce1;border-radius:16px;
+  background:#f8fbff;
+}
+.practice-builder-fieldset legend{padding:0 8px;font-weight:900}
+.practice-author-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.practice-author-grid{grid-template-columns:1fr}}

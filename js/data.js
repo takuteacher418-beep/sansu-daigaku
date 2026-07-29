@@ -68,7 +68,34 @@ const DEFAULT_APP_DATA = {
       distractors: ["いちばん大きい数です。", "全部を足した数です。"],
       choices: ["いくつかの数を同じくらいにならした数です。", "いちばん大きい数です。", "全部を足した数です。"],
       blankPhrase: "同じくらいにならした", blankDistractors: ["大きい順に並べた", "全部かけた"],
-      clozeText: "平均とは、いくつかの数を［　］数です。", hint: "数を同じになるように分ける場面を思い出そう。"
+      clozeText: "平均とは、いくつかの数を［　］数です。", hint: "数を同じになるように分ける場面を思い出そう.",
+      practiceKind: "averageCalculation",
+      practiceItems: [
+        {
+          type: "choice",
+          prompt: "4、6、8の平均を求めましょう。",
+          supportText: "4＋6＋8＝18、18÷3",
+          choices: ["6", "18", "3"],
+          correct: "6",
+          explanation: "全部を足した18を、数の個数3で割るので、平均は6です。"
+        },
+        {
+          type: "cloze",
+          prompt: "10、15、20の平均を求めましょう。",
+          clozeText: "10＋15＋20＝45。45を［　］で割ると、平均は15です。",
+          blankChoices: ["3", "15", "45"],
+          blankCorrect: "3",
+          explanation: "数は3個あるので、合計45を3で割ります。"
+        },
+        {
+          type: "choice",
+          prompt: "3日間に読んだ本のページ数は、12ページ、18ページ、15ページでした。1日平均は何ページですか。",
+          supportText: "12＋18＋15＝45",
+          choices: ["15ページ", "45ページ", "3ページ"],
+          correct: "15ページ",
+          explanation: "合計45ページを3日で割るので、1日平均は15ページです。"
+        }
+      ]
     },
     {
       id: "p2", unit: "平均", concept: "平均の求め方", title: "平均の求め方を説明しよう", difficulty: 3, professor: "メディアン教授",
@@ -80,7 +107,33 @@ const DEFAULT_APP_DATA = {
       choices: ["全部の数を足し、その合計を数の個数で割ります。", "全部の数をかけ、いちばん大きい数で割ります。", "いちばん大きい数と小さい数を足します。"],
       blankPhrase: "数の個数", blankDistractors: ["いちばん大きい数", "合計"],
       clozeText: "平均は、全部の数を足し、その合計を［　］で割って求めます。", hint: "合計を、数がいくつあるかで分けます。",
-      practiceKind: "averageCalculation"
+      practiceKind: "averageCalculation",
+      practiceItems: [
+        {
+          type: "choice",
+          prompt: "5、7、9の平均を求めましょう。",
+          supportText: "5＋7＋9＝21",
+          choices: ["7", "21", "3"],
+          correct: "7",
+          explanation: "合計21を、数の個数3で割るので、平均は7です。"
+        },
+        {
+          type: "cloze",
+          prompt: "6、8、10、12の平均を求めましょう。",
+          clozeText: "6＋8＋10＋12＝36。36を［　］で割ると、平均は9です。",
+          blankChoices: ["4", "9", "36"],
+          blankCorrect: "4",
+          explanation: "数が4個あるので、合計36を4で割ります。"
+        },
+        {
+          type: "choice",
+          prompt: "4回のテストの点数は、70点、80点、90点、80点でした。平均点は何点ですか。",
+          supportText: "70＋80＋90＋80＝320",
+          choices: ["80点", "320点", "4点"],
+          correct: "80点",
+          explanation: "合計320点を4回で割るので、平均は80点です。"
+        }
+      ]
     },
     {
       id: "p3", unit: "割合", concept: "割合", title: "割合の意味を説明しよう", difficulty: 2, professor: "レシオ教授",
@@ -92,7 +145,33 @@ const DEFAULT_APP_DATA = {
       choices: ["比べる量が、もとにする量の何倍にあたるかを表す数です。", "二つの量の差だけを表す数です。", "二つの量を足した合計を表す数です。"],
       blankPhrase: "もとにする量", blankDistractors: ["答え", "いちばん大きい量"],
       clozeText: "割合とは、比べる量が［　］の何倍にあたるかを表す数です。", hint: "何を基準にして比べるかを考えよう。",
-      practiceKind: "ratioMeaning"
+      practiceKind: "ratioCalculation",
+      practiceItems: [
+        {
+          type: "choice",
+          prompt: "もとにする量が100人、比べる量が40人です。割合はいくつですか。",
+          supportText: "40÷100",
+          choices: ["0.4", "2.5", "60"],
+          correct: "0.4",
+          explanation: "比べる量40を、もとにする量100で割るので0.4です。"
+        },
+        {
+          type: "cloze",
+          prompt: "もとにする量が50個、比べる量が20個です。割合を求めましょう。",
+          clozeText: "20÷50＝［　］",
+          blankChoices: ["0.4", "2.5", "30"],
+          blankCorrect: "0.4",
+          explanation: "比べる量20÷もとにする量50＝0.4です。"
+        },
+        {
+          type: "choice",
+          prompt: "クラス40人のうち、図書委員は8人です。クラス全体をもとにした図書委員の割合はいくつですか。",
+          supportText: "8÷40",
+          choices: ["0.2", "5", "32"],
+          correct: "0.2",
+          explanation: "8÷40＝0.2です。"
+        }
+      ]
     }
   ]
 };

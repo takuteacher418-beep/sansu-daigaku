@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>算数大学 Version 11.4</title>
+  <title>算数大学 Version 11.5</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
         <h1>算数大学</h1>
         <p>自分に合った学び方で、算数をもっと好きになる。</p>
-        <span class="version">Version 11.4</span>
+        <span class="version">Version 11.5</span>
       </section>
 
       <section class="login-panel">
@@ -48,7 +48,7 @@
 
   <div id="appView" class="hidden">
     <header class="topbar">
-      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.4</small></div></div>
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.5</small></div></div>
       <div id="sessionInfo" class="session-info"></div>
       <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
     </header>
@@ -208,7 +208,8 @@
         </article>
         <aside class="panel practice-summary">
           <p class="eyebrow">EXPLANATION KEY</p><h2>今回の説明</h2>
-          <div id="practiceExplanationKey" class="explanation-key"></div>
+          <button id="togglePracticeKeyBtn" class="btn ghost full" type="button">説明を確認する</button>
+          <div id="practiceExplanationKey" class="explanation-key hidden"></div>
           <h3>練習の記録</h3><div id="practiceDots" class="practice-dots"></div>
         </aside>
       </section>
@@ -300,9 +301,32 @@
 全部かけた"></textarea></label>
       <label>図・補足（任意）<textarea id="problemVisualField"></textarea></label>
       <label>ヒント（任意）<textarea id="problemHintField"></textarea></label>
+
+      <fieldset class="practice-builder-fieldset">
+        <legend>説明を使う確認問題</legend>
+        <p class="notice">確認問題は、説明をもう一度選ぶ問題ではなく、実際のテストに近い計算・文章問題にします。</p>
+        <label>自動作成テンプレート
+          <select id="problemPracticeKindField">
+            <option value="manual">手動で3問作る</option>
+            <option value="averageCalculation">平均を実際に求める問題</option>
+            <option value="ratioCalculation">割合を実際に求める問題</option>
+          </select>
+        </label>
+        <div id="manualPracticeFields">
+          <div class="practice-author-grid">
+            <label>確認問題1<textarea id="practicePrompt1" placeholder="例：4、6、8の平均を求めましょう。"></textarea></label>
+            <label>選択肢（1行に1つ。正解を先頭）<textarea id="practiceChoices1" placeholder="6&#10;18&#10;3"></textarea></label>
+            <label>確認問題2<textarea id="practicePrompt2"></textarea></label>
+            <label>選択肢（1行に1つ。正解を先頭）<textarea id="practiceChoices2"></textarea></label>
+            <label>確認問題3<textarea id="practicePrompt3"></textarea></label>
+            <label>選択肢（1行に1つ。正解を先頭）<textarea id="practiceChoices3"></textarea></label>
+          </div>
+        </div>
+      </fieldset>
+
       <div class="builder-preview">
-        <strong>自動で作られるもの</strong>
-        <span>選択式の説明問題</span><span>穴埋め式の説明問題</span><span>確認問題3問</span><span>自動採点</span>
+        <strong>作成される学習の流れ</strong>
+        <span>説明を選ぶ・穴埋めする</span><span>実際の問題を3問解く</span><span>説明理解と活用を別々に記録</span><span>自動採点</span>
       </div>
       <button class="btn primary large" type="submit">説明問題を作成する</button>
     </form>
