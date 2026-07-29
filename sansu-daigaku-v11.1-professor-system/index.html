@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>算数大学 Version 11.0</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <section id="loginView" class="login-view">
+    <div class="login-shell">
+      <section class="brand-panel">
+        <div class="logo-mark">Σ</div>
+        <p class="eyebrow light">ADAPTIVE LEARNING RPG</p>
+        <h1>算数大学</h1>
+        <p>自分に合った学び方で、算数をもっと好きになる。</p>
+        <span class="version">Version 11.0</span>
+      </section>
+
+      <section class="login-panel">
+        <div class="switcher">
+          <button id="studentTabBtn" class="switch active" type="button">児童</button>
+          <button id="teacherTabBtn" class="switch" type="button">教師</button>
+        </div>
+
+        <form id="studentLoginForm" class="login-form">
+          <label>ログインID
+            <input id="studentIdInput" value="aoi01" autocomplete="username" />
+          </label>
+          <label>パスワード
+            <input id="studentPasswordInput" type="password" value="1234" autocomplete="current-password" />
+          </label>
+          <button class="btn primary large" type="submit">算数大学へ入る</button>
+          <small>デモ：aoi01 / 1234</small>
+        </form>
+
+        <form id="teacherLoginForm" class="login-form hidden">
+          <label>教師用パスコード
+            <input id="teacherPasscodeInput" type="password" value="4180" />
+          </label>
+          <button class="btn primary large" type="submit">教師画面を開く</button>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div class="mini-brand"><div class="logo-mark small">Σ</div><div><strong>算数大学</strong><small>Version 11.0</small></div></div>
+      <div id="sessionInfo" class="session-info"></div>
+      <button id="logoutBtn" class="btn ghost" type="button">ログアウト</button>
+    </header>
+
+    <main id="studentHomeView" class="page hidden">
+      <section class="hero-grid">
+        <article class="panel campus-panel">
+          <div class="section-head">
+            <div><p class="eyebrow">MY CAMPUS</p><h2>キャンパス</h2></div>
+            <span id="campusLevel" class="pill">Lv.1</span>
+          </div>
+          <div class="campus-art">
+            <div class="sun"></div><div class="building left">📚</div><div class="building main">🏛️</div><div class="building right">🔭</div><div class="fountain">⛲</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric"><span>研究ポイント</span><strong id="studentPoints">0 pt</strong></div>
+            <div class="metric"><span>クリア</span><strong id="studentClears">0 問</strong></div>
+          </div>
+        </article>
+
+        <article class="panel welcome-panel">
+          <div class="professor-message">
+            <div class="professor-avatar"><img id="homeProfessorImage" src="images/professors/takkun.png" alt="たっくん教授"></div>
+            <div class="speech"><small>たっくん教授</small><strong>今日も自分に合った方法で進めよう！</strong></div>
+          </div>
+          <div class="student-summary">
+            <div><p class="eyebrow">STUDENT</p><h2 id="studentDisplayName"></h2><p id="studentStyleText" class="muted"></p></div>
+            <div id="studentLevel" class="level-badge">1</div>
+          </div>
+          <div class="xp-track"><div id="xpFill"></div></div>
+          <small id="xpText"></small>
+          <div id="supportChips" class="chips"></div>
+        </article>
+
+        <article class="panel recommendation-panel">
+          <p class="eyebrow">TODAY'S LEARNING</p>
+          <h2>今日のおすすめ</h2>
+          <div id="recommendationBox" class="recommendation"></div>
+          <button id="startRecommendationBtn" class="btn gold large" type="button">おすすめに挑戦</button>
+          <button id="openProfessorListBtn" class="btn soft" type="button">教授一覧を見る</button>
+          <button id="openProfileBtn" class="btn soft" type="button">ぼくの学び方を見る</button>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="section-head">
+            <div><p class="eyebrow">CHALLENGE</p><h2>問題に挑戦する</h2></div>
+            <select id="unitFilter"></select>
+          </div>
+          <div id="problemList" class="problem-list"></div>
+        </article>
+        <aside class="panel">
+          <p class="eyebrow">LEARNING RECORD</p>
+          <h2>成長の記録</h2>
+          <div id="studentMetrics" class="metric-row"></div>
+          <h3>最近の挑戦</h3>
+          <div id="recentHistory" class="history-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <main id="problemView" class="page hidden">
+      <button id="backToHomeBtn" class="btn ghost" type="button">← キャンパスへ戻る</button>
+      <section class="battle-grid">
+        <article class="panel">
+          <div class="professor-message">
+            <div class="professor-avatar large-avatar"><img id="battleProfessorImage" src="images/professors/takkun.png" alt=""></div>
+            <div><p class="eyebrow">PROFESSOR BATTLE</p><h2 id="problemProfessor"></h2></div>
+          </div>
+
+          <div class="toolbar">
+            <button id="readAloudBtn" class="tool-btn" type="button">🔊 読み上げ</button>
+            <button id="furiganaBtn" class="tool-btn" type="button">ふりがな</button>
+            <button id="largeTextBtn" class="tool-btn" type="button">文字を大きく</button>
+          </div>
+
+          <div class="question-card">
+            <small id="problemMeta"></small>
+            <h1 id="problemTitle"></h1>
+            <div id="questionText" class="question-text"></div>
+            <div id="visualAid" class="visual-aid hidden"></div>
+          </div>
+
+          <div id="hintBox" class="hint-box hidden"></div>
+          <button id="showHintBtn" class="btn soft" type="button">ヒントを見る</button>
+        </article>
+
+        <article class="panel">
+          <p class="eyebrow">YOUR ANSWER</p>
+          <h2>自分の考えを伝えよう</h2>
+          <div id="answerModeTabs" class="answer-tabs"></div>
+          <div id="answerArea"></div>
+          <button id="submitAnswerBtn" class="btn primary large full" type="button">教授に答える</button>
+          <div id="feedbackBox" class="feedback hidden"></div>
+        </article>
+      </section>
+    </main>
+
+    <main id="profileView" class="page hidden">
+      <button id="backFromProfileBtn" class="btn ghost" type="button">← キャンパスへ戻る</button>
+      <section class="panel profile-panel">
+        <p class="eyebrow">MY LEARNING STYLE</p>
+        <h1>ぼくの学び方</h1>
+        <p class="muted">苦手の名前ではなく、学びやすくする方法を表示します。</p>
+        <div id="profileCards" class="profile-cards"></div>
+      </section>
+    </main>
+
+    <main id="teacherView" class="page hidden">
+      <nav class="teacher-tabs">
+        <button class="teacher-tab active" data-view="dashboard" type="button">概要</button>
+        <button class="teacher-tab" data-view="students" type="button">児童・LDIR</button>
+        <button class="teacher-tab" data-view="problems" type="button">問題管理</button>
+        <button class="teacher-tab" data-view="results" type="button">結果</button>
+      </nav>
+      <section id="teacherContent"></section>
+    </main>
+  </div>
+
+
+  <dialog id="professorDialog" class="modal professor-modal">
+    <div class="section-head">
+      <div><p class="eyebrow">PROFESSOR GUIDE</p><h2>教授一覧</h2></div>
+      <button id="closeProfessorDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <p class="muted">教授ごとに得意な単元と話し方が異なります。問題に応じて担当教授が登場します。</p>
+    <div id="professorGallery" class="professor-gallery"></div>
+  </dialog>
+
+  <dialog id="studentDialog" class="modal">
+    <form id="studentForm">
+      <div class="section-head"><h2>児童・学習プロフィール</h2><button id="closeStudentDialogBtn" class="btn ghost" type="button">×</button></div>
+      <input id="editingStudentId" type="hidden" />
+      <div class="form-grid">
+        <label>名前<input id="studentNameField" required /></label>
+        <label>学年<select id="studentGradeField"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
+        <label>ログインID<input id="studentLoginField" required /></label>
+        <label>パスワード<input id="studentPasswordField" value="1234" required /></label>
+      </div>
+      <p class="notice">以下は、現時点では表示支援を設定するための試作項目です。正式なLDIR項目を入力いただいた後、項目・採点・判定ロジックを差し替えられます。</p>
+      <div class="assessment-grid">
+        <fieldset><legend>読む支援</legend>
+          <label class="check"><input id="supportAudio" type="checkbox" />読み上げ</label>
+          <label class="check"><input id="supportRuby" type="checkbox" />ふりがな</label>
+        </fieldset>
+        <fieldset><legend>書く支援</legend>
+          <label class="check"><input id="supportLarge" type="checkbox" />大きな文字</label>
+          <label class="check"><input id="supportChoice" type="checkbox" />選択式</label>
+          <label class="check"><input id="supportTemplate" type="checkbox" />文の型</label>
+        </fieldset>
+        <fieldset><legend>算数支援</legend>
+          <label class="check"><input id="supportVisual" type="checkbox" />図を表示</label>
+          <label class="check"><input id="supportSteps" type="checkbox" />手順を小分け</label>
+          <label class="check"><input id="supportEasy" type="checkbox" />簡略問題</label>
+        </fieldset>
+      </div>
+      <button class="btn primary large" type="submit">保存する</button>
+    </form>
+  </dialog>
+
+  <dialog id="problemDialog" class="modal">
+    <form id="problemForm">
+      <div class="section-head"><h2>問題を登録</h2><button id="closeProblemDialogBtn" class="btn ghost" type="button">×</button></div>
+      <input id="editingProblemId" type="hidden" />
+      <div class="form-grid">
+        <label>単元<input id="problemUnitField" required /></label>
+        <label>題名<input id="problemTitleField" required /></label>
+        <label>教授名<input id="problemProfessorField" required /></label>
+        <label>難易度<select id="problemDifficultyField"><option value="1">★</option><option value="2" selected>★★</option><option value="3">★★★</option></select></label>
+      </div>
+      <label>通常の問題文<textarea id="problemQuestionField" required></textarea></label>
+      <label>簡略問題文<textarea id="problemSimpleField"></textarea></label>
+      <label>図・補足<textarea id="problemVisualField"></textarea></label>
+      <label>選択肢（1行に1つ。1行目を正解にする）<textarea id="problemChoicesField"></textarea></label>
+      <label>採点キーワード（読点区切り）<input id="problemKeywordsField" /></label>
+      <label>模範回答<textarea id="problemModelField"></textarea></label>
+      <label>ヒント<textarea id="problemHintField"></textarea></label>
+      <button class="btn primary large" type="submit">保存する</button>
+    </form>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
