@@ -392,3 +392,79 @@ ruby[data-auto-ruby="true"] rt{
   .small-step-cloze-text{font-size:1.12rem}
   .small-step-blank{min-width:6em}
 }
+
+
+/* Version 12.0: final test and teacher marking workflow */
+.teacher-tab-badge{
+  display:inline-grid;place-items:center;min-width:21px;height:21px;margin-left:5px;padding:0 6px;
+  border-radius:999px;background:#d84848;color:#fff;font-size:11px;font-weight:900;
+}
+.final-test-emblem{font-size:38px}
+.final-test-heading{padding:17px;border-radius:17px;background:linear-gradient(145deg,#fff8d6,#f5fbff);border:2px solid #e4cf6c}
+.final-test-heading>span{display:inline-block;padding:4px 9px;border-radius:999px;background:#253f64;color:#fff;font-size:11px;font-weight:900;letter-spacing:.08em}
+.final-test-heading h2{margin:10px 0 0;line-height:1.65}
+.final-test-answer-card{margin-top:14px;padding:17px;border:2px solid #c8d9e7;border-radius:17px;background:#fff}
+.final-choice-list{display:grid;gap:11px}
+.marking-choice-heading{text-align:center;padding:12px}
+.marking-choice-heading h2{margin:8px 0}.marking-choice-heading p{color:#597080}
+.marking-choice-icon{font-size:50px}
+.marking-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.marking-choice-card{display:flex;flex-direction:column;align-items:center;gap:7px;min-height:185px;padding:23px;border:3px solid transparent;border-radius:21px;background:#fff;cursor:pointer;font:inherit}
+.marking-choice-card:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(38,72,104,.16)}
+.self-mark-card{border-color:#79bc8c;background:#f2fff5}.teacher-mark-card{border-color:#72a9dd;background:#f2f8ff}
+.marking-card-icon{font-size:44px}.marking-choice-card strong{font-size:20px}.marking-choice-card small{color:#5d7280}
+.self-mark-symbol{width:85px;height:85px;display:grid;place-items:center;margin:8px auto;border:7px solid #e34d4d;border-radius:50%;font-size:57px;font-weight:900;color:#e34d4d;line-height:1}
+.teacher-style-comment{margin:12px 0;padding:13px;border-radius:13px;background:#fff6d6;border:1px solid #ead174}
+.submitted-envelope{font-size:70px}.submitted-answer-preview{margin:14px auto;padding:13px;border-radius:13px;background:#f2f7fb;max-width:420px}
+.submitted-answer-preview small,.submitted-answer-preview strong{display:block}.submitted-answer-preview strong{margin-top:5px;font-size:20px}
+
+.submission-inbox-panel{border-top:5px solid #467fba}
+.submission-inbox-count{display:grid;place-items:center;width:85px;height:85px;border-radius:50%;background:#fff0ec;border:4px solid #e56855}
+.submission-inbox-count strong{font-size:28px;color:#b64336}.submission-inbox-count small{font-size:11px}
+.submission-filter-row{display:flex;gap:8px;margin-bottom:13px}
+.teacher-submission-list{display:grid;gap:11px}
+.teacher-submission-card{display:grid;grid-template-columns:50px 1fr auto;gap:13px;align-items:center;padding:14px;border:1px solid #d6e1e9;border-radius:15px;background:#fff}
+.teacher-submission-card.pending{border-left:6px solid #e25b50;background:#fffdf9}
+.teacher-submission-card.returned{border-left:6px solid #55aa72;background:#f7fcf8}
+.submission-student-avatar{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#e9f3fc;color:#2e668f;font-size:22px;font-weight:900}
+.submission-card-main h3{margin:4px 0}.submission-card-main p{margin:0 0 4px}
+.submission-status{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+.submission-status.pending{background:#ffe5e2;color:#a83e34}.submission-status.returned{background:#e1f6e7;color:#277747}
+
+.teacher-marking-panel{background:#eef3f7}
+.marking-paper{max-width:760px;margin:12px auto;padding:24px;border-radius:20px;background:#fff;box-shadow:0 12px 30px rgba(38,62,82,.12)}
+.marking-paper-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
+.mark-preview{display:grid;place-items:center;width:90px;height:90px;border:6px solid #b7c2ca;border-radius:50%;font-size:58px;color:#8796a1;font-weight:900}
+.mark-preview.○{border-color:#e14f4f;color:#e14f4f}.mark-preview.△{border-color:#e49a2a;color:#e49a2a}.mark-preview.×{border-color:#527ea8;color:#527ea8}
+.marking-question-block,.marking-answer-block{margin:15px 0;padding:15px;border-radius:14px}
+.marking-question-block{background:#f2f7fb}.marking-question-block p{font-size:18px;line-height:1.75}
+.marking-answer-block{background:#fff8d8;border:2px solid #ead272}.marking-answer-block strong{display:block;margin-top:7px;font-size:24px}
+.correct-answer-details{margin:12px 0;padding:12px;border:1px solid #d4e0e8;border-radius:12px}
+.mark-button-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.teacher-mark-btn{display:flex;flex-direction:column;align-items:center;padding:13px;border:3px solid #dae2e8;border-radius:15px;background:#fff;font:inherit;font-size:42px;font-weight:900;cursor:pointer}
+.teacher-mark-btn small{font-size:11px;color:#5f707b}.teacher-mark-btn.selected{transform:translateY(-2px);box-shadow:0 8px 17px rgba(34,60,80,.13)}
+.teacher-mark-btn.circle.selected{border-color:#e14f4f;color:#e14f4f}.teacher-mark-btn.triangle.selected{border-color:#e49a2a;color:#e49a2a}.teacher-mark-btn.retry.selected{border-color:#527ea8;color:#527ea8}
+.teacher-comment-field{display:block;margin:17px 0;font-weight:900}.teacher-comment-field textarea{display:block;width:100%;margin-top:8px;padding:12px;border:2px solid #cad9e5;border-radius:12px;font:inherit;resize:vertical}
+.quick-comment-row{display:flex;gap:8px;flex-wrap:wrap;margin:-8px 0 16px}
+.quick-comment-btn{padding:7px 10px;border:1px solid #c8d8e4;border-radius:999px;background:#f4f8fb;cursor:pointer}
+
+.returned-mark-popup{position:fixed;right:22px;bottom:22px;z-index:1250;width:min(390px,calc(100vw - 28px));display:grid;grid-template-columns:58px 1fr auto;gap:11px;align-items:center;padding:15px 42px 15px 15px;border:2px solid #ebc64c;border-radius:18px;background:#fffdf3;box-shadow:0 18px 45px rgba(45,59,73,.25);animation:mail-arrive .3s ease-out}
+.returned-popup-icon{font-size:42px}.returned-popup-copy small{color:#806b28}.returned-popup-copy h2{margin:3px 0;font-size:18px}.returned-popup-copy p{margin:0;font-size:12px;color:#60707a}
+.returned-popup-close{position:absolute;right:8px;top:7px;border:0;background:transparent;font-size:20px;color:#7a8790;cursor:pointer}
+.returned-mark-dialog{width:min(650px,calc(100vw - 28px))}
+.returned-mark-paper{text-align:center;padding:10px}
+.returned-mark-symbol{display:grid;place-items:center;width:115px;height:115px;margin:5px auto 16px;border:9px solid #e24c4c;border-radius:50%;color:#e24c4c;font-size:73px;font-weight:900;line-height:1;transform:rotate(-8deg)}
+.returned-mark-symbol.△{border-color:#e49a2a;color:#e49a2a}.returned-mark-symbol.×{border-color:#527ea8;color:#527ea8}
+.returned-answer-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;margin:9px 0;padding:12px;border-radius:12px;background:#f3f7fa;text-align:left}
+.returned-answer-row.correct{background:#eff9f1}.returned-answer-row strong{font-size:18px}
+.returned-teacher-comment{display:grid;grid-template-columns:55px 1fr;gap:12px;margin:16px 0;padding:15px;border-radius:15px;background:#fff5cf;text-align:left}
+.teacher-comment-avatar{font-size:38px}.returned-teacher-comment small{color:#7d692f}.returned-teacher-comment p{margin:4px 0 0;line-height:1.75;font-weight:800}
+
+@media(max-width:650px){
+  .marking-choice-grid,.mark-button-grid{grid-template-columns:1fr}
+  .marking-choice-card{min-height:140px}
+  .teacher-submission-card{grid-template-columns:45px 1fr}.teacher-submission-card>button{grid-column:2}
+  .marking-paper{padding:15px}.mark-preview{width:70px;height:70px;font-size:44px}
+  .returned-mark-popup{grid-template-columns:48px 1fr}.returned-mark-popup>button.btn{grid-column:2}
+  .returned-answer-row{grid-template-columns:1fr}
+}

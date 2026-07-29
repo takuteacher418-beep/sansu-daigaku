@@ -20,7 +20,12 @@
   let practiceResults = [];
   let activeAssignmentId = null;
   let popupAssignmentId = null;
+  let activeFinalTest = null;
+  let activeFinalAnswer = "";
+  let pendingPracticeSummary = null;
+  let popupReturnedSubmissionId = null;
   const dismissedAssignmentIds = new Set();
+  const dismissedReturnedSubmissionIds = new Set();
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -57,6 +62,49 @@
     }
     return normalized;
   }
+
+  function buildFallbackFinalTest(problem, fallback = {}) {
+    const sourceProblem = { ...fallback, ...problem };
+    const practices = Array.isArray(sourceProblem.practiceItems) ? sourceProblem.practiceItems : [];
+    const item = practices[practices.length - 1] || {};
+    if (item.type === "cloze") {
+      return {
+        type: "cloze",
+        prompt: `さいごの かくにんテストです。\n${item.prompt || sourceProblem.question || ""}`,
+        clozeText: item.clozeText || "答えは［　］です。",
+        blankChoices: item.blankChoices || [],
+        blankCorrect: item.blankCorrect || "",
+        explanation: item.explanation || sourceProblem.correctExplanation || "",
+        teacherNote: "答えと考え方を見てください。"
+      };
+    }
+    return {
+      type: "choice",
+      prompt: `さいごの かくにんテストです。\n${item.prompt || sourceProblem.question || ""}`,
+      choices: item.choices || [sourceProblem.correctExplanation, ...(sourceProblem.distractors || [])].filter(Boolean),
+      correct: item.correct || sourceProblem.correctExplanation || "",
+      explanation: item.explanation || sourceProblem.correctExplanation || "",
+      teacherNote: "答えと考え方を見てください。"
+    };
+  }
+
+  function normalizeFinalTest(test, problem) {
+    const normalized = { ...buildFallbackFinalTest(problem), ...(test || {}) };
+    normalized.prompt = String(normalized.prompt || "さいごの かくにんテストです。").trim();
+    if (normalized.type === "cloze") {
+      normalized.clozeText = String(normalized.clozeText || "答えは［　］です。");
+      normalized.blankChoices = Array.isArray(normalized.blankChoices) ? normalized.blankChoices.filter(Boolean) : [];
+      if (normalized.blankCorrect && !normalized.blankChoices.includes(normalized.blankCorrect)) {
+        normalized.blankChoices.unshift(normalized.blankCorrect);
+      }
+    } else {
+      normalized.type = "choice";
+      normalized.choices = Array.isArray(normalized.choices) ? normalized.choices.filter(Boolean) : [];
+      if (normalized.correct && !normalized.choices.includes(normalized.correct)) normalized.choices.unshift(normalized.correct);
+    }
+    return normalized;
+  }
+
 
   const FURIGANA_DICTIONARY = [
     ["先生からの課題","せんせいからのかだい"],["問題を選んで挑戦しよう","もんだいをえらんでちょうせんしよう"],
@@ -156,7 +204,7 @@
 
     accessibilityApplying = true;
     [$("#studentHomeView"),$("#problemView"),$("#practiceView"),$("#profileView"),
-     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
+     $("#assignmentMailPopup"),$("#assignmentInboxDialog"),$("#returnedMarkPopup"),$("#returnedMarkDialog"),$("#avatarDialog"),$(".topbar")].filter(Boolean).forEach((root) => {
       if (!rubyEnabled) {
         unwrapGeneratedRuby(root);
         return;
@@ -200,6 +248,7 @@
           return [...clone(DEFAULT_APP_DATA.problems), ...customProblems];
         })()
       };
+      merged.submissions = Array.isArray(parsed.submissions) ? parsed.submissions : [];
       merged.students = merged.students.map((student) => ({
         ...student,
         history: Array.isArray(student.history) ? student.history : [],
@@ -227,7 +276,8 @@
           clozeText: sourceProblem.clozeText || fallback.clozeText || "",
           practiceKind: sourceProblem.practiceKind || fallback.practiceKind || "manual",
           practiceItems: sourceProblem.practiceItems || fallback.practiceItems || [],
-          smallSteps: sourceProblem.smallSteps || fallback.smallSteps || []
+          smallSteps: sourceProblem.smallSteps || fallback.smallSteps || [],
+          finalTest: sourceProblem.finalTest || fallback.finalTest || buildFallbackFinalTest(sourceProblem, fallback)
         };
         normalized.clozeText = normalizeClozeText(normalized);
         normalized.practiceItems = (normalized.practiceItems || []).map((item) => normalizePracticeItem(item, normalized));
@@ -437,6 +487,7 @@
     }).join("") || '<p class="muted">まだ記録がありません。</p>';
 
     renderStudentAssignments();
+    renderReturnedMarkNotification();
   }
 
 
@@ -539,6 +590,74 @@
   }
   $("#laterAssignmentBtn").addEventListener("click", dismissCurrentAssignmentPopup);
   $("#closeAssignmentMailBtn").addEventListener("click", dismissCurrentAssignmentPopup);
+
+
+  function returnedSubmissionsForCurrentStudent() {
+    const student = currentStudent();
+    if (!student || !Array.isArray(appData.submissions)) return [];
+    return appData.submissions
+      .filter((submission) => submission.studentId === student.id && submission.status === "returned")
+      .sort((a, b) => new Date(b.returnedAt || b.reviewedAt) - new Date(a.returnedAt || a.reviewedAt));
+  }
+
+  function renderReturnedMarkNotification() {
+    const unread = returnedSubmissionsForCurrentStudent().find((submission) =>
+      !submission.studentViewedAt && !dismissedReturnedSubmissionIds.has(submission.id)
+    );
+    if (!unread) {
+      $("#returnedMarkPopup").classList.add("hidden");
+      popupReturnedSubmissionId = null;
+      return;
+    }
+    const problem = appData.problems.find((item) => item.id === unread.problemId);
+    popupReturnedSubmissionId = unread.id;
+    $("#returnedMarkPopupTitle").textContent = `${problem?.title || "テスト"}の丸つけが とどきました！`;
+    $("#returnedMarkPopupMessage").textContent = unread.comment || "先生からコメントが届いています。";
+    $("#returnedMarkPopup").classList.remove("hidden");
+    scheduleAccessibility();
+  }
+
+  function openReturnedMark(submissionId) {
+    const submission = appData.submissions.find((item) => item.id === submissionId);
+    if (!submission) return;
+    const problem = appData.problems.find((item) => item.id === submission.problemId);
+    submission.studentViewedAt = new Date().toISOString();
+    saveData();
+    $("#returnedMarkPopup").classList.add("hidden");
+    $("#returnedMarkContent").innerHTML = `
+      <article class="returned-mark-paper">
+        <div class="returned-mark-symbol ${submission.mark}">${escapeHtml(submission.mark || "○")}</div>
+        <p class="eyebrow">${escapeHtml(problem?.unit || "かくにんテスト")}</p>
+        <h2>${escapeHtml(problem?.title || "先生からのおへんじ")}</h2>
+        <div class="returned-answer-row">
+          <span>あなたの答え</span>
+          <strong>${escapeHtml(submission.answer)}</strong>
+        </div>
+        <div class="returned-answer-row correct">
+          <span>正しい答え</span>
+          <strong>${escapeHtml(submission.correctAnswer)}</strong>
+        </div>
+        <div class="returned-teacher-comment">
+          <div class="teacher-comment-avatar">👩‍🏫</div>
+          <div><small>先生から</small><p>${escapeHtml(submission.comment).replace(/\n/g, "<br>")}</p></div>
+        </div>
+        <button id="closeReturnedFromContentBtn" class="btn primary large full" type="button">わかりました</button>
+      </article>`;
+    $("#returnedMarkDialog").showModal();
+    $("#closeReturnedFromContentBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
+    popupReturnedSubmissionId = null;
+    scheduleAccessibility();
+  }
+
+  $("#openReturnedMarkBtn").addEventListener("click", () => {
+    if (popupReturnedSubmissionId) openReturnedMark(popupReturnedSubmissionId);
+  });
+  $("#closeReturnedMarkPopupBtn").addEventListener("click", () => {
+    if (popupReturnedSubmissionId) dismissedReturnedSubmissionIds.add(popupReturnedSubmissionId);
+    $("#returnedMarkPopup").classList.add("hidden");
+    popupReturnedSubmissionId = null;
+  });
+  $("#closeReturnedMarkDialogBtn").addEventListener("click", () => $("#returnedMarkDialog").close());
 
   function renderUnitFilter() {
     const gradeValue = $("#gradeFilter").value;
@@ -1063,6 +1182,9 @@
     practiceItems = buildPracticeItems(activeProblem).slice(0,3);
     practiceIndex = 0;
     practiceResults = [];
+    activeFinalTest = null;
+    activeFinalAnswer = "";
+    pendingPracticeSummary = null;
     supportUsage.explanationSeconds = explanationSeconds;
     supportUsage.explanationAnswer = explanationAnswer;
     showPage("practiceView");
@@ -1107,6 +1229,14 @@
   });
 
   $("#checkPracticeBtn").addEventListener("click", () => {
+    if (activeFinalTest && $("#practiceCounter").textContent === "さいごのテスト") {
+      if (!activeFinalAnswer) {
+        showToast("答えを選んでください");
+        return;
+      }
+      renderMarkingChoice();
+      return;
+    }
     const item = practiceItems[practiceIndex];
     const answer = item.type === "choice" ? document.querySelector('input[name="practiceChoice"]:checked')?.value : $("#practiceClozeAnswer")?.value;
     if (!answer) { showToast("答えを選んでください"); return; }
@@ -1120,27 +1250,205 @@
     });
   });
 
+
   function finishPracticeSession() {
     const correctCount = practiceResults.filter(Boolean).length;
     const score = Math.round(correctCount / practiceItems.length * 100);
+    pendingPracticeSummary = {
+      correctCount,
+      score,
+      practiceTotal: practiceItems.length
+    };
+    renderFinalTest();
+  }
+
+  function renderFinalTest() {
+    activeFinalTest = normalizeFinalTest(activeProblem.finalTest, activeProblem);
+    activeFinalAnswer = "";
+    $("#practiceCounter").textContent = "さいごのテスト";
+    $("#practiceProgressFill").style.width = "100%";
+    $("#practiceDots").innerHTML = `
+      ${practiceItems.map((_, i) => `<span class="practice-dot good">${i + 1}</span>`).join("")}
+      <span class="practice-dot current">テスト</span>`;
+    $("#practiceProfessor").innerHTML = `
+      <div class="final-test-emblem">📝</div>
+      <div><small>FINAL CHECK</small><strong>さいごは、自分の力でやってみよう。</strong></div>`;
+    $("#practiceQuestion").innerHTML = `
+      <div class="final-test-heading">
+        <span>さいごの かくにんテスト</span>
+        <h2>${escapeHtml(activeFinalTest.prompt).replace(/\n/g, "<br>")}</h2>
+      </div>`;
+    $("#practiceExplanationKey").classList.add("hidden");
+    $("#togglePracticeKeyBtn").classList.add("hidden");
+    $("#practiceFeedback").classList.add("hidden");
+    $("#checkPracticeBtn").classList.remove("hidden");
+    $("#checkPracticeBtn").textContent = "答えを決める";
+
+    if (activeFinalTest.type === "cloze") {
+      const clozeHtml = String(activeFinalTest.clozeText)
+        .split("<br>").map((part) => escapeHtml(part)).join("<br>")
+        .replace("［　］", '<span id="finalTestBlank" class="cloze-blank">ここを選ぶ</span>');
+      $("#practiceAnswerArea").innerHTML = `
+        <div class="final-test-answer-card">
+          <p class="cloze-full-text">${clozeHtml}</p>
+          <div class="cloze-options">
+            ${activeFinalTest.blankChoices.map((value) =>
+              `<button class="final-test-option cloze-option" data-value="${escapeHtml(value)}" type="button">${escapeHtml(value)}</button>`
+            ).join("")}
+          </div>
+          <input id="finalTestAnswer" type="hidden">
+        </div>`;
+      $$(".final-test-option").forEach((button) => button.addEventListener("click", () => {
+        $$(".final-test-option").forEach((item) => item.classList.toggle("selected", item === button));
+        activeFinalAnswer = button.dataset.value;
+        $("#finalTestAnswer").value = activeFinalAnswer;
+        $("#finalTestBlank").textContent = activeFinalAnswer;
+      }));
+    } else {
+      $("#practiceAnswerArea").innerHTML = `
+        <div class="final-test-answer-card final-choice-list">
+          ${activeFinalTest.choices.map((choice) =>
+            `<label class="choice explanation-choice">
+              <input type="radio" name="finalTestChoice" value="${escapeHtml(choice)}">
+              <span>${escapeHtml(choice)}</span>
+            </label>`
+          ).join("")}
+        </div>`;
+      $$('input[name="finalTestChoice"]').forEach((input) => input.addEventListener("change", () => {
+        activeFinalAnswer = input.value;
+      }));
+    }
+    scheduleAccessibility();
+  }
+
+  function renderMarkingChoice() {
+    $("#practiceQuestion").innerHTML = `
+      <div class="marking-choice-heading">
+        <div class="marking-choice-icon">📮</div>
+        <h2>だれが 丸つけを しますか？</h2>
+        <p>自分ですぐに たしかめることも、先生に見てもらうこともできます。</p>
+      </div>`;
+    $("#practiceAnswerArea").innerHTML = `
+      <div class="marking-choice-grid">
+        <button id="selfMarkBtn" class="marking-choice-card self-mark-card" type="button">
+          <span class="marking-card-icon">✅</span>
+          <strong>丸つけをする</strong>
+          <small>今すぐ答えをたしかめます</small>
+        </button>
+        <button id="teacherMarkBtn" class="marking-choice-card teacher-mark-card" type="button">
+          <span class="marking-card-icon">📨</span>
+          <strong>先生に丸つけをしてもらう</strong>
+          <small>先生の提出箱へ送ります</small>
+        </button>
+      </div>`;
+    $("#checkPracticeBtn").classList.add("hidden");
+    $("#practiceFeedback").classList.add("hidden");
+    $("#selfMarkBtn").addEventListener("click", completeWithSelfMark);
+    $("#teacherMarkBtn").addEventListener("click", submitForTeacherMark);
+    scheduleAccessibility();
+  }
+
+  function correctAnswerForFinalTest(test) {
+    return test.type === "cloze" ? test.blankCorrect : test.correct;
+  }
+
+  function recordCompletedLearning(extra = {}) {
+    const summary = pendingPracticeSummary || {
+      correctCount: practiceResults.filter(Boolean).length,
+      score: Math.round(practiceResults.filter(Boolean).length / Math.max(1, practiceItems.length) * 100),
+      practiceTotal: practiceItems.length
+    };
     const student = currentStudent();
-    const gain = correctCount * 10 + 10;
-    student.history.push({problemId:activeProblem.id,score,answerMode,supports:{...supportUsage,answerMode},practiceCorrect:correctCount,practiceTotal:practiceItems.length,route:supportUsage.route||learningRoute,hintCount,elapsedSeconds:Math.round((Date.now()-problemStartedAt)/1000),assignmentId:activeAssignmentId,date:new Date().toISOString()});
+    const gain = summary.correctCount * 10 + 10;
+    student.history.push({
+      problemId: activeProblem.id,
+      score: summary.score,
+      answerMode,
+      supports: {...supportUsage, answerMode},
+      practiceCorrect: summary.correctCount,
+      practiceTotal: summary.practiceTotal,
+      finalTestAnswer: activeFinalAnswer,
+      finalTestMarking: extra.finalTestMarking || "self",
+      submissionId: extra.submissionId || null,
+      route: supportUsage.route || learningRoute,
+      hintCount,
+      elapsedSeconds: Math.round((Date.now() - problemStartedAt) / 1000),
+      assignmentId: activeAssignmentId,
+      date: new Date().toISOString()
+    });
     if (activeAssignmentId) {
       const assignment = (student.assignments || []).find((item) => item.id === activeAssignmentId);
       if (assignment) {
         assignment.status = "completed";
         assignment.completedAt = new Date().toISOString();
-        assignment.score = score;
+        assignment.score = summary.score;
       }
     }
-    student.xp += gain; student.points += Math.ceil(gain/2); saveData();
-    const professor=professorForProblem(activeProblem);
-    $("#practiceQuestion").innerHTML=`<div class="practice-result"><img src="${professor.image}" alt="${professor.name}"><h2>確認問題 ${correctCount} / ${practiceItems.length} 問正解</h2><p>${correctCount===3?'説明を理解し、使うことができました！':'正しい説明を見ながら、もう一度挑戦できます。'}</p></div>`;
-    $("#practiceAnswerArea").innerHTML=`<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
-    $("#checkPracticeBtn").classList.add("hidden"); $("#practiceFeedback").classList.add("hidden");
-    $("#practiceHomeBtn").addEventListener("click",renderStudentHome);
+    student.xp += gain;
+    student.points += Math.ceil(gain / 2);
+    saveData();
+    return summary;
   }
+
+  function completeWithSelfMark() {
+    const correctAnswer = correctAnswerForFinalTest(activeFinalTest);
+    const correct = activeFinalAnswer === correctAnswer;
+    const summary = recordCompletedLearning({ finalTestMarking: "self" });
+    const professor = professorForProblem(activeProblem);
+    $("#practiceQuestion").innerHTML = `
+      <div class="practice-result final-self-result">
+        <img src="${professor.image}" alt="${professor.name}">
+        <div class="self-mark-symbol">${correct ? "○" : "△"}</div>
+        <h2>${correct ? "正解です！" : "答えをたしかめました"}</h2>
+        <p><strong>あなたの答え：</strong>${escapeHtml(activeFinalAnswer)}</p>
+        <p><strong>正しい答え：</strong>${escapeHtml(correctAnswer)}</p>
+        <div class="teacher-style-comment">${escapeHtml(activeFinalTest.explanation || activeProblem.correctExplanation)}</div>
+        <small>確認問題は ${summary.correctCount} / ${summary.practiceTotal} 問正解でした。</small>
+      </div>`;
+    $("#practiceAnswerArea").innerHTML = `<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
+    $("#practiceHomeBtn").addEventListener("click", renderStudentHome);
+    scheduleAccessibility();
+  }
+
+  function submitForTeacherMark() {
+    if (!Array.isArray(appData.submissions)) appData.submissions = [];
+    const student = currentStudent();
+    const submission = {
+      id: `submission_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      studentId: student.id,
+      problemId: activeProblem.id,
+      question: activeFinalTest.prompt,
+      answerType: activeFinalTest.type,
+      answer: activeFinalAnswer,
+      correctAnswer: correctAnswerForFinalTest(activeFinalTest),
+      teacherNote: activeFinalTest.teacherNote || "",
+      status: "pending",
+      submittedAt: new Date().toISOString(),
+      reviewedAt: null,
+      returnedAt: null,
+      mark: null,
+      comment: "",
+      studentViewedAt: null
+    };
+    appData.submissions.push(submission);
+    recordCompletedLearning({ finalTestMarking: "teacher", submissionId: submission.id });
+    saveData();
+
+    $("#practiceQuestion").innerHTML = `
+      <div class="practice-result submitted-result">
+        <div class="submitted-envelope">📨</div>
+        <h2>先生に おくりました！</h2>
+        <p>先生が丸つけをしたら、ホーム画面におへんじが届きます。</p>
+        <div class="submitted-answer-preview">
+          <small>あなたの答え</small>
+          <strong>${escapeHtml(activeFinalAnswer)}</strong>
+        </div>
+      </div>`;
+    $("#practiceAnswerArea").innerHTML = `<button id="practiceHomeBtn" class="btn primary large full" type="button">キャンパスへ戻る</button>`;
+    $("#practiceHomeBtn").addEventListener("click", renderStudentHome);
+    scheduleAccessibility();
+  }
+
 
   $("#leavePracticeBtn").addEventListener("click",renderStudentHome);
 
@@ -1223,10 +1531,12 @@
 
   function renderTeacherView(viewName) {
     showPage("teacherView");
+    updateSubmissionBadge();
     if (viewName === "dashboard") renderTeacherDashboard();
     if (viewName === "students") renderTeacherStudents();
     if (viewName === "problems") renderTeacherProblems();
     if (viewName === "assignments") renderTeacherAssignments();
+    if (viewName === "submissions") renderTeacherSubmissions();
     if (viewName === "results") renderTeacherResults();
   }
 
@@ -1235,6 +1545,7 @@
     const average = results.length ? Math.round(results.reduce((sum, item) => sum + item.score, 0) / results.length) : 0;
     const assignments = allAssignmentRows();
     const pendingAssignments = assignments.filter((assignment) => assignment.status !== "completed").length;
+    const pendingSubmissions = allSubmissionRows().filter((submission) => submission.status === "pending").length;
     $("#teacherContent").innerHTML = `
       <section class="teacher-metrics">
         <div class="metric"><span>登録児童</span><strong>${appData.students.length}</strong></div>
@@ -1242,9 +1553,10 @@
         <div class="metric"><span>平均点</span><strong>${average}</strong></div>
         <div class="metric"><span>登録問題</span><strong>${appData.problems.length}</strong></div>
         <div class="metric"><span>未完了課題</span><strong>${pendingAssignments}</strong></div>
+        <div class="metric"><span>丸つけ待ち</span><strong>${pendingSubmissions}</strong></div>
       </section>
       <section class="panel" style="margin-top:12px">
-        <h2>Version 11.9.2</h2>
+        <h2>Version 12.0</h2>
         <p>個別の児童へ問題を配信し、児童画面ではメールのような小さな通知として受け取れるようになりました。</p>
         <p class="notice">現在のチェック項目は仮項目です。正式なLDIR項目を受け取った後、項目と判定ロジックを反映できます。</p>
       </section>`;
@@ -1397,6 +1709,186 @@
       renderTeacherAssignments();
       showToast("課題を取り消しました");
     }));
+  }
+
+
+  function allSubmissionRows() {
+    if (!Array.isArray(appData.submissions)) appData.submissions = [];
+    return appData.submissions.map((submission) => {
+      const student = appData.students.find((item) => item.id === submission.studentId);
+      const problem = appData.problems.find((item) => item.id === submission.problemId);
+      return {
+        ...submission,
+        studentName: student?.name || "削除された児童",
+        studentGrade: student?.grade || "",
+        problemTitle: problem?.title || "削除された問題",
+        problemUnit: problem?.unit || ""
+      };
+    }).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  }
+
+  function updateSubmissionBadge() {
+    const pending = allSubmissionRows().filter((item) => item.status === "pending").length;
+    const badge = $("#submissionTabBadge");
+    if (!badge) return;
+    badge.textContent = pending;
+    badge.classList.toggle("hidden", pending === 0);
+  }
+
+  function submissionStatusLabel(status) {
+    if (status === "returned") return "返却済み";
+    if (status === "reviewed") return "確認済み";
+    return "未確認";
+  }
+
+  function renderTeacherSubmissions() {
+    const rows = allSubmissionRows();
+    const pendingCount = rows.filter((item) => item.status === "pending").length;
+    $("#teacherContent").innerHTML = `
+      <section class="panel submission-inbox-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">SUBMISSION BOX</p>
+            <h2>提出箱</h2>
+            <p class="muted">児童から「丸つけをしてほしい」と届いたテストです。</p>
+          </div>
+          <div class="submission-inbox-count"><strong>${pendingCount}</strong><small>未確認</small></div>
+        </div>
+        <div class="submission-filter-row">
+          <button class="btn soft submission-filter active" data-filter="all" type="button">すべて</button>
+          <button class="btn ghost submission-filter" data-filter="pending" type="button">未確認</button>
+          <button class="btn ghost submission-filter" data-filter="returned" type="button">返却済み</button>
+        </div>
+        <div id="teacherSubmissionList" class="teacher-submission-list"></div>
+      </section>`;
+
+    function drawList(filter = "all") {
+      const filtered = filter === "all" ? rows : rows.filter((item) => item.status === filter);
+      $("#teacherSubmissionList").innerHTML = filtered.length ? filtered.map((submission) => `
+        <article class="teacher-submission-card ${submission.status}">
+          <div class="submission-student-avatar">${escapeHtml((submission.studentName || "?").slice(0,1))}</div>
+          <div class="submission-card-main">
+            <div class="row">
+              <span class="tag">${escapeHtml(submission.studentGrade)}年</span>
+              <span class="submission-status ${submission.status}">${submissionStatusLabel(submission.status)}</span>
+            </div>
+            <h3>${escapeHtml(submission.studentName)}さん</h3>
+            <p><strong>${escapeHtml(submission.problemTitle)}</strong>｜${escapeHtml(submission.problemUnit)}</p>
+            <small>${new Date(submission.submittedAt).toLocaleString("ja-JP")}</small>
+          </div>
+          <button class="btn ${submission.status === "pending" ? "primary" : "soft"} open-submission-btn" data-id="${submission.id}" type="button">
+            ${submission.status === "pending" ? "丸つけする" : "内容を見る"}
+          </button>
+        </article>`).join("") : '<p class="notice">この条件の提出はありません。</p>';
+      $$(".open-submission-btn").forEach((button) =>
+        button.addEventListener("click", () => openTeacherSubmission(button.dataset.id))
+      );
+    }
+
+    $$(".submission-filter").forEach((button) => button.addEventListener("click", () => {
+      $$(".submission-filter").forEach((item) => {
+        item.classList.toggle("active", item === button);
+        item.classList.toggle("soft", item === button);
+        item.classList.toggle("ghost", item !== button);
+      });
+      drawList(button.dataset.filter);
+    }));
+    drawList();
+    updateSubmissionBadge();
+  }
+
+  function openTeacherSubmission(submissionId) {
+    const submission = appData.submissions.find((item) => item.id === submissionId);
+    if (!submission) return;
+    const student = appData.students.find((item) => item.id === submission.studentId);
+    const problem = appData.problems.find((item) => item.id === submission.problemId);
+
+    $("#teacherContent").innerHTML = `
+      <section class="panel teacher-marking-panel">
+        <button id="backToSubmissionListBtn" class="btn ghost" type="button">← 提出箱へ戻る</button>
+        <div class="marking-paper">
+          <div class="marking-paper-head">
+            <div>
+              <p class="eyebrow">FINAL TEST</p>
+              <h2>${escapeHtml(student?.name || "児童")}さんの かくにんテスト</h2>
+              <span class="tag">${escapeHtml(problem?.grade || "")}年｜${escapeHtml(problem?.unit || "")}</span>
+            </div>
+            <div id="markPreview" class="mark-preview ${submission.mark || ""}">${submission.mark || "？"}</div>
+          </div>
+
+          <div class="marking-question-block">
+            <small>問題</small>
+            <p>${escapeHtml(submission.question).replace(/\n/g, "<br>")}</p>
+          </div>
+          <div class="marking-answer-block">
+            <small>児童の答え</small>
+            <strong>${escapeHtml(submission.answer)}</strong>
+          </div>
+          <details class="correct-answer-details">
+            <summary>正しい答えを確認する</summary>
+            <p>${escapeHtml(submission.correctAnswer)}</p>
+            ${submission.teacherNote ? `<small>${escapeHtml(submission.teacherNote)}</small>` : ""}
+          </details>
+
+          <div class="teacher-mark-controls">
+            <h3>丸つけ</h3>
+            <div class="mark-button-grid">
+              <button class="teacher-mark-btn circle ${submission.mark === "○" ? "selected" : ""}" data-mark="○" type="button">○<small>よくできました</small></button>
+              <button class="teacher-mark-btn triangle ${submission.mark === "△" ? "selected" : ""}" data-mark="△" type="button">△<small>もう少し</small></button>
+              <button class="teacher-mark-btn retry ${submission.mark === "×" ? "selected" : ""}" data-mark="×" type="button">×<small>もう一度考えよう</small></button>
+            </div>
+          </div>
+
+          <label class="teacher-comment-field">
+            先生からのコメント
+            <textarea id="teacherSubmissionComment" rows="4" maxlength="300" placeholder="できたことを具体的にほめましょう。">${escapeHtml(submission.comment || "")}</textarea>
+          </label>
+          <div class="quick-comment-row">
+            <button class="quick-comment-btn" data-comment="よく考えて答えられました！" type="button">よく考えたね</button>
+            <button class="quick-comment-btn" data-comment="学習したことを使って答えられました！" type="button">学習を使えたね</button>
+            <button class="quick-comment-btn" data-comment="もう一度問題をゆっくり読むと、もっとよくなります。" type="button">もう一歩</button>
+          </div>
+          <button id="returnSubmissionBtn" class="btn primary large full" type="button">
+            ${submission.status === "returned" ? "内容を更新して返却する" : "児童に返却する"}
+          </button>
+        </div>
+      </section>`;
+
+    let selectedMark = submission.mark || "";
+    $$(".teacher-mark-btn").forEach((button) => button.addEventListener("click", () => {
+      selectedMark = button.dataset.mark;
+      $$(".teacher-mark-btn").forEach((item) => item.classList.toggle("selected", item === button));
+      $("#markPreview").textContent = selectedMark;
+      $("#markPreview").className = `mark-preview ${selectedMark}`;
+    }));
+    $$(".quick-comment-btn").forEach((button) => button.addEventListener("click", () => {
+      const field = $("#teacherSubmissionComment");
+      field.value = field.value.trim()
+        ? `${field.value.trim()}\n${button.dataset.comment}`
+        : button.dataset.comment;
+    }));
+    $("#backToSubmissionListBtn").addEventListener("click", renderTeacherSubmissions);
+    $("#returnSubmissionBtn").addEventListener("click", () => {
+      const comment = $("#teacherSubmissionComment").value.trim();
+      if (!selectedMark) {
+        showToast("○・△・×のどれかを選んでください");
+        return;
+      }
+      if (!comment) {
+        showToast("先生からのコメントを入力してください");
+        return;
+      }
+      submission.mark = selectedMark;
+      submission.comment = comment;
+      submission.status = "returned";
+      submission.reviewedAt = new Date().toISOString();
+      submission.returnedAt = new Date().toISOString();
+      submission.studentViewedAt = null;
+      saveData();
+      updateSubmissionBadge();
+      renderTeacherSubmissions();
+      showToast(`${student?.name || "児童"}さんに返却しました`);
+    });
   }
 
   function renderTeacherResults() {

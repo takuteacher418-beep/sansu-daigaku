@@ -252,6 +252,9 @@
         <button class="teacher-tab" data-view="students" type="button">児童・LDIR</button>
         <button class="teacher-tab" data-view="problems" type="button">問題管理</button>
         <button class="teacher-tab" data-view="assignments" type="button">個別課題</button>
+        <button class="teacher-tab teacher-submission-tab" data-view="submissions" type="button">
+          提出箱 <span id="submissionTabBadge" class="teacher-tab-badge hidden">0</span>
+        </button>
         <button class="teacher-tab" data-view="results" type="button">結果・支援分析</button>
       </nav>
       <section id="teacherContent"></section>
@@ -286,6 +289,26 @@
     <div id="assignmentInboxList" class="assignment-inbox-list"></div>
   </dialog>
 
+
+
+  <section id="returnedMarkPopup" class="returned-mark-popup hidden" aria-live="polite">
+    <div class="returned-popup-icon">💮</div>
+    <div class="returned-popup-copy">
+      <small>先生から おへんじが とどきました</small>
+      <h2 id="returnedMarkPopupTitle">丸つけが とどきました！</h2>
+      <p id="returnedMarkPopupMessage">先生のコメントを見てみましょう。</p>
+    </div>
+    <button id="openReturnedMarkBtn" class="btn gold" type="button">見る</button>
+    <button id="closeReturnedMarkPopupBtn" class="returned-popup-close" type="button" aria-label="あとで見る">×</button>
+  </section>
+
+  <dialog id="returnedMarkDialog" class="modal returned-mark-dialog">
+    <div class="section-head">
+      <div><p class="eyebrow">TEACHER FEEDBACK</p><h2>先生からの丸つけ</h2></div>
+      <button id="closeReturnedMarkDialogBtn" class="btn ghost" type="button">×</button>
+    </div>
+    <div id="returnedMarkContent"></div>
+  </dialog>
 
   <dialog id="avatarDialog" class="modal avatar-dialog">
     <div class="section-head">

@@ -124,7 +124,19 @@ const DEFAULT_APP_DATA = {
         "correct": "9本",
         "explanation": "5＋4＝9です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n赤い花が5本、白い花が4本あります。全部で何本ですか。",
+      "choices": [
+        "9本",
+        "1本",
+        "20本"
+      ],
+      "correct": "9本",
+      "explanation": "5＋4＝9です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g1_02",
@@ -191,7 +203,19 @@ const DEFAULT_APP_DATA = {
         "correct": "3人",
         "explanation": "7－4＝3です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n7人と4人では、何人ちがいますか。",
+      "choices": [
+        "3人",
+        "11人",
+        "4人"
+      ],
+      "correct": "3人",
+      "explanation": "7－4＝3です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g1_03",
@@ -258,7 +282,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "0",
         "explanation": "同じ数を全部引くと0です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n式を［　］に入る答えをえらびましょう。",
+      "clozeText": "6－6＝［　］",
+      "blankChoices": [
+        "0",
+        "6",
+        "12"
+      ],
+      "blankCorrect": "0",
+      "explanation": "同じ数を全部引くと0です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_04",
@@ -325,7 +362,19 @@ const DEFAULT_APP_DATA = {
         "correct": "4こ",
         "explanation": "47は40と7なので、10のまとまりは4こです。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n47は、10のまとまりがいくつありますか。",
+      "choices": [
+        "4こ",
+        "7こ",
+        "47こ"
+      ],
+      "correct": "4こ",
+      "explanation": "47は40と7なので、10のまとまりは4こです。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g1_05",
@@ -392,7 +441,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "4人",
         "explanation": "端から順に4人目を見ます。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n左から4番目をあらわします。",
+      "clozeText": "左の端から［　］数えます。",
+      "blankChoices": [
+        "4人",
+        "3人",
+        "5人"
+      ],
+      "blankCorrect": "4人",
+      "explanation": "端から順に4人目を見ます。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_06",
@@ -459,7 +521,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "端",
         "explanation": "端をそろえてくらべます。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n長さをくらべます。",
+      "clozeText": "片方の［　］をそろえます。",
+      "blankChoices": [
+        "端",
+        "色",
+        "太さ"
+      ],
+      "blankCorrect": "端",
+      "explanation": "端をそろえてくらべます。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_07",
@@ -526,7 +601,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "同じコップ",
         "explanation": "同じコップを使います。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nかさをくらべます。",
+      "clozeText": "［　］が何杯分かを調べます。",
+      "blankChoices": [
+        "同じコップ",
+        "違うコップ",
+        "大きい箱"
+      ],
+      "blankCorrect": "同じコップ",
+      "explanation": "同じコップを使います。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_08",
@@ -593,7 +681,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "6",
         "explanation": "30分は長い針が6です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n2時30分です。",
+      "clozeText": "短い針は2と3の間、長い針は［　］を指します。",
+      "blankChoices": [
+        "6",
+        "3",
+        "12"
+      ],
+      "blankCorrect": "6",
+      "explanation": "30分は長い針が6です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_09",
@@ -660,7 +761,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "3",
         "explanation": "三角形の辺は3本です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n形の名前をこたえます。",
+      "clozeText": "辺が［　］本ある形を三角形といいます。",
+      "blankChoices": [
+        "3",
+        "4",
+        "0"
+      ],
+      "blankCorrect": "3",
+      "explanation": "三角形の辺は3本です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g1_10",
@@ -727,7 +841,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "大きい",
         "explanation": "右に進むほど数は大きくなります。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n数をくらべます。",
+      "clozeText": "数直線で右にある数ほど［　］です。",
+      "blankChoices": [
+        "大きい",
+        "小さい",
+        "同じ"
+      ],
+      "blankCorrect": "大きい",
+      "explanation": "右に進むほど数は大きくなります。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g2_01",
@@ -794,7 +921,19 @@ const DEFAULT_APP_DATA = {
         "correct": "6",
         "explanation": "608の6は百の位です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n608の百の位の数字は何ですか。",
+      "choices": [
+        "6",
+        "0",
+        "8"
+      ],
+      "correct": "6",
+      "explanation": "608の6は百の位です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_02",
@@ -861,7 +1000,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "そろえ",
         "explanation": "同じ位をそろえます。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nひっ算のしかたです。",
+      "clozeText": "一の位、十の位を縦に［　］ます。",
+      "blankChoices": [
+        "そろえ",
+        "入れかえ",
+        "離し"
+      ],
+      "blankCorrect": "そろえ",
+      "explanation": "同じ位をそろえます。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g2_03",
@@ -928,7 +1080,19 @@ const DEFAULT_APP_DATA = {
         "correct": "34",
         "explanation": "10－6＝4、6－3＝3です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n70－36はいくつですか。",
+      "choices": [
+        "34",
+        "44",
+        "106"
+      ],
+      "correct": "34",
+      "explanation": "10－6＝4、6－3＝3です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_04",
@@ -995,7 +1159,19 @@ const DEFAULT_APP_DATA = {
         "correct": "2＋2＋2＋2＋2＋2",
         "explanation": "2が6つ分です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n2×6をたし算で表したものはどれですか。",
+      "choices": [
+        "2＋2＋2＋2＋2＋2",
+        "2＋6",
+        "6－2"
+      ],
+      "correct": "2＋2＋2＋2＋2＋2",
+      "explanation": "2が6つ分です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_05",
@@ -1062,7 +1238,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "45",
         "explanation": "九五45です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n九九を［　］に入る答えをえらびましょう。",
+      "clozeText": "9×5＝［　］",
+      "blankChoices": [
+        "45",
+        "14",
+        "40"
+      ],
+      "blankCorrect": "45",
+      "explanation": "九五45です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g2_06",
@@ -1129,7 +1318,19 @@ const DEFAULT_APP_DATA = {
         "correct": "999",
         "explanation": "1000－1＝999です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n1000より1小さい数は何ですか。",
+      "choices": [
+        "999",
+        "1001",
+        "990"
+      ],
+      "correct": "999",
+      "explanation": "1000－1＝999です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_07",
@@ -1196,7 +1397,19 @@ const DEFAULT_APP_DATA = {
         "correct": "m",
         "explanation": "教室は長いのでmが適しています。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n教室の横の長さをあらわすのによい単位はどれですか。",
+      "choices": [
+        "m",
+        "cm",
+        "mL"
+      ],
+      "correct": "m",
+      "explanation": "教室は長いのでmが適しています。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_08",
@@ -1263,7 +1476,19 @@ const DEFAULT_APP_DATA = {
         "correct": "L",
         "explanation": "かさはLなどであらわします。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n牛乳パックのかさをあらわすのによい単位はどれですか。",
+      "choices": [
+        "L",
+        "m",
+        "cm"
+      ],
+      "correct": "L",
+      "explanation": "かさはLなどであらわします。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g2_09",
@@ -1330,7 +1555,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "時間",
         "explanation": "時間を表しています。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n合う言葉をえらびます。",
+      "clozeText": "始まりから終わりまでの長さを［　］といいます。",
+      "blankChoices": [
+        "時間",
+        "時刻",
+        "長さ"
+      ],
+      "blankCorrect": "時間",
+      "explanation": "時間を表しています。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g2_10",
@@ -1397,7 +1635,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "4",
         "explanation": "正方形の4つの角は直角です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n形のとくちょうです。",
+      "clozeText": "正方形には直角が［　］こあります。",
+      "blankChoices": [
+        "4",
+        "3",
+        "2"
+      ],
+      "blankCorrect": "4",
+      "explanation": "正方形の4つの角は直角です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g3_01",
@@ -1464,7 +1715,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "3",
         "explanation": "6が3つ分で18です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n式を［　］に入る答えをえらびましょう。",
+      "clozeText": "18÷6＝［　］",
+      "blankChoices": [
+        "3",
+        "12",
+        "108"
+      ],
+      "blankCorrect": "3",
+      "explanation": "6が3つ分で18です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g3_02",
@@ -1531,7 +1795,19 @@ const DEFAULT_APP_DATA = {
         "correct": "14÷4＝3あまり2",
         "explanation": "あまりは4より小さい2です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nこの中で正しい答えはどれですか。",
+      "choices": [
+        "14÷4＝3あまり2",
+        "14÷4＝2あまり6",
+        "14÷4＝4あまり2"
+      ],
+      "correct": "14÷4＝3あまり2",
+      "explanation": "あまりは4より小さい2です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_03",
@@ -1598,7 +1874,19 @@ const DEFAULT_APP_DATA = {
         "correct": "420",
         "explanation": "100×4＋5×4＝420です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n105×4はいくつですか。",
+      "choices": [
+        "420",
+        "109",
+        "405"
+      ],
+      "correct": "420",
+      "explanation": "100×4＋5×4＝420です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_04",
@@ -1665,7 +1953,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "8分の5",
         "explanation": "8分の5です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n分数を完成させます。",
+      "clozeText": "1を8等分した5つ分は［　］",
+      "blankChoices": [
+        "8分の5",
+        "5分の8",
+        "8"
+      ],
+      "blankCorrect": "8分の5",
+      "explanation": "8分の5です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g3_05",
@@ -1732,7 +2033,19 @@ const DEFAULT_APP_DATA = {
         "correct": "2.5",
         "explanation": "一の位は同じで、十分の位5の方が大きいです。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n2.5と2.3ではどちらが大きいですか。",
+      "choices": [
+        "2.5",
+        "2.3",
+        "同じ"
+      ],
+      "correct": "2.5",
+      "explanation": "一の位は同じで、十分の位5の方が大きいです。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_06",
@@ -1799,7 +2112,19 @@ const DEFAULT_APP_DATA = {
         "correct": "kg",
         "explanation": "重さなのでkgが適しています。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nランドセルの重さをあらわすのによい単位はどれですか。",
+      "choices": [
+        "kg",
+        "m",
+        "L"
+      ],
+      "correct": "kg",
+      "explanation": "重さなのでkgが適しています。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_07",
@@ -1866,7 +2191,19 @@ const DEFAULT_APP_DATA = {
         "correct": "5cm",
         "explanation": "直径の半分が半径です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n直径が10cmの円の半径は何cmですか。",
+      "choices": [
+        "5cm",
+        "20cm",
+        "10cm"
+      ],
+      "correct": "5cm",
+      "explanation": "直径の半分が半径です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_08",
@@ -1933,7 +2270,19 @@ const DEFAULT_APP_DATA = {
         "correct": "3",
         "explanation": "10－7＝3です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nAが10、Bが7のとき、AはBよりいくつ多いですか。",
+      "choices": [
+        "3",
+        "17",
+        "7"
+      ],
+      "correct": "3",
+      "explanation": "10－7＝3です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g3_09",
@@ -2000,7 +2349,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "何倍",
         "explanation": "割り算で何倍かを出します。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n倍を出します。",
+      "clozeText": "くらべる量÷もとにする量＝［　］",
+      "blankChoices": [
+        "何倍",
+        "合計",
+        "差"
+      ],
+      "blankCorrect": "何倍",
+      "explanation": "割り算で何倍かを出します。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g3_10",
@@ -2067,7 +2429,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "同じ",
         "explanation": "等号は等しいことをあらわします。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n等号の意味です。",
+      "clozeText": "＝の左右は数が［　］です。",
+      "blankChoices": [
+        "同じ",
+        "必ず違う",
+        "0"
+      ],
+      "blankCorrect": "同じ",
+      "explanation": "等号は等しいことをあらわします。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_01",
@@ -2134,7 +2509,19 @@ const DEFAULT_APP_DATA = {
         "correct": "10000",
         "explanation": "1兆＝10000億です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n1兆は1億がいくつ集まった数ですか。",
+      "choices": [
+        "10000",
+        "100",
+        "10"
+      ],
+      "correct": "10000",
+      "explanation": "1兆＝10000億です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g4_02",
@@ -2201,7 +2588,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "5000",
         "explanation": "百の位8なので切り上げます。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n四捨五入します。",
+      "clozeText": "4850を千の位までの概数にすると［　］",
+      "blankChoices": [
+        "5000",
+        "4000",
+        "4800"
+      ],
+      "blankCorrect": "5000",
+      "explanation": "百の位8なので切り上げます。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_03",
@@ -2268,7 +2668,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "ひく",
         "explanation": "かけた数を引きます。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n筆算の手順です。",
+      "clozeText": "たてる、かける、［　］、おろす",
+      "blankChoices": [
+        "ひく",
+        "たす",
+        "わる"
+      ],
+      "blankCorrect": "ひく",
+      "explanation": "かけた数を引きます。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_04",
@@ -2335,7 +2748,19 @@ const DEFAULT_APP_DATA = {
         "correct": "1.35",
         "explanation": "0.75＋0.60＝1.35です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n0.75＋0.6はいくつですか。",
+      "choices": [
+        "1.35",
+        "0.81",
+        "13.5"
+      ],
+      "correct": "1.35",
+      "explanation": "0.75＋0.60＝1.35です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g4_05",
@@ -2402,7 +2827,19 @@ const DEFAULT_APP_DATA = {
         "correct": "8分の7",
         "explanation": "分母は8のままです。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n8分の3＋8分の4はいくつですか。",
+      "choices": [
+        "8分の7",
+        "16分の7",
+        "8分の1"
+      ],
+      "correct": "8分の7",
+      "explanation": "分母は8のままです。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g4_06",
@@ -2469,7 +2906,19 @@ const DEFAULT_APP_DATA = {
         "correct": "たて×横",
         "explanation": "たて×横です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n長方形の面積を求める式はどれですか。",
+      "choices": [
+        "たて×横",
+        "たて＋横",
+        "たて×2＋横×2"
+      ],
+      "correct": "たて×横",
+      "explanation": "たて×横です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g4_07",
@@ -2536,7 +2985,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "360",
         "explanation": "1回転は360度です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n角度を答えます。",
+      "clozeText": "1回転の角は［　］度",
+      "blankChoices": [
+        "360",
+        "180",
+        "90"
+      ],
+      "blankCorrect": "360",
+      "explanation": "1回転は360度です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_08",
@@ -2603,7 +3065,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "平行",
         "explanation": "平行です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n言葉を完成させます。",
+      "clozeText": "どこまでのばしても交わらない2直線を［　］といいます。",
+      "blankChoices": [
+        "平行",
+        "垂直",
+        "直角"
+      ],
+      "blankCorrect": "平行",
+      "explanation": "平行です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_09",
@@ -2670,7 +3145,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "変わらずに",
         "explanation": "水平なら変化しません。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\nグラフを読みます。",
+      "clozeText": "線が水平なら数は［　］います。",
+      "blankChoices": [
+        "変わらずに",
+        "増えて",
+        "減って"
+      ],
+      "blankCorrect": "変わらずに",
+      "explanation": "水平なら変化しません。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g4_10",
@@ -2737,7 +3225,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "正方形6枚",
         "explanation": "正方形6枚です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n立方体のとくちょうです。",
+      "clozeText": "立方体は合同な［　］で囲まれています。",
+      "blankChoices": [
+        "正方形6枚",
+        "長方形4枚",
+        "三角形8枚"
+      ],
+      "blankCorrect": "正方形6枚",
+      "explanation": "正方形6枚です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g5_01",
@@ -2804,7 +3305,19 @@ const DEFAULT_APP_DATA = {
         "correct": "15ページ",
         "explanation": "45÷3＝15ページです。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n12ページ、18ページ、15ページの1日平均は何ページですか。",
+      "choices": [
+        "15ページ",
+        "45ページ",
+        "3ページ"
+      ],
+      "correct": "15ページ",
+      "explanation": "45÷3＝15ページです。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_02",
@@ -2871,7 +3384,19 @@ const DEFAULT_APP_DATA = {
         "correct": "12m",
         "explanation": "60÷5＝12です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n5回の記録の合計が60mです。平均は何mですか。",
+      "choices": [
+        "12m",
+        "55m",
+        "300m"
+      ],
+      "correct": "12m",
+      "explanation": "60÷5＝12です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_03",
@@ -2938,7 +3463,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "15",
         "explanation": "120÷8＝15です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n1あたりを出します。",
+      "clozeText": "8Lで120km進む車は、1Lあたり［　］kmです。",
+      "blankChoices": [
+        "15",
+        "112",
+        "960"
+      ],
+      "blankCorrect": "15",
+      "explanation": "120÷8＝15です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g5_04",
@@ -3005,7 +3543,19 @@ const DEFAULT_APP_DATA = {
         "correct": "5m",
         "explanation": "300÷60＝5です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n300mを60秒で走る速さは秒速何mですか。",
+      "choices": [
+        "5m",
+        "360m",
+        "18000m"
+      ],
+      "correct": "5m",
+      "explanation": "300÷60＝5です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_05",
@@ -3072,7 +3622,19 @@ const DEFAULT_APP_DATA = {
         "correct": "0.4",
         "explanation": "20÷50＝0.4です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n50人中20人の割合はいくつですか。",
+      "choices": [
+        "0.4",
+        "2.5",
+        "30"
+      ],
+      "correct": "0.4",
+      "explanation": "20÷50＝0.4です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_06",
@@ -3139,7 +3701,19 @@ const DEFAULT_APP_DATA = {
         "correct": "0.25",
         "explanation": "25÷100＝0.25です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n25％を小数であらわすとどれですか。",
+      "choices": [
+        "0.25",
+        "2.5",
+        "25"
+      ],
+      "correct": "0.25",
+      "explanation": "25÷100＝0.25です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_07",
@@ -3206,7 +3780,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "0.12",
         "explanation": "4×3＝12で小数2桁です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n計算します。",
+      "clozeText": "0.4×0.3＝［　］",
+      "blankChoices": [
+        "0.12",
+        "1.2",
+        "12"
+      ],
+      "blankCorrect": "0.12",
+      "explanation": "4×3＝12で小数2桁です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g5_08",
@@ -3273,7 +3860,19 @@ const DEFAULT_APP_DATA = {
         "correct": "6分の5",
         "explanation": "3分の2＝6分の4です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n3分の2＋6分の1はいくつですか。",
+      "choices": [
+        "6分の5",
+        "9分の3",
+        "6分の3"
+      ],
+      "correct": "6分の5",
+      "explanation": "3分の2＝6分の4です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_09",
@@ -3340,7 +3939,19 @@ const DEFAULT_APP_DATA = {
         "correct": "12立方m",
         "explanation": "2×3×2＝12です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n縦2m、横3m、高さ2mの体積は何立方mですか。",
+      "choices": [
+        "12立方m",
+        "7立方m",
+        "6立方m"
+      ],
+      "correct": "12立方m",
+      "explanation": "2×3×2＝12です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g5_10",
@@ -3407,7 +4018,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "大きさ",
         "explanation": "大きさも同じです。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n合同の意味です。",
+      "clozeText": "合同な図形は、形と［　］が同じです。",
+      "blankChoices": [
+        "大きさ",
+        "色",
+        "向きだけ"
+      ],
+      "blankCorrect": "大きさ",
+      "explanation": "大きさも同じです。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g6_01",
@@ -3474,7 +4098,19 @@ const DEFAULT_APP_DATA = {
         "correct": "2分の1",
         "explanation": "20分の10を約分して2分の1です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n5分の2×4分の5はいくつですか。",
+      "choices": [
+        "2分の1",
+        "20分の10",
+        "1"
+      ],
+      "correct": "2分の1",
+      "explanation": "20分の10を約分して2分の1です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_02",
@@ -3541,7 +4177,19 @@ const DEFAULT_APP_DATA = {
         "correct": "10分の3",
         "explanation": "5分の3×2分の1＝10分の3です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n5分の3÷2はいくつですか。",
+      "choices": [
+        "10分の3",
+        "5分の6",
+        "5分の1"
+      ],
+      "correct": "10分の3",
+      "explanation": "5分の3×2分の1＝10分の3です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_03",
@@ -3608,7 +4256,19 @@ const DEFAULT_APP_DATA = {
         "correct": "2対5",
         "explanation": "4対10を2で割ると2対5です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n4対10と等しい比はどれですか。",
+      "choices": [
+        "2対5",
+        "4対5",
+        "8対10"
+      ],
+      "correct": "2対5",
+      "explanation": "4対10を2で割ると2対5です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_04",
@@ -3675,7 +4335,19 @@ const DEFAULT_APP_DATA = {
         "correct": "4倍",
         "explanation": "比例では同じ倍率です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n比例しているとき、xが4倍になるとyはどうなりますか。",
+      "choices": [
+        "4倍",
+        "半分",
+        "変わらない"
+      ],
+      "correct": "4倍",
+      "explanation": "比例では同じ倍率です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_05",
@@ -3742,7 +4414,19 @@ const DEFAULT_APP_DATA = {
         "correct": "8cm",
         "explanation": "3×8＝24です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n面積24平方cmの長方形で横を3cmにすると縦は何cmですか。",
+      "choices": [
+        "8cm",
+        "21cm",
+        "72cm"
+      ],
+      "correct": "8cm",
+      "explanation": "3×8＝24です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_06",
@@ -3809,7 +4493,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "ぴったり",
         "explanation": "線対称の定義です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n線対称の意味です。",
+      "clozeText": "対称の軸で折ると両側が［　］重なります。",
+      "blankChoices": [
+        "ぴったり",
+        "少しだけ",
+        "重ならず"
+      ],
+      "blankCorrect": "ぴったり",
+      "explanation": "線対称の定義です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   },
   {
     "id": "g6_07",
@@ -3876,7 +4573,19 @@ const DEFAULT_APP_DATA = {
         "correct": "線分の中点",
         "explanation": "中心が対応点を結ぶ線分の中点です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n点対称な図形で、対応する点と中心を結ぶと中心はどこにありますか。",
+      "choices": [
+        "線分の中点",
+        "端",
+        "図形の外だけ"
+      ],
+      "correct": "線分の中点",
+      "explanation": "中心が対応点を結ぶ線分の中点です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_08",
@@ -3943,7 +4652,19 @@ const DEFAULT_APP_DATA = {
         "correct": "5cm",
         "explanation": "半径は直径の半分です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n直径10cmの円の半径は何cmですか。",
+      "choices": [
+        "5cm",
+        "10cm",
+        "20cm"
+      ],
+      "correct": "5cm",
+      "explanation": "半径は直径の半分です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_09",
@@ -4010,7 +4731,19 @@ const DEFAULT_APP_DATA = {
         "correct": "120立方cm",
         "explanation": "15×8＝120です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "choice",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n三角柱の底面積が15平方cm、高さ8cmです。体積は何立方cmですか。",
+      "choices": [
+        "120立方cm",
+        "23立方cm",
+        "60立方cm"
+      ],
+      "correct": "120立方cm",
+      "explanation": "15×8＝120です。",
+      "teacherNote": "答えだけでなく、問題に合う考え方ができているかを見てください。"
+    }
   },
   {
     "id": "g6_10",
@@ -4077,7 +4810,20 @@ const DEFAULT_APP_DATA = {
         "blankCorrect": "4",
         "explanation": "合計12÷3＝4です。"
       }
-    ]
+    ],
+    "finalTest": {
+      "type": "cloze",
+      "prompt": "さいごの かくにんテストです。自分の力で こたえましょう。\n平均値を出します。",
+      "clozeText": "2、4、6の平均値は［　］",
+      "blankChoices": [
+        "4",
+        "12",
+        "3"
+      ],
+      "blankCorrect": "4",
+      "explanation": "合計12÷3＝4です。",
+      "teacherNote": "答えと、問題に合う計算が選べているかを見てください。"
+    }
   }
 ]
 };
